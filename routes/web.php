@@ -2,6 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
+use App\Livewire\Admin\EventDetail;
+use App\Livewire\Pages\Admin\Dashboard;
+use App\Livewire\Pages\Admin\EventManagement;
 
 Route::view('/', 'welcome');
 
@@ -29,7 +32,11 @@ Route::middleware('auth')->group(function () {
 
 
     //admin
-    Volt::route('/dashboard-admin', 'pages.admin.dashboard')->name('admin.dashboard');
+    Route::get('/dashboard-admin', Dashboard::class)->name('admin.dashboard');
+    Route::get('/admin/moderasi-event', EventManagement::class)->name('admin.event.master');
+
+    // Rute detail event admin
+    Route::get('/admin/moderasi-event/detail/{id}', EventDetail::class)->name('admin.event.detail');
 });
 
 

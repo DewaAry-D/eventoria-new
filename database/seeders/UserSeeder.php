@@ -16,8 +16,8 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         // Ambil ID relasi yang dibutuhkan
-        $idFmipa = Fakultas::where('nama_fakultas', 'Fakultas Matematika dan Ilmu Pengetahuan Alam')->first()->id;
-        $idInformatika = Prodi::where('nama_prodi', 'Informatika')->first()->id;
+        $idFmipa = Fakultas::query()->where('nama_fakultas', 'Fakultas Matematika dan Ilmu Pengetahuan Alam')->first()->id;
+        $idInformatika = Prodi::query()->where('nama_prodi', 'Informatika')->first()->id;
 
         // 1. Akun Admin DPM (DPM FMIPA)
         $admin = User::firstOrCreate(
