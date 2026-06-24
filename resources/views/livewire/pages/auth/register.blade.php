@@ -6,7 +6,7 @@ use App\Models\OrganisasiMahasiswa;
 use App\Models\Fakultas;
 use App\Models\Prodi;
 use App\Enums\UserRole;
-use App\Enums\OrganisasiStatus;
+// use App\Enums\OrganisasiStatus;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -18,282 +18,416 @@ use Livewire\WithFileUploads;
 
 new #[Layout('layouts.guest')] class extends Component
 {
-    use WithFileUploads; // Wajib ditambahkan untuk memproses upload file
+    use WithFileUploads;
 
-    public string $jenis_akun = 'mahasiswa';
+    // Properti Global
+    public string $role = '';
+    public bool $syarat_ketentuan = false;
 
-    public string $email = '';
-    public string $password = '';
-    public string $password_confirmation = '';
-
-    // Field Mahasiswa
-    public string $nama = '';
+    // Properti Mahasiswa
+    public string $nama_mahasiswa = '';
     public string $nim = '';
+    public $prodi_id_mahasiswa = '';
+    public string $email_mahasiswa = '';
+    public string $password_mahasiswa = '';
 
-    // Field Organisasi Dasar
+    // Properti Organisasi
     public string $nama_organisasi = '';
     public string $no_organisasi = '';
+    public string $email_organisasi = '';
+    public string $password_organisasi = '';
     public string $tingkat_organisasi = '';
-    public $fakultas_id = '';
-    public $prodi_id = '';
-
-    // Field Organisasi Wajib Baru
+    public $fakultas_id_organisasi = '';
+    public $prodi_id_organisasi = '';
+    public string $ig_url = '';
+    public string $linkedin_url = '';
     public string $deskripsi = '';
     public string $visi = '';
     public string $misi = '';
+    
+    // File Uploads
+    public $logo_url;
     public $ad_art;
     public $sk;
 
     public function with(): array
     {
         return [
-            'daftar_fakultas' => Fakultas::all(),
-            'semua_prodi' => Prodi::with('fakultas')->get(),
-            'prodi_terfilter' => $this->fakultas_id ? Prodi::where('fakultas_id', $this->fakultas_id)->get() : [],
+            'daftar_fakultas' => Fakultas::all(), 
+            'daftar_prodi' => Prodi::all(), 
         ];
     }
 
-    public function register(): void
+    public function register()
     {
-        $rules = [
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-            'password' => ['required', 'string', 'confirmed', Rules\Password::defaults()],
-        ];
+        $this->validate([
+            'role' => ['required', 'in:mahasiswa,organisasi'],
+            'syarat_ketentuan' => ['accepted']
+        ]);
 
-        if ($this->jenis_akun === 'mahasiswa') {
-            $rules['nama'] = ['required', 'string', 'max:255'];
-            $rules['nim'] = ['required', 'string', 'max:50', 'unique:mahasiswa,nim'];
-            $rules['prodi_id'] = ['required', 'exists:prodi,id'];
+        if ($this->role === 'mahasiswa') {
+            $this->validate([
+                'nama_mahasiswa' => ['required', 'string', 'max:255'],
+                'nim' => ['required', 'string', 'max:50', 'unique:mahasiswa,nim'],
+                'prodi_id_mahasiswa' => ['required', 'integer'],
+                'email_mahasiswa' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users,email'],
+                'password_mahasiswa' => ['required', Rules\Password::defaults()],
+            ]);
         } else {
-            // Validasi data organisasi
-            $rules['nama_organisasi'] = ['required', 'string', 'max:255'];
-            $rules['no_organisasi'] = ['required', 'string', 'max:50']; // Sekarang wajib (required) sesuai DB
-            $rules['tingkat_organisasi'] = ['required', 'in:prodi,fakultas,universitas'];
-            $rules['deskripsi'] = ['required', 'string'];
-            $rules['visi'] = ['required', 'string'];
-            $rules['misi'] = ['required', 'string'];
-            $rules['ad_art'] = ['required', 'file', 'mimes:pdf', 'max:5120']; // Wajib PDF, max 5MB
-            $rules['sk'] = ['required', 'file', 'mimes:pdf', 'max:5120']; // Wajib PDF, max 5MB
-
-            if (in_array($this->tingkat_organisasi, ['prodi', 'fakultas'])) {
-                $rules['fakultas_id'] = ['required', 'exists:fakultas,id'];
-            }
-            if ($this->tingkat_organisasi === 'prodi') {
-                $rules['prodi_id'] = ['required', 'exists:prodi,id'];
-            }
+            $this->validate([
+                'nama_organisasi' => ['required', 'string', 'max:255'],
+                'no_organisasi' => ['required', 'string', 'max:255'],
+                'email_organisasi' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users,email'],
+                'password_organisasi' => ['required', Rules\Password::defaults()],
+                'tingkat_organisasi' => ['required', 'string'],
+                'fakultas_id_organisasi' => ['nullable', 'integer'],
+                'prodi_id_organisasi' => ['nullable', 'integer'],
+                'ig_url' => ['nullable', 'string', 'max:255'],
+                'linkedin_url' => ['nullable', 'string', 'max:255'],
+                'deskripsi' => ['required', 'string'],
+                'visi' => ['required', 'string'],
+                'misi' => ['required', 'string'],
+                'logo_url' => ['nullable', 'image', 'mimes:jpeg,png,jpg', 'max:2048'],
+                'ad_art' => ['nullable', 'file', 'mimes:pdf', 'max:5120'],
+                'sk' => ['nullable', 'file', 'mimes:pdf', 'max:5120'],
+            ]);
         }
 
-        $validated = $this->validate($rules);
-
         $user = DB::transaction(function () {
-            $user = User::create([
-                'email' => $this->email,
-                'password' => Hash::make($this->password),
-                'role' => $this->jenis_akun === 'mahasiswa' ? UserRole::MAHASISWA : UserRole::ORGANISASI,
-            ]);
+            
+            if ($this->role === 'mahasiswa') {
+                $user = User::create([
+                    'name' => $this->nama_mahasiswa,
+                    'email' => $this->email_mahasiswa,
+                    'password' => Hash::make($this->password_mahasiswa),
+                    'role' => 'mahasiswa', 
+                ]);
 
-            $user->assignRole($user->role->value);
-
-            if ($this->jenis_akun === 'mahasiswa') {
                 Mahasiswa::create([
                     'user_id' => $user->id,
-                    'prodi_id' => $this->prodi_id,
-                    'nama' => $this->nama,
+                    'nama' => $this->nama_mahasiswa,
                     'nim' => $this->nim,
+                    'prodi_id' => $this->prodi_id_mahasiswa,
                 ]);
+
             } else {
-                // Simpan file dokumen yang diunggah
-                $pathAdArt = $this->ad_art->store('dokumen', 'public');
-                $pathSk = $this->sk->store('dokumen', 'public');
+                $user = User::create([
+                    'name' => $this->nama_organisasi,
+                    'email' => $this->email_organisasi,
+                    'password' => Hash::make($this->password_organisasi),
+                    'role' => 'organisasi', 
+                ]);
+
+                $logoPath = $this->logo_url ? $this->logo_url->store('organisasi_files/logos', 'public') : null;
+                $adArtPath = $this->ad_art ? $this->ad_art->store('organisasi_files/dokumen', 'public') : null;
+                $skPath = $this->sk ? $this->sk->store('organisasi_files/dokumen', 'public') : null;
 
                 OrganisasiMahasiswa::create([
                     'user_id' => $user->id,
                     'nama_organisasi' => $this->nama_organisasi,
                     'no_organisasi' => $this->no_organisasi,
+                    'ig_url' => $this->ig_url,
+                    'linkedin_url' => $this->linkedin_url,
+                    'status' => 'pending', 
                     'tingkat_organisasi' => $this->tingkat_organisasi,
-                    'fakultas_id' => in_array($this->tingkat_organisasi, ['prodi', 'fakultas']) ? $this->fakultas_id : null,
-                    'prodi_id' => $this->tingkat_organisasi === 'prodi' ? $this->prodi_id : null,
-                    'status' => OrganisasiStatus::PENDING,
+                    'fakultas_id' => $this->fakultas_id_organisasi ?: null,
+                    'prodi_id' => $this->prodi_id_organisasi ?: null,
+                    'logo_url' => $logoPath,
                     'deskripsi' => $this->deskripsi,
                     'visi' => $this->visi,
                     'misi' => $this->misi,
-                    'ad_art' => $pathAdArt,
-                    'sk' => $pathSk,
+                    'ad_art' => $adArtPath,
+                    'sk' => $skPath,
                 ]);
             }
-
-            event(new Registered($user));
-            Auth::login($user);
 
             return $user;
         });
 
-        if ($user->role === 'mahasiswa') {
-            $this->redirect(route('mahasiswa.dashboard', absolute: false), navigate: true);
-        } elseif ($user->role === 'organisasi') {
-            $this->redirect(route('organisasi.dashboard', absolute: false), navigate: true);
+        event(new Registered($user));
+        Auth::login($user);
+
+        if ($this->role === 'mahasiswa') {
+            return $this->redirect(route('mahasiswa.dashboard', absolute: false), navigate: true);
         } else {
-            $this->redirect(route('dashboard', absolute: false), navigate: true);
+            return $this->redirect(route('organisasi.dashboard', absolute: false), navigate: true);
         }
     }
 }; ?>
 
-<div>
-    <form wire:submit="register">
+<div x-data="{ role: @entangle('role'), showPass: false, tingkat: @entangle('tingkat_organisasi') }" class="min-h-screen flex flex-col bg-surface-container-lowest">
+    
+    <header class="w-full border-b-[3px] border-primary py-5 bg-surface-container-lowest text-center shadow-sm">
+        <a href="/" wire:navigate class="inline-flex items-center gap-2 text-2xl font-extrabold text-primary tracking-tight">
+            <i class="fa-solid fa-graduation-cap"></i> Eventoria
+        </a>
+    </header>
+
+    <main class="flex-grow w-full max-w-5xl mx-auto px-6 py-10">
         
-        <div class="mb-6 bg-gray-50 p-4 rounded-lg border border-gray-200">
-            <x-input-label value="Mendaftar Sebagai:" class="mb-2 text-gray-700" />
-            <div class="flex items-center space-x-6">
-                <label class="flex items-center cursor-pointer">
-                    <input type="radio" wire:model.live="jenis_akun" value="mahasiswa" class="text-indigo-600 border-gray-300 focus:ring-indigo-500">
-                    <span class="ml-2 text-sm text-gray-700 font-medium">Mahasiswa</span>
-                </label>
-                <label class="flex items-center cursor-pointer">
-                    <input type="radio" wire:model.live="jenis_akun" value="organisasi" class="text-indigo-600 border-gray-300 focus:ring-indigo-500">
-                    <span class="ml-2 text-sm text-gray-700 font-medium">Organisasi Kampus</span>
-                </label>
+        <div x-show="role === ''" x-transition.opacity.duration.500ms class="text-center py-10">
+            <h1 class="text-headline-lg font-extrabold text-primary mb-3">Pilih Jenis Akun</h1>
+            <p class="text-on-surface-variant text-body-lg mb-10 max-w-lg mx-auto">Silakan pilih jenis akun yang ingin Anda daftarkan untuk bergabung dengan ekosistem Eventoria.</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+                <div @click="role = 'mahasiswa'" class="group cursor-pointer rounded-xl border-2 border-outline-variant bg-surface-container-lowest p-8 hover:border-primary hover:shadow-card transition-all text-center">
+                    <div class="w-16 h-16 mx-auto bg-primary-fixed text-primary rounded-full flex items-center justify-center text-2xl mb-4 group-hover:bg-primary group-hover:text-on-primary transition-colors">
+                        <i class="fa-solid fa-user-graduate"></i>
+                    </div>
+                    <h3 class="text-title-lg font-bold text-primary mb-2">Mahasiswa</h3>
+                    <p class="text-sm text-on-surface-variant">Daftar untuk mencari, mendaftar, dan mengikuti berbagai event kampus.</p>
+                </div>
+
+                <div @click="role = 'organisasi'" class="group cursor-pointer rounded-xl border-2 border-outline-variant bg-surface-container-lowest p-8 hover:border-primary hover:shadow-card transition-all text-center">
+                    <div class="w-16 h-16 mx-auto bg-primary-fixed text-primary rounded-full flex items-center justify-center text-2xl mb-4 group-hover:bg-primary group-hover:text-on-primary transition-colors">
+                        <i class="fa-solid fa-users-gear"></i>
+                    </div>
+                    <h3 class="text-title-lg font-bold text-primary mb-2">Organisasi</h3>
+                    <p class="text-sm text-on-surface-variant">Daftar untuk membuat, mengelola, dan mempublikasikan event kampus Anda.</p>
+                </div>
             </div>
         </div>
 
-        @if($jenis_akun === 'mahasiswa')
-            <div>
-                <x-input-label for="nama" value="Nama Lengkap" />
-                <x-text-input wire:model="nama" id="nama" class="block mt-1 w-full" type="text" required autofocus />
-                <x-input-error :messages="$errors->get('nama')" class="mt-2" />
+        <div x-show="role !== ''" style="display: none;" x-transition.opacity.duration.500ms>
+            
+            <button @click="role = ''" type="button" class="text-sm font-semibold text-outline hover:text-primary mb-6 flex items-center gap-2 transition-colors">
+                <i class="fa-solid fa-arrow-left"></i> Kembali pilih peran
+            </button>
+
+            <div class="text-center mb-8 border-b border-outline-variant pb-8">
+                <h1 class="text-headline-md font-extrabold text-primary mb-2">
+                    <span x-show="role === 'organisasi'">Registrasi Organisasi</span>
+                    <span x-show="role === 'mahasiswa'">Registrasi Mahasiswa</span>
+                </h1>
+                <p class="text-sm text-on-surface-variant">
+                    <span x-show="role === 'organisasi'">Bergabunglah dengan ekosistem akademik Eventoria untuk mengelola kegiatan kampus Anda.</span>
+                    <span x-show="role === 'mahasiswa'">Lengkapi data diri Anda untuk mulai mengeksplorasi kegiatan kampus.</span>
+                </p>
             </div>
 
-            <div class="mt-4">
-                <x-input-label for="nim" value="NIM" />
-                <x-text-input wire:model="nim" id="nim" class="block mt-1 w-full" type="text" required />
-                <x-input-error :messages="$errors->get('nim')" class="mt-2" />
-            </div>
+            <form wire:submit="register">
+                            
+                <div x-show="role === 'organisasi'" class="bg-[#e8f0fe] border border-[#d2e3fc] rounded-lg p-4 mb-8 flex gap-3 text-[13.5px] text-[#1967d2]">
+                    <i class="fa-solid fa-circle-info mt-0.5"></i>
+                    <p>Akun organisasi akan diperiksa dan menunggu persetujuan Admin Kampus. Lengkapi seluruh dokumen legalitas (AD/ART & SK) untuk mempercepat proses verifikasi.</p>
+                </div>
 
-            <div class="mt-4">
-                <x-input-label for="prodi_id" value="Program Studi" />
-                <select wire:model="prodi_id" id="prodi_id" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 rounded-md shadow-sm" required>
-                    <option value="">-- Pilih Program Studi --</option>
-                    @foreach($semua_prodi as $prodi)
-                        <option value="{{ $prodi->id }}">{{ $prodi->nama_prodi }} ({{ $prodi->fakultas->nama_fakultas }})</option>
-                    @endforeach
-                </select>
-                <x-input-error :messages="$errors->get('prodi_id')" class="mt-2" />
-            </div>
-        @endif
-
-        @if($jenis_akun === 'organisasi')
-            <div>
-                <x-input-label for="nama_organisasi" value="Nama Organisasi" />
-                <x-text-input wire:model="nama_organisasi" id="nama_organisasi" class="block mt-1 w-full" type="text" required autofocus />
-                <x-input-error :messages="$errors->get('nama_organisasi')" class="mt-2" />
-            </div>
-
-            <div class="mt-4">
-                <x-input-label for="no_organisasi" value="Nomor Organisasi / Kontak" />
-                <x-text-input wire:model="no_organisasi" id="no_organisasi" class="block mt-1 w-full" type="text" required />
-                <x-input-error :messages="$errors->get('no_organisasi')" class="mt-2" />
-            </div>
-
-            <div class="mt-4 p-4 border rounded-md bg-white shadow-sm">
-                <x-input-label for="tingkat_organisasi" value="Tingkat Organisasi" />
-                <select wire:model.live="tingkat_organisasi" id="tingkat_organisasi" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 rounded-md shadow-sm" required>
-                    <option value="">-- Pilih Tingkatan --</option>
-                    <option value="universitas">Tingkat Universitas</option>
-                    <option value="fakultas">Tingkat Fakultas</option>
-                    <option value="prodi">Tingkat Program Studi (Prodi)</option>
-                </select>
-                <x-input-error :messages="$errors->get('tingkat_organisasi')" class="mt-2" />
-
-                @if(in_array($tingkat_organisasi, ['fakultas', 'prodi']))
-                    <div class="mt-4">
-                        <x-input-label for="fakultas_id" value="Pilih Fakultas" />
-                        <select wire:model.live="fakultas_id" id="fakultas_id" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 rounded-md shadow-sm" required>
-                            <option value="">-- Pilih Fakultas --</option>
-                            @foreach($daftar_fakultas as $fakultas)
-                                <option value="{{ $fakultas->id }}">{{ $fakultas->nama_fakultas }}</option>
-                            @endforeach
-                        </select>
-                        <x-input-error :messages="$errors->get('fakultas_id')" class="mt-2" />
+                {{-- ========================================== --}}
+                {{-- BLOK MAHASISWA                             --}}
+                {{-- ========================================== --}}
+                <div x-show="role === 'mahasiswa'" class="flex flex-col gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-[13px] font-bold text-on-surface mb-1.5">Nama Lengkap</label>
+                            <input wire:model="nama_mahasiswa" type="text" placeholder="Masukkan nama lengkap Anda" :required="role === 'mahasiswa'"
+                                class="w-full text-[14px] rounded-md border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary py-2.5 px-3 transition-colors shadow-sm" />
+                        </div>
+                        <div>
+                            <label class="block text-[13px] font-bold text-on-surface mb-1.5">NIM (Nomor Induk Mahasiswa)</label>
+                            <input wire:model="nim" type="text" placeholder="Contoh: 2105551000" :required="role === 'mahasiswa'"
+                                class="w-full text-[14px] rounded-md border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary py-2.5 px-3 transition-colors shadow-sm" />
+                        </div>
+                        <div>
+                            <label class="block text-[13px] font-bold text-on-surface mb-1.5">Program Studi</label>
+                            <select wire:model="prodi_id_mahasiswa" :required="role === 'mahasiswa'" class="w-full text-[14px] rounded-md border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary py-2.5 px-3 transition-colors shadow-sm bg-transparent">
+                                <option value="" disabled selected>Pilih Program Studi</option>
+                                @foreach($daftar_prodi as $item)
+                                    <option value="{{ $item->id }}">{{ $item->nama_prodi }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[13px] font-bold text-on-surface mb-1.5">Email Kampus</label>
+                            <input wire:model="email_mahasiswa" type="email" placeholder="mahasiswa@student.univ.ac.id" :required="role === 'mahasiswa'"
+                                class="w-full text-[14px] rounded-md border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary py-2.5 px-3 transition-colors shadow-sm" />
+                        </div>
+                        <div>
+                            <label class="block text-[13px] font-bold text-on-surface mb-1.5">Kata Sandi</label>
+                            <div class="relative">
+                                <input wire:model="password_mahasiswa" :type="showPass ? 'text' : 'password'" placeholder="••••••••" :required="role === 'mahasiswa'"
+                                    class="w-full text-[14px] rounded-md border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary py-2.5 px-3 pr-10 transition-colors shadow-sm" />
+                                <i @click="showPass = !showPass" :class="showPass ? 'fa-eye-slash' : 'fa-eye'" class="fa-regular absolute right-3.5 top-1/2 -translate-y-1/2 cursor-pointer text-outline hover:text-primary"></i>
+                            </div>
+                        </div>
                     </div>
-                @endif
+                </div>
 
-                @if($tingkat_organisasi === 'prodi' && $fakultas_id)
-                    <div class="mt-4">
-                        <x-input-label for="prodi_id" value="Pilih Program Studi" />
-                        <select wire:model="prodi_id" id="prodi_id" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 rounded-md shadow-sm" required>
-                            <option value="">-- Pilih Prodi --</option>
-                            @foreach($prodi_terfilter as $prodi)
-                                <option value="{{ $prodi->id }}">{{ $prodi->nama_prodi }}</option>
-                            @endforeach
-                        </select>
-                        <x-input-error :messages="$errors->get('prodi_id')" class="mt-2" />
+                {{-- ========================================== --}}
+                {{-- BLOK ORGANISASI                            --}}
+                {{-- ========================================== --}}
+                <div x-show="role === 'organisasi'" class="flex flex-col gap-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-[13px] font-bold text-on-surface mb-1.5">Nama Organisasi</label>
+                            <input wire:model="nama_organisasi" type="text" placeholder="Contoh: BEM Fakultas Teknik" :required="role === 'organisasi'"
+                                class="w-full text-[14px] rounded-md border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary py-2.5 px-3 transition-colors shadow-sm" />
+                        </div>
+                        <div>
+                            <label class="block text-[13px] font-bold text-on-surface mb-1.5">Nomor Organisasi</label>
+                            <input wire:model="no_organisasi" type="text" placeholder="Contoh: 08123456789" :required="role === 'organisasi'"
+                                class="w-full text-[14px] rounded-md border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary py-2.5 px-3 transition-colors shadow-sm" />
+                        </div>
+                        <div>
+                            <label class="block text-[13px] font-bold text-on-surface mb-1.5">Email Organisasi</label>
+                            <input wire:model="email_organisasi" type="email" placeholder="organisasi@univ.ac.id" :required="role === 'organisasi'"
+                                class="w-full text-[14px] rounded-md border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary py-2.5 px-3 transition-colors shadow-sm" />
+                        </div>
+                        <div>
+                            <label class="block text-[13px] font-bold text-on-surface mb-1.5">Kata Sandi</label>
+                            <div class="relative">
+                                <input wire:model="password_organisasi" :type="showPass ? 'text' : 'password'" placeholder="••••••••" :required="role === 'organisasi'"
+                                    class="w-full text-[14px] rounded-md border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary py-2.5 px-3 pr-10 transition-colors shadow-sm" />
+                                <i @click="showPass = !showPass" :class="showPass ? 'fa-eye-slash' : 'fa-eye'" class="fa-regular absolute right-3.5 top-1/2 -translate-y-1/2 cursor-pointer text-outline hover:text-primary"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-[13px] font-bold text-on-surface mb-1.5">Tingkat Organisasi</label>
+                            <select x-model="tingkat" wire:model="tingkat_organisasi" class="w-full text-[14px] rounded-md border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary py-2.5 px-3 bg-transparent">
+                                <option value="" disabled selected>Pilih Tingkat</option>
+                                <option value="universitas">Universitas</option>
+                                <option value="fakultas">Fakultas</option>
+                                <option value="program_studi">Program Studi</option>
+                            </select>
+                        </div>
+
+                        <!-- Conditional Fakultas / Prodi -->
+                        <div x-show="tingkat === 'fakultas'" x-transition style="display: none;">
+                            <label class="block text-[13px] font-bold text-on-surface mb-1.5">Fakultas</label>
+                            <select wire:model="fakultas_id_organisasi" class="w-full text-[14px] rounded-md border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary py-2.5 px-3 bg-transparent">
+                                <option value="" selected>Pilih Fakultas</option>
+                                @foreach($daftar_fakultas as $item)
+                                    <option value="{{ $item->id }}">{{ $item->nama_fakultas }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div x-show="tingkat === 'program_studi'" x-transition style="display: none;">
+                            <label class="block text-[13px] font-bold text-on-surface mb-1.5">Program Studi</label>
+                            <select wire:model="prodi_id_organisasi" class="w-full text-[14px] rounded-md border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary py-2.5 px-3 bg-transparent">
+                                <option value="" selected>Pilih Program Studi</option>
+                                @foreach($daftar_prodi as $item)
+                                    <option value="{{ $item->id }}">{{ $item->nama_prodi }}</option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
-                @endif
-            </div>
 
-            <div class="mt-6">
-                <x-input-label for="deskripsi" value="Deskripsi Organisasi" />
-                <textarea wire:model="deskripsi" id="deskripsi" rows="3" class="block w-full mt-1 border-gray-300 focus:border-indigo-500 rounded-md shadow-sm" required></textarea>
-                <x-input-error :messages="$errors->get('deskripsi')" class="mt-2" />
-            </div>
+                    <!-- Bagian 2: Dokumen Legalitas & Sosial Media -->
+                    <div class="border-t border-outline-variant pt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="flex flex-col gap-6">
+                            <div>
+                                <label class="block text-[13px] font-bold text-on-surface mb-1.5">Logo Organisasi</label>
+                                <label for="logo_upload" class="flex flex-col items-center justify-center w-full py-4 border-2 border-outline-variant border-dashed rounded-md cursor-pointer bg-surface-container-lowest hover:bg-surface-container-low transition-all">
+                                    <i class="fa-solid fa-cloud-arrow-up text-outline text-xl mb-1"></i>
+                                    <p class="text-[12px] text-on-surface font-semibold">{{ $logo_url ? $logo_url->getClientOriginalName() : 'Unggah Logo' }}</p>
+                                    <p class="text-[11px] text-outline">PNG, JPG (Max 2MB)</p>
+                                    <input wire:model="logo_url" id="logo_upload" type="file" class="hidden" accept="image/png, image/jpeg" />
+                                </label>
+                                @error('logo_url') <span class="text-[11px] text-error mt-1 block">{{ $message }}</span> @enderror
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-[13px] font-bold text-on-surface mb-1.5">Dokumen AD/ART</label>
+                                    <label for="ad_art_upload" class="flex flex-col items-center justify-center w-full py-3 border border-outline-variant rounded-md cursor-pointer bg-surface-container-lowest hover:bg-surface-container-low transition-all">
+                                        <i class="fa-solid fa-file-pdf text-outline text-lg mb-1"></i>
+                                        <p class="text-[11px] text-on-surface font-medium truncate px-2 text-center w-full">{{ $ad_art ? $ad_art->getClientOriginalName() : 'Unggah File PDF' }}</p>
+                                        <input wire:model="ad_art" id="ad_art_upload" type="file" class="hidden" accept="application/pdf" />
+                                    </label>
+                                    @error('ad_art') <span class="text-[11px] text-error mt-1 block">{{ $message }}</span> @enderror
+                                </div>
+                                <div>
+                                    <label class="block text-[13px] font-bold text-on-surface mb-1.5">Dokumen SK</label>
+                                    <label for="sk_upload" class="flex flex-col items-center justify-center w-full py-3 border border-outline-variant rounded-md cursor-pointer bg-surface-container-lowest hover:bg-surface-container-low transition-all">
+                                        <i class="fa-solid fa-file-pdf text-outline text-lg mb-1"></i>
+                                        <p class="text-[11px] text-on-surface font-medium truncate px-2 text-center w-full">{{ $sk ? $sk->getClientOriginalName() : 'Unggah File PDF' }}</p>
+                                        <input wire:model="sk" id="sk_upload" type="file" class="hidden" accept="application/pdf" />
+                                    </label>
+                                    @error('sk') <span class="text-[11px] text-error mt-1 block">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+                        </div>
 
-            <div class="mt-4">
-                <x-input-label for="visi" value="Visi Organisasi" />
-                <textarea wire:model="visi" id="visi" rows="2" class="block w-full mt-1 border-gray-300 focus:border-indigo-500 rounded-md shadow-sm" required></textarea>
-                <x-input-error :messages="$errors->get('visi')" class="mt-2" />
-            </div>
+                        <div class="flex flex-col gap-6">
+                            <div>
+                                <label class="block text-[13px] font-bold text-on-surface mb-1.5">Link Instagram</label>
+                                <div class="flex rounded-md shadow-sm">
+                                    <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-outline-variant bg-surface-container text-outline text-[14px] font-medium">ig/</span>
+                                    <input wire:model="ig_url" type="text" placeholder="username"
+                                        class="flex-1 block w-full rounded-none rounded-r-md text-[14px] border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary py-2.5 px-3 transition-colors" />
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-[13px] font-bold text-on-surface mb-1.5">Link LinkedIn</label>
+                                <div class="flex rounded-md shadow-sm">
+                                    <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-outline-variant bg-surface-container text-outline text-[14px] font-medium">in/</span>
+                                    <input wire:model="linkedin_url" type="text" placeholder="company"
+                                        class="flex-1 block w-full rounded-none rounded-r-md text-[14px] border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary py-2.5 px-3 transition-colors" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-            <div class="mt-4">
-                <x-input-label for="misi" value="Misi Organisasi" />
-                <textarea wire:model="misi" id="misi" rows="3" class="block w-full mt-1 border-gray-300 focus:border-indigo-500 rounded-md shadow-sm" required></textarea>
-                <x-input-error :messages="$errors->get('misi')" class="mt-2" />
-            </div>
+                    <!-- Bagian 3: Profil Organisasi -->
+                    <div class="flex flex-col gap-5 border-t border-outline-variant pt-6">
+                        <h3 class="text-title-lg font-bold text-primary mb-1">Informasi Profil Organisasi</h3>
+                        <div>
+                            <label class="block text-[13px] font-bold text-on-surface mb-1.5">Deskripsi Singkat Organisasi</label>
+                            <textarea wire:model="deskripsi" rows="3" placeholder="Tuliskan gambaran umum organisasi Anda..." :required="role === 'organisasi'"
+                                    class="w-full text-[14px] rounded-md border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary py-2.5 px-3 transition-colors shadow-sm resize-y"></textarea>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-[13px] font-bold text-on-surface mb-1.5">Visi</label>
+                                <textarea wire:model="visi" rows="4" placeholder="Tuliskan visi organisasi..." :required="role === 'organisasi'"
+                                        class="w-full text-[14px] rounded-md border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary py-2.5 px-3 transition-colors shadow-sm resize-none"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-[13px] font-bold text-on-surface mb-1.5">Misi</label>
+                                <textarea wire:model="misi" rows="4" placeholder="Tuliskan misi organisasi..." :required="role === 'organisasi'"
+                                        class="w-full text-[14px] rounded-md border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary py-2.5 px-3 transition-colors shadow-sm resize-none"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-            <div class="mt-6 p-4 border rounded-md bg-gray-50 shadow-sm">
-                <h3 class="text-sm font-bold text-gray-700 mb-4 border-b pb-2">Dokumen Pendukung (Wajib PDF)</h3>
+                {{-- ========================================== --}}
+                {{-- TOMBOL SUBMIT & ERRORS                     --}}
+                {{-- ========================================== --}}
+                <div class="mt-8 pt-6 border-t border-outline-variant flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input wire:model="syarat_ketentuan" type="checkbox" required class="w-4 h-4 rounded border-outline-variant text-primary focus:ring-primary shadow-sm cursor-pointer">
+                        <span class="text-[13px] font-medium text-on-surface">Saya menyetujui syarat dan ketentuan layanan.</span>
+                    </label>
+
+                    <button type="submit" class="w-full sm:w-auto bg-primary text-on-primary font-bold text-[13.5px] px-8 py-2.5 rounded-md hover:bg-primary-container transition-colors shadow-sm">
+                        <span wire:loading.remove wire:target="register">
+                            Daftar Sekarang
+                        </span>
+                        <span wire:loading wire:target="register">
+                            Memproses...
+                        </span>
+                    </button>
+                </div>
                 
-                <div class="mt-4">
-                    <x-input-label for="ad_art" value="Dokumen AD/ART (PDF)" />
-                    <input type="file" wire:model="ad_art" id="ad_art" accept="application/pdf" class="block w-full mt-1 text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" required />
-                    <x-input-error :messages="$errors->get('ad_art')" class="mt-2" />
-                </div>
+                @if($errors->any())
+                    <div class="mt-4 p-3 bg-error-container text-on-error-container text-[12px] rounded-md">
+                        Terjadi kesalahan. Pastikan semua field wajib terisi dan format file (PDF/Image) sesuai.
+                        <ul class="list-disc pl-5 mt-1">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
 
-                <div class="mt-4">
-                    <x-input-label for="sk" value="SK Kepengurusan (PDF)" />
-                    <input type="file" wire:model="sk" id="sk" accept="application/pdf" class="block w-full mt-1 text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" required />
-                    <x-input-error :messages="$errors->get('sk')" class="mt-2" />
-                </div>
-            </div>
-        @endif
-
-        <hr class="my-6 border-gray-200">
-
-        <div>
-            <x-input-label for="email" :value="__('Email (Untuk Login)')" />
-            <x-text-input wire:model="email" id="email" class="block mt-1 w-full bg-white" type="email" required autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+            </form>
         </div>
 
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-            <x-text-input wire:model="password" id="password" class="block mt-1 w-full" type="password" required autocomplete="new-password" />
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
+    </main>
 
-        <div class="mt-4">
-            <x-input-label for="password_confirmation" :value="__('Konfirmasi Password')" />
-            <x-text-input wire:model="password_confirmation" id="password_confirmation" class="block mt-1 w-full" type="password" required autocomplete="new-password" />
-            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
-        </div>
+    <footer class="w-full bg-surface-container-low py-6 text-center border-t border-outline-variant mt-auto">
+        <p class="text-[13.5px] text-on-surface-variant font-medium">
+            Sudah memiliki akun? <a wire:navigate href="{{ route('login') }}" class="font-bold text-primary hover:text-primary-container transition-colors">Masuk di sini</a>
+        </p>
+    </footer>
 
-        <div class="flex items-center justify-end mt-6">
-            <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('login') }}" wire:navigate>
-                {{ __('Sudah punya akun?') }}
-            </a>
-
-            <x-primary-button class="ms-4">
-                <span wire:loading.remove wire:target="register">{{ __('Daftar Sekarang') }}</span>
-                <span wire:loading wire:target="register">{{ __('Memproses...') }}</span>
-            </x-primary-button>
-        </div>
-    </form>
 </div>
