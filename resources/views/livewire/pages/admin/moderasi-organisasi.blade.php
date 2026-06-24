@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\OrganisasiMahasiswa;
+use App\Models\AdminDpm;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
 use Livewire\WithPagination;
@@ -245,14 +246,16 @@ new #[Layout('layouts.admin')] class extends Component
                                     </select>
                                 </div>
 
-                                <div>
-                                    <label class="block text-xs font-bold text-gray-500 mb-1.5 uppercase tracking-wider">Tingkat Organisasi</label>
-                                    <select wire:model.live="filterTingkat" class="block w-full text-sm border-gray-200 rounded-lg bg-gray-50 focus:ring-[#000666] focus:border-[#000666]">
-                                        <option value="">Semua Tingkat</option>
-                                        <option value="fakultas">Tingkat Fakultas</option>
-                                        <option value="prodi">Tingkat Program Studi</option>
-                                    </select>
-                                </div>
+                                @if(AdminDpm::where('user_id', auth()->id())->value('fakultas_id'))
+                                    <div>
+                                        <label class="block text-xs font-bold text-gray-500 mb-1.5 uppercase tracking-wider">Tingkat Organisasi</label>
+                                        <select wire:model.live="filterTingkat" class="block w-full text-sm border-gray-200 rounded-lg bg-gray-50 focus:ring-[#000666] focus:border-[#000666]">
+                                            <option value="">Semua Tingkat</option>
+                                            <option value="fakultas">Tingkat Fakultas</option>
+                                            <option value="prodi">Tingkat Program Studi</option>
+                                        </select>
+                                    </div>
+                                @endif
                             </div>
                         </div>
 

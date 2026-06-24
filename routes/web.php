@@ -33,6 +33,7 @@ Route::middleware('auth')->group(function () {
     Volt::route('/dashboard-admin', 'pages.admin.dashboard')->name('admin.dashboard');
     Volt::route('/moderasi-organisasi', 'pages.admin.moderasi-organisasi')->name('admin.moderasi-organisasi');
     Volt::route('/moderasi-organisasi/{id}', 'pages.admin.detail-organisasi')->name('admin.moderasi-organisasi.detail');
+    Volt::route('/moderasi-event', 'pages.admin.moderasi-event')->name('admin.moderasi-event');
 });
 
 
