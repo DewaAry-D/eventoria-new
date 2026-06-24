@@ -136,7 +136,7 @@ new #[Layout('layouts.admin')] class extends Component
     }
 }; ?>
 
-<div>
+<div class="p-8">
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
             <h1 class="text-2xl font-bold text-[#000666]">Manajemen Pengajuan Organisasi</h1>

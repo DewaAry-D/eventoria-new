@@ -40,12 +40,12 @@ new #[Layout('layouts.mahasiswa')] class extends Component
                   // ATAU Event tingkat Fakultas (Hanya untuk fakultas yang sama)
                   ->orWhere(function($q2) use ($mahasiswa) {
                       $q2->where('tingkat_event', 'fakultas')
-                         ->whereHas('organisasi', fn($q3) => $q3->where('fakultas_id', $mahasiswa->prodi->fakultas_id));
+                            ->whereHas('organisasi', fn($q3) => $q3->where('fakultas_id', $mahasiswa?->prodi?->fakultas_id));
                   })
                   // ATAU Event tingkat Prodi (Hanya untuk prodi yang sama persis)
                   ->orWhere(function($q2) use ($mahasiswa) {
                       $q2->where('tingkat_event', 'prodi')
-                         ->whereHas('organisasi', fn($q3) => $q3->where('prodi_id', $mahasiswa->prodi_id));
+                            ->whereHas('organisasi', fn($q3) => $q3->where('prodi_id', $mahasiswa?->prodi_id));
                   });
             });
 
