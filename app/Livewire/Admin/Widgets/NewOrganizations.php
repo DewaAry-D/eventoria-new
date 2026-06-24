@@ -25,7 +25,7 @@ class NewOrganizations extends Component
 
     public function render()
     {
-        $adminDpm = AdminDpm::where('user_id', Auth::id())->first();
+        $adminDpm = AdminDpm::query()->where('user_id', Auth::id())->first();
 
         $query = OrganisasiMahasiswa::query();
         $query->where('status', 'pending');

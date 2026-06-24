@@ -58,7 +58,7 @@ class EventMaster extends Component
 
     protected function baseEventQuery()
     {
-        $adminDpm = AdminDpm::where('user_id', Auth::id())->first();
+        $adminDpm = AdminDpm::query()->where('user_id', Auth::id())->first();
 
         // Query awal berdasarkan birokrasi DPM
         $query = Event::whereHas('organisasi', function ($q) use ($adminDpm) {
@@ -103,7 +103,7 @@ class EventMaster extends Component
 
     public function approveEvent(int $eventId)
     {
-        $adminDpm = AdminDpm::where('user_id', Auth::id())->first();
+        $adminDpm = AdminDpm::query()->where('user_id', Auth::id())->first();
         $event = $this->baseEventQuery()->find($eventId);
 
         if ($event) {

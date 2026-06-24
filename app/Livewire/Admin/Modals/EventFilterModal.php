@@ -73,11 +73,11 @@ class EventFilterModal extends Component
     public function render()
     {
         return view('livewire.admin.modals.event-filter-modal', [
-            'listFakultas'   => Fakultas::orderBy('nama_fakultas')->get(),
-            'listKategori'   => Kategori::orderBy('nama_kategori')->get(),
-            'listOrganisasi' => OrganisasiMahasiswa::when($this->fakultasId, function($q) {
+            'listFakultas'   => Fakultas::orderBy('nama_fakultas', 'asc')->get(),
+            'listKategori'   => Kategori::orderBy('nama_kategori', 'asc')->get(),
+            'listOrganisasi' => OrganisasiMahasiswa::query()->when($this->fakultasId, function($q) {
                                     $q->where('fakultas_id', $this->fakultasId);
-                                })->orderBy('nama_organisasi')->get()
+                                    })->orderBy('nama_organisasi', 'asc')->get()
         ]);
     }
 }

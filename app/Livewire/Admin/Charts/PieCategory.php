@@ -26,7 +26,7 @@ class PieCategory extends Component
     private function baseEventQuery()
     {
         // Mengambil data profil Admin DPM yang sedang login saat ini
-        $adminDpm = AdminDpm::where('user_id', Auth::id())->first();
+        $adminDpm = AdminDpm::query()->where('user_id', Auth::id())->first();
 
         return Event::whereHas('organisasi', function ($q) use ($adminDpm) {
 

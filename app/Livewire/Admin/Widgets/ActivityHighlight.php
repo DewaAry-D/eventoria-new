@@ -29,7 +29,7 @@ class ActivityHighlight extends Component
     public function render()
     {
         // Ambil data profil Admin DPM yang sedang login
-        $adminDpm = AdminDpm::where('user_id', Auth::id())->first();
+        $adminDpm = AdminDpm::query()->where('user_id', Auth::id())->first();
 
         $baseEventQuery = Event::whereHas('organisasi', function ($q) use ($adminDpm) {
             if ($adminDpm && $adminDpm->fakultas_id !== null) {

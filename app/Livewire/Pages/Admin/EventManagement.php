@@ -19,7 +19,7 @@ class EventManagement extends Component
     public function mount()
     {
         // Ambil profil Admin DPM yang Login
-        $adminDpm = AdminDpm::where('user_id', Auth::id())->first();
+        $adminDpm = AdminDpm::query()->where('user_id', Auth::id())->first();
         $this->fakultasId = $adminDpm?->fakultas_id;
 
         $this->statCards = $this->calculateStatCards();
