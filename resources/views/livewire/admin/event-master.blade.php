@@ -1,23 +1,42 @@
 <div class="bg-surface-container-lowest p-md sm:p-lg rounded-2xl border border-outline-variant/30 shadow-sm w-full">
+    
     <div class="flex items-center justify-between gap-md mb-lg select-none w-full">
         <div>
-            <h4 class="text-title-sm sm:text-title-md font-bold text-primary tracking-tight">
+            <h4 class="text-title-sm sm:text-title-md font-bold sm:font-bold text-primary tracking-tight">
                 {{ $title }}
             </h4>
         </div>
         
         @if(!$isDashboard)
             <div class="items-center gap-sm w-full sm:w-auto hidden sm:flex">
+                <!-- Input Cari Desktop -->
                 <div class="relative flex-1 sm:w-64">
                     <span class="absolute inset-y-0 left-0 flex items-center pl-sm text-secondary/50">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="currentColor"/></svg>
                     </span>
                     <input type="text" wire:model.live.debounce.300ms="search" placeholder="Cari pengajuan event..." class="w-full text-body-md pl-9 pr-sm py-1.5 bg-surface-container/40 border border-outline-variant/30 rounded-xl focus:outline-none focus:border-primary/30 text-primary placeholder-secondary/40 font-medium">
                 </div>
+
+                <!-- Tombol Filter Desktop -->
+                <button type="button" 
+                        @click="$dispatch('open-modal-filter-event')"
+                        class="inline-flex items-center justify-center gap-xs px-md py-2 border border-outline-variant/30 bg-surface-container-lowest hover:bg-surface-container/30 text-primary rounded-xl transition-all font-bold text-body-md active:scale-95 shadow-sm">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+                    <span>Filter</span>
+                </button>
             </div>
+
+            <!-- Tombol Filter Mobile -->
+            <button type="button" 
+                    @click="$dispatch('open-modal-filter-event')"
+                    class="inline-flex sm:hidden items-center justify-center w-8 h-8 border border-outline-variant/30 bg-surface-container-lowest hover:bg-surface-container/30 text-primary rounded-xl transition-all active:scale-95 shadow-sm shrink-0"
+                    title="Buka Filter">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+            </button>
         @else
+            <!-- Nav Lihat Semua di Dashboard -->
             <a href="{{ route('admin.event.master') }}" wire:navigate 
-                class="inline-flex items-center gap-x-1 text-body-sm sm:text-body-md font-bold sm:font-bold text-primary hover:text-primary/80 group transition-all whitespace-nowrap flex-shrink-0">
+                class="inline-flex items-center gap-x-1 text-body-sm sm:text-body-md font-bold text-primary hover:text-primary/80 group transition-all whitespace-nowrap flex-shrink-0">
                 <span>Lihat Semua</span>
                 <svg class="w-4 h-4 transform group-hover:translate-x-0.5 transition-transform duration-200" 
                     fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
@@ -27,6 +46,7 @@
         @endif
     </div>
 
+    <!-- Input Search Mobile -->
     @if(!$isDashboard)
         <div class="flex items-center gap-sm w-full mb-lg sm:hidden">
             <div class="relative flex-1">
@@ -89,7 +109,9 @@
                             <span>{{ $event->created_at->format('d M Y') }}</span>
                         </div>
                         <div class="flex items-center gap-xs min-w-0">
-                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-secondary/50"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path></svg>
+                            <svg width="12" height="12" viewBox="0 0 12 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M6 7.5C6.4125 7.5 6.76562 7.35312 7.05937 7.05937C7.35312 6.76562 7.5 6.4125 7.5 6C7.5 5.5875 7.35312 5.23438 7.05937 4.94063C6.76562 4.64688 6.4125 4.5 6 4.5C5.5875 4.5 5.23438 4.64688 4.94063 4.94063C4.64688 5.23438 4.5 5.5875 4.5 6C4.5 6.4125 4.64688 6.76562 4.94063 7.05937C5.23438 7.35312 5.5875 7.5 6 7.5ZM6 13.0125C7.525 11.6125 8.65625 10.3406 9.39375 9.19687C10.1313 8.05312 10.5 7.0375 10.5 6.15C10.5 4.7875 10.0656 3.67188 9.19687 2.80312C8.32812 1.93437 7.2625 1.5 6 1.5C4.7375 1.5 3.67188 1.93437 2.80312 2.80312C1.93437 3.67188 1.5 4.7875 1.5 6.15C1.5 7.0375 1.86875 8.05312 2.60625 9.19687C3.34375 10.3406 4.475 11.6125 6 13.0125ZM6 15C3.9875 13.2875 2.48438 11.6969 1.49063 10.2281C0.496875 8.75937 0 7.4 0 6.15C0 4.275 0.603125 2.78125 1.80938 1.66875C3.01562 0.55625 4.4125 0 6 0C7.5875 0 8.98438 0.55625 10.1906 1.66875C11.3969 2.78125 12 4.275 12 6.15C12 7.4 11.5031 8.75937 10.5094 10.2281C9.51562 11.6969 8.0125 13.2875 6 15Z" fill="currentColor"/>
+                            </svg>
                             <span class="truncate max-w-[120px]">{{ $event->nama_lokasi }}</span>
                         </div>
                     </div>
@@ -108,7 +130,9 @@
                                 Tolak
                             </button>
                         @endif
-                        <a href="#" class="flex-1 py-1.5 rounded-xl bg-[#000666] text-white font-bold text-xs flex items-center justify-center transition-all active:scale-95 text-center">
+                        <a href="{{ route('admin.event.detail', $event->id) }}"
+                            wire:navigate
+                            class="flex-1 py-1.5 rounded-xl bg-[#000666] text-white font-bold text-xs flex items-center justify-center transition-all active:scale-95 text-center">
                             Detail
                         </a>
                     </div>
@@ -232,11 +256,15 @@
     @if(!$isDashboard && $paginationData && $paginationData['totalPages'] > 1)
         <div class="flex flex-col items-center justify-center gap-md sm:flex-row sm:items-center sm:justify-between border-t border-outline-variant/20 mt-lg pt-md font-medium select-none">
             
+            <!-- Info Text Kiri Bawah -->
             <div class="hidden sm:block text-body-sm text-secondary/60">
                 Menampilkan <span class="font-bold text-primary/80">{{ $paginationData['from'] }}-{{ $paginationData['to'] }}</span> dari <span class="font-bold text-primary/80">{{ $paginationData['total'] }}</span> pengajuan event
             </div>
             
+            <!-- Tombol Kontrol Paginasi -->
             <div class="inline-flex items-center gap-xs text-body-sm">
+                
+                <!-- Tombol Previous -->
                 <button type="button" 
                         wire:click="previousPage"
                         class="w-8 h-8 rounded-xl border border-outline-variant/30 flex items-center justify-center transition-colors {{ $paginationData['currentPage'] == 1 ? 'text-secondary/40 bg-surface-container/10 cursor-not-allowed' : 'text-secondary/70 hover:bg-surface-container/40' }}"
@@ -244,8 +272,31 @@
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" fill="currentColor"/></svg>
                 </button>
                 
-                @for($i = 1; $i <= $paginationData['totalPages']; $i++)
-                    @if($i == $paginationData['currentPage'])
+                @php
+                    $currentPage = $paginationData['currentPage'];
+                    $totalPages = $paginationData['totalPages'];
+                    
+                    // Radius halaman aktif (1 kanan, 1 kiri)
+                    $sidePages = 1; 
+                    
+                    $startPage = max(1, $currentPage - $sidePages);
+                    $endPage = min($totalPages, $currentPage + $sidePages);
+                @endphp
+
+                <!-- Tampilkan Angka 1 Permanen di Awal -->
+                @if($startPage > 1)
+                    <button type="button" wire:click="gotoPage(1)" class="w-8 h-8 rounded-xl border border-outline-variant/30 flex items-center justify-center text-secondary/70 bg-surface-container-lowest font-medium transition-all duration-150 hover:bg-[#000666]/[0.06] hover:border-[#000666]/30 hover:text-[#000666] active:scale-95">
+                        1
+                    </button>
+
+                    @if($startPage > 2)
+                        <span class="w-8 h-8 flex items-center justify-center text-secondary/40 font-bold text-xs">...</span>
+                    @endif
+                @endif
+
+                {{-- Perulangan Angka Utama Sekitar Current Page --}}
+                @for($i = $startPage; $i <= $endPage; $i++)
+                    @if($i == $currentPage)
                         <button type="button" class="w-8 h-8 rounded-xl bg-[#000666] text-white flex items-center justify-center font-bold shadow-sm">
                             {{ $i }}
                         </button>
@@ -255,10 +306,22 @@
                         </button>
                     @endif
                 @endfor
+
+                <!-- Tampilkan Angka Terakhir Permanen di Ujung Kanan -->
+                @if($endPage < $totalPages)
+                    @if($endPage < $totalPages - 1)
+                        <span class="w-8 h-8 flex items-center justify-center text-secondary/40 font-bold text-xs">...</span>
+                    @endif
+                    <button type="button" wire:click="gotoPage({{ $totalPages }})" class="w-8 h-8 rounded-xl border border-outline-variant/30 flex items-center justify-center text-secondary/70 bg-surface-container-lowest font-medium transition-all duration-150 hover:bg-[#000666]/[0.06] hover:border-[#000666]/30 hover:text-[#000666] active:scale-95">
+                        {{ $totalPages }}
+                    </button>
+                @endif
                 
+                <!-- Tombol Next (>) -->
                 <button type="button" 
                         wire:click="nextPage"
                         class="w-8 h-8 rounded-xl border border-outline-variant/30 flex items-center justify-center transition-colors {{ $paginationData['currentPage'] == $paginationData['totalPages'] ? 'text-secondary/40 bg-surface-container/10 cursor-not-allowed' : 'text-secondary/70 hover:bg-surface-container/40' }}"
+                        nameTitle="Previous"
                         {{ $paginationData['currentPage'] == $paginationData['totalPages'] ? 'disabled' : '' }}>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" fill="currentColor"/></svg>
                 </button>
@@ -276,9 +339,12 @@
 
     <!-- Reject Modal -->
     <x-admin.modals.reject-modal 
-        id="reject-event"
-        title="Tolak Pendaftaran?"
-        wireAction="rejectEvent"
+    id="reject-event"
+    title="Tolak Pendaftaran?"
+    wireAction="rejectEvent"
     />
+    
+    <!-- Filter Modal -->
+    <livewire:admin.modals.event-filter-modal :currentFakultasId="$fakultasId" />
 </div>
 

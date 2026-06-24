@@ -46,26 +46,6 @@
                 </svg>
                 <span class="text-body-md {{ $active === 'moderasi-event' ? 'font-bold' : 'font-medium' }}">Moderasi Event</span>
             </a>
-
-            <!-- Master Kategori -->
-            <a href="#" 
-                class="flex items-center gap-md px-md py-sm rounded-xl transition-all group
-                {{ $active === 'master-kategori' ? 'bg-secondary-container text-primary shadow-sm' : 'text-secondary hover:bg-surface-container hover:text-on-surface' }}">
-                <svg width="19" height="20" class="{{ $active === 'master-kategori' ? 'text-primary' : 'text-secondary/70 group-hover:text-on-surface' }}" viewBox="0 0 19 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M3.5 9L9 0L14.5 9H3.5ZM14.5 20C13.25 20 12.1875 19.5625 11.3125 18.6875C10.4375 17.8125 10 16.75 10 15.5C10 14.25 10.4375 13.1875 11.3125 12.3125C12.1875 11.4375 13.25 11 14.5 11C15.75 11 16.8125 11.4375 17.6875 12.3125C18.5625 13.1875 19 14.25 19 15.5C19 16.75 18.5625 17.8125 17.6875 18.6875C16.8125 19.5625 15.75 20 14.5 20ZM0 19.5V11.5H8V19.5H0ZM14.5 18C15.2 18 15.7917 17.7583 16.275 17.275C16.7583 16.7917 17 16.2 17 15.5C17 14.8 16.7583 14.2083 16.275 13.725C15.7917 13.2417 15.2 13 14.5 13C13.8 13 13.2083 13.2417 12.725 13.725C12.2417 14.2083 12 14.8 12 15.5C12 16.2 12.2417 16.7917 12.725 17.275C13.2083 17.7583 13.8 18 14.5 18ZM2 17.5H6V13.5H2V17.5ZM7.05 7H10.95L9 3.85L7.05 7Z" fill="currentColor"/>
-                </svg>
-                <span class="text-body-md {{ $active === 'master-kategori' ? 'font-bold' : 'font-medium' }}">Master Data Kategori</span>
-            </a>
-
-            <!-- Organisasi Aktif -->
-            <a href="#" 
-                class="flex items-center gap-md px-md py-sm rounded-xl transition-all group
-                {{ $active === 'organisasi-aktif' ? 'bg-secondary-container text-primary shadow-sm' : 'text-secondary hover:bg-surface-container hover:text-on-surface' }}">
-                <svg width="18" height="13" class="{{ $active === 'organisasi-aktif' ? 'text-primary' : 'text-secondary/70 group-hover:text-on-surface' }}" viewBox="0 0 17 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M5.83333 7.29167C3.88333 7.29167 0 8.26667 0 10.2083V11.6667H11.6667V10.2083C11.6667 8.26667 7.78333 7.29167 5.83333 7.29167ZM1.95 10C2.65 9.51667 4.34167 8.95833 5.83333 8.95833C7.325 8.95833 9.01667 9.51667 9.71667 10H1.95ZM5.83333 5.83333C7.44167 5.83333 8.75 4.525 8.75 2.91667C8.75 1.30833 7.44167 0 5.83333 0C4.225 0 2.91667 1.30833 2.91667 2.91667C2.91667 4.525 4.225 5.83333 5.83333 5.83333ZM5.83333 1.66667C6.525 1.66667 7.08333 2.225 7.08333 2.91667C7.08333 3.60833 6.525 4.16667 5.83333 4.16667C5.14167 4.16667 4.58333 3.60833 4.58333 2.91667C4.58333 2.225 5.14167 1.66667 5.83333 1.66667ZM11.7 7.34167C12.6667 8.04167 13.3333 8.975 13.3333 10.2083V11.6667H16.6667V10.2083C16.6667 8.525 13.75 7.56667 11.7 7.34167ZM10.8333 5.83333C12.4417 5.83333 13.75 4.525 13.75 2.91667C13.75 1.30833 12.4417 0 10.8333 0C10.3833 0 9.96667 0.108333 9.58333 0.291667C10.1083 1.03333 10.4167 1.94167 10.4167 2.91667C10.4167 3.89167 10.1083 4.8 9.58333 5.54167C9.96667 5.725 10.3833 5.83333 10.8333 5.83333Z" fill="currentColor"/>
-                </svg>
-                <span class="text-body-md {{ $active === 'organisasi-aktif' ? 'font-bold' : 'font-medium' }}">Data Organisasi Aktif</span>
-            </a>
         </nav>
     </div>
     

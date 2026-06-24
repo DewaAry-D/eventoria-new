@@ -4,6 +4,7 @@ namespace App\Livewire\Pages\Admin;
 
 use Livewire\Component;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\On;
 use App\Models\AdminDpm;
 use App\Models\Event;
 use App\Models\OrganisasiMahasiswa;
@@ -33,6 +34,13 @@ class Dashboard extends Component
             $this->scopeName = 'Universitas Udayana';
         }
 
+        // Fungsi pengambil data
+        $this->loadDashboardData();
+    }
+
+    #[On('trigger-global-refresh')]
+    public function loadDashboardData()
+    {
         $this->cardsData = [
             'orgAktif'         => $this->baseOrgQuery()->where('status', OrganisasiStatus::APPROVED->value)->count(),
             'eventBerlangsung' => $this->baseEventQuery()->where('status', EventStatus::PUBLISHED->value)->count(),

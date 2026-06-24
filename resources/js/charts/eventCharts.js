@@ -85,6 +85,23 @@ export function eventBarChart(config) {
                     },
                 },
             });
+
+            this.$watch(
+                () => this.$wire.chartConfig,
+                (newConfig) => {
+                    if (this.chartInstance && newConfig) {
+                        this.chartInstance.data.labels = newConfig.labels;
+                        this.chartInstance.data.datasets[0].data =
+                            newConfig.data;
+                        this.chartInstance.data.datasets[0].backgroundColor =
+                            newConfig.bg;
+                        this.chartInstance.data.datasets[0].borderColor =
+                            newConfig.border;
+
+                        this.chartInstance.update();
+                    }
+                },
+            );
         },
 
         destroy() {
@@ -179,6 +196,19 @@ export function eventLineChart(config) {
                     },
                 },
             });
+
+            this.$watch(
+                () => this.$wire.config,
+                (newConfig) => {
+                    if (this.chartInstance && newConfig) {
+                        this.chartInstance.data.labels = newConfig.labels;
+                        this.chartInstance.data.datasets[0].data =
+                            newConfig.data;
+
+                        this.chartInstance.update();
+                    }
+                },
+            );
         },
 
         destroy() {
@@ -191,6 +221,7 @@ export function eventLineChart(config) {
 export function eventPieChart(config) {
     return {
         chartInstance: null,
+        currentTotal: config.total, 
 
         init() {
             const canvas = this.$refs.canvas;
@@ -199,7 +230,8 @@ export function eventPieChart(config) {
 
             const centerTextPlugin = {
                 id: "centerText",
-                afterDraw(chart) {
+                
+                afterDraw: (chart) => {
                     const {
                         ctx,
                         chartArea: { top, bottom, left, right },
@@ -214,7 +246,7 @@ export function eventPieChart(config) {
                     ctx.fillStyle = "#000666";
                     ctx.textAlign = "center";
                     ctx.textBaseline = "middle";
-                    ctx.fillText(config.total, centerX, centerY - 9);
+                    ctx.fillText(this.currentTotal, centerX, centerY - 9);
 
                     // Label "TOTAL"
                     ctx.font = "600 10px Inter, sans-serif";
@@ -234,7 +266,7 @@ export function eventPieChart(config) {
                     datasets: [
                         {
                             data: config.data,
-                            backgroundColor: config.colors,
+                            backgroundColor: config.colors || config.bg,
                             borderWidth: 0,
                             borderRadius: 5,
                             spacing: 4,
@@ -264,9 +296,7 @@ export function eventPieChart(config) {
                                         (a, b) => a + b,
                                         0,
                                     );
-                                    const pct = Math.round(
-                                        (context.raw / total) * 100,
-                                    );
+                                    const pct = total > 0 ? Math.round((context.raw / total) * 100) : 0;
                                     return `${context.raw} Event · ${pct}%`;
                                 },
                             },
@@ -274,6 +304,22 @@ export function eventPieChart(config) {
                     },
                 },
             });
+
+            this.$watch(
+                () => this.$wire.chartConfig,
+                (newConfig) => {
+                    if (this.chartInstance && newConfig) {
+                        this.currentTotal = newConfig.total;
+                        this.chartInstance.data.labels = newConfig.labels;
+                        this.chartInstance.data.datasets[0].data =
+                            newConfig.data;
+                        this.chartInstance.data.datasets[0].backgroundColor =
+                            newConfig.bg;
+
+                        this.chartInstance.update();
+                    }
+                },
+            );
         },
 
         destroy() {

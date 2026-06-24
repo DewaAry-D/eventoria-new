@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin\Charts;
 
 use Livewire\Component;
+use Livewire\Attributes\On;
 use App\Models\Event;
 use App\Models\AdminDpm;
 use App\Enums\EventStatus;
@@ -13,6 +14,8 @@ class PieCategory extends Component
 {
     public ?int $fakultasId = null;
     public string $title = 'Distribusi Kategori Event';
+
+    public array $chartConfig = [];
 
     public function mount(?int $fakultasId = null, string $title = null)
     {
@@ -88,18 +91,20 @@ class PieCategory extends Component
         ];
     }
 
+    #[On('trigger-global-refresh')]
+    public function refreshPieChartData()
+    {
+        // Kosongkan saja, Livewire otomatis memicu fungsi render() di bawah
+    }
+
     public function render()
     {
         $adminDpm = AdminDpm::with('fakultas')->where('user_id', Auth::id())->first();
+        $scopeName = $adminDpm && $adminDpm->fakultas_id !== null ? $adminDpm->fakultas->nama_fakultas : 'Universitas Udayana';
 
-        if ($adminDpm && $adminDpm->fakultas_id !== null) {
-            $scopeName = $adminDpm->fakultas->nama_fakultas;
-        } else {
-            $scopeName = 'Universitas Udayana';
-        }
+        $this->chartConfig = $this->getPieChartConfig();
 
         return view('livewire.admin.charts.pie-category', [
-            'chartConfig' => $this->getPieChartConfig(),
             'scopeName'   => $scopeName
         ]);
     }

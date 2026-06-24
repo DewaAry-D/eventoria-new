@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin\Widgets;
 
 use Livewire\Component;
+use Livewire\Attributes\On;
 use App\Models\Event;
 use App\Models\AdminDpm;
 use App\Enums\EventStatus;
@@ -17,6 +18,12 @@ class ActivityHighlight extends Component
     public function mount(?int $fakultasId = null)
     {
         $this->fakultasId = $fakultasId;
+    }
+
+    #[On('trigger-global-refresh')]
+    public function refreshHighlight()
+    {
+        // Biarkan kosong, Livewire otomatis memicu ulang fungsi render() di bawah
     }
 
     public function render()

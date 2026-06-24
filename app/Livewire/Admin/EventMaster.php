@@ -4,6 +4,7 @@ namespace App\Livewire\Admin;
 
 use Livewire\Component;
 use Livewire\WithPagination;
+use Livewire\Attributes\On;
 use App\Models\Event;
 use App\Models\AdminDpm;
 use App\Enums\EventStatus;
@@ -25,6 +26,24 @@ class EventMaster extends Component
     public string $selectedEventName = '';
     public string $alasanPenolakan = '';
 
+    // State untuk Filter
+    public ?string $filterPeriode = '';
+    public ?int $filterKategoriId = null;
+    public ?string $filterStatus = '';
+    public ?int $filterOrganisasiId = null;
+
+    // Daftarkan listener event
+    #[ \Livewire\Attributes\On('filterEvents') ]
+    public function handleFilters($filters)
+    {
+        $this->filterPeriode = $filters['periode'];
+        $this->filterStatus = $filters['status'];
+        $this->fakultasId = $filters['fakultasId'];
+        $this->filterKategoriId = $filters['kategoriId'];
+        $this->filterOrganisasiId = $filters['organisasiId'];
+        
+        $this->resetPage();
+    }
     public function updatingSearch()
     {
         $this->resetPage();
@@ -39,17 +58,47 @@ class EventMaster extends Component
 
     protected function baseEventQuery()
     {
-        // Ambil data profil Admin DPM yang sedang login
         $adminDpm = AdminDpm::where('user_id', Auth::id())->first();
 
-        return Event::whereHas('organisasi', function ($q) use ($adminDpm) {
-            if ($adminDpm && $adminDpm->fakultas_id !== null) {
+        // Query awal berdasarkan birokrasi DPM
+        $query = Event::whereHas('organisasi', function ($q) use ($adminDpm) {
+            if ($this->fakultasId) {
+                $q->where('fakultas_id', $this->fakultasId);
+            } elseif ($adminDpm && $adminDpm->fakultas_id !== null) {
                 $q->where('fakultas_id', $adminDpm->fakultas_id);
-            } 
-            else {
+            } else {
                 $q->where('tingkat_organisasi', 'universitas');
             }
         });
+
+        // logika Filter Status jika dipilih
+        if (!$this->isDashboard && $this->filterStatus) {
+            $query->where('status', $this->filterStatus);
+        }
+
+        // logika Filter Kategori jika dipilih
+        if ($this->filterKategoriId) {
+            $query->where('kategori_id', $this->filterKategoriId);
+        }
+
+        // logika Filter Organisasi jika dipilih
+        if ($this->filterOrganisasiId) {
+            $query->where('organisasi_id', $this->filterOrganisasiId);
+        }
+
+        // logika Filter Periode Waktu jika dipilih
+        if ($this->filterPeriode) {
+            if ($this->filterPeriode === 'today') {
+                $query->whereDate('created_at', \Carbon\Carbon::today());
+            } elseif ($this->filterPeriode === 'this_week') {
+                $query->whereBetween('created_at', [\Carbon\Carbon::now()->startOfWeek(), \Carbon\Carbon::now()->endOfWeek()]);
+            } elseif ($this->filterPeriode === 'this_month') {
+                $query->whereMonth('created_at', \Carbon\Carbon::now()->month)
+                        ->whereYear('created_at', \Carbon\Carbon::now()->year);
+            }
+        }
+
+        return $query;
     }
 
     public function approveEvent(int $eventId)
@@ -62,6 +111,9 @@ class EventMaster extends Component
                 'status'       => EventStatus::PUBLISHED->value,
                 'admin_acc_id' => $adminDpm?->id,
             ]);
+
+            // Refresh Global
+            $this->dispatch('trigger-global-refresh');
 
             session()->flash('success', "Event '{$event->nama_event}' berhasil disetujui!");
         } else {
@@ -79,6 +131,9 @@ class EventMaster extends Component
                 'catatan_revisi' => $alasan,
             ]);
 
+            // Refresh Global
+            $this->dispatch('trigger-global-refresh');
+
             session()->flash('success', "Event '{$event->nama_event}' dikembalikan untuk direvisi.");
         } else {
             session()->flash('error', "Aksi ilegal terdeteksi. Data tidak ditemukan di wilayah Anda.");
@@ -94,6 +149,18 @@ class EventMaster extends Component
         $this->selectedEventName = '';
         $this->alasanPenolakan = '';
         $this->resetErrorBag();
+    }
+
+    #[On('trigger-global-refresh')]
+    public function resetAndRefreshTable()
+    {
+        $this->search = '';
+        $this->filterPeriode = '';
+        $this->filterStatus = '';
+        $this->filterKategoriId = null;
+        $this->filterOrganisasiId = null;
+
+        $this->resetPage(); // Kembalikan paginasi ke halaman 1
     }
 
     public function render()
@@ -119,7 +186,11 @@ class EventMaster extends Component
             }
 
             // Paginasi 5 data per halaman
-            $paginator = $query->latest()->paginate(5);
+            $paginator = $query->orderByRaw("FIELD(status, '" . EventStatus::PENDING_APPROVAL->value . "', '" . EventStatus::PUBLISHED->value . "', '" . EventStatus::REVISION->value . "') ASC")
+                            ->orderBy('created_at', 'desc')
+                            ->paginate(6)
+                            ->onEachSide(1);
+            
             $events = $paginator->items();
             
             $paginationData = [

@@ -10,7 +10,7 @@
         </p>
     </div>
 
-    <div class="w-full h-[180px] sm:h-[200px]"
+    <div class="w-full h-44 sm:h-52"
         x-data="eventPieChart(@js($chartConfig))">
         <canvas x-ref="canvas"></canvas>
     </div>
@@ -24,10 +24,10 @@
                     style="background-color: {{ $item['color'] }}"></span>
 
                 <div class="flex flex-col min-w-0">
-                    <span class="text-[11px] sm:text-caption font-bold text-primary truncate leading-none">
+                    <span class="text-caption sm:text-caption font-bold sm:font-bold text-primary truncate leading-none">
                         {{ $item['label'] }}
                     </span>
-                    <span class="text-[10px] sm:text-[11px] text-secondary/50 font-medium leading-none mt-0.5">
+                    <span class="text-[10px] sm:text-caption text-secondary font-medium leading-none mt-0.5">
                         {{ $item['count'] }} Event
                     </span>
                 </div>

@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin\Charts;
 
 use Livewire\Component;
+use Livewire\Attributes\On;
 use App\Models\Event;
 use App\Models\AdminDpm;
 use App\Enums\EventStatus;
@@ -15,6 +16,8 @@ class BarEvent extends Component
 
     public string $title = 'Jumlah Event Per Bulan'; // nilai default
     public ?string $description = null; // nilai default
+
+    public array $chartConfig = [];
 
     public function mount(?int $fakultasId = null, string $title = null, string $description = null)
     {
@@ -82,10 +85,16 @@ class BarEvent extends Component
         ];
     }
 
+    #[On('trigger-global-refresh')]
+    public function refreshChartData()
+    {
+        // Biarkan kosong, Livewire otomatis memicu fungsi render() di bawah
+    }
+
     public function render()
     {
-        return view('livewire.admin.charts.bar-event', [
-            'chartConfig' => $this->getBarChartConfig()
-        ]);
+        $this->chartConfig = $this->getBarChartConfig();
+
+        return view('livewire.admin.charts.bar-event');
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin\Widgets;
 
 use Livewire\Component;
+use Livewire\Attributes\On;
 use App\Models\OrganisasiMahasiswa;
 use App\Models\AdminDpm;
 use Illuminate\Support\Facades\Auth;
@@ -16,16 +17,19 @@ class NewOrganizations extends Component
         $this->fakultasId = $fakultasId;
     }
 
+    #[On('trigger-global-refresh')]
+    public function refreshNewOrganizations()
+    {
+        // Biarkan kosong, Livewire otomatis memicu ulang fungsi render() di bawah
+    }
+
     public function render()
     {
-        // Ambil data profil Admin DPM yang sedang login
         $adminDpm = AdminDpm::where('user_id', Auth::id())->first();
 
         $query = OrganisasiMahasiswa::query();
-
         $query->where('status', 'pending');
 
-        // Cek Tingkat Admin DPM
         if ($adminDpm && $adminDpm->fakultas_id !== null) {
             $query->where('fakultas_id', $adminDpm->fakultas_id);
         } 

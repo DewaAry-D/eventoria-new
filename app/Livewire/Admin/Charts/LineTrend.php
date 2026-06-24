@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin\Charts;
 
 use Livewire\Component;
+use Livewire\Attributes\On;
 use App\Models\Event;
 use App\Models\AdminDpm;
 use App\Enums\EventStatus;
@@ -15,6 +16,8 @@ class LineTrend extends Component
     
     public string $title = 'Tren Organisasi Aktif'; // Nilai default
     public ?string $description = null; // Nilai default
+
+    public array $config = [];
 
     public function mount(?int $fakultasId = null, string $title = null, string $description = null)
     {
@@ -68,10 +71,16 @@ class LineTrend extends Component
         ];
     }
 
+    #[On('trigger-global-refresh')]
+    public function refreshLineChartData()
+    {
+        // Kosongkan saja, Livewire otomatis memicu fungsi render() di bawah
+    }
+
     public function render()
     {
-        return view('livewire.admin.charts.line-trend', [
-            'config'    => $this->getLineChartConfig(),
-        ]);
+        $this->config = $this->getLineChartConfig();
+
+        return view('livewire.admin.charts.line-trend');
     }
 }

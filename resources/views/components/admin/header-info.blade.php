@@ -2,19 +2,17 @@
     'title'
 ])
 
-<div class="flex flex-col gap-md sm:flex-row sm:items-center sm:justify-between w-full mb-lg gap-y-sm">
+<div class="flex justify-between items-start gap-md w-full mb-lg select-none">
     
-    <div class="space-y-1">
-        <h3 class="text-headline-lg font-bold text-primary tracking-tight leading-none">
+    <div class="space-y-1 pr-4">
+        <h3 class="text-headline-md md:text-headline-lg font-bold md:font-bold text-primary tracking-tight leading-none">
             {{ $title }}
         </h3>
         
         {{ $slot }}
     </div>
 
-    @if(isset($action))
-        <div class="flex items-center gap-xs sm:gap-sm shrink-0 w-full sm:w-auto">
-            {{ $action }}
-        </div>
-    @endif
+    <div class="shrink-0 flex items-center self-center">
+        {{ $action }}
+    </div>
 </div>

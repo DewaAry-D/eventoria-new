@@ -1,14 +1,14 @@
-<div class="p-md lg:p-lg space-y-lg">
+<div class="w-full p-md sm:p-lg xl:p-xl space-y-lg sm:space-y-xl">
 
     <x-admin.header-info title="Dashboard Overview">
-        <p class="text-body-md text-on-surface-variant/80 font-medium leading-relaxed">
-            Pantau statistik dan kelola aktivitas kampus di lingkup <strong class="text-primary font-bold">{{ $scopeName }}</strong>
+        <p class="text-xs sm:text-body-md text-on-surface-variant/80 font-medium leading-relaxed mt-1">
+            Mari kelola aktivitas kampus di lingkup <strong class="text-primary font-bold">{{ $scopeName }}</strong>
         </p>
     
         <!-- Unduh Laporan -->
         <x-slot name="action">
             <button type="button" wire:click="exportReport" wire:loading.attr="disabled"
-                class="inline-flex items-center justify-center gap-xs px-lg py-md bg-primary text-on-primary font-bold rounded-lg shadow-sm hover:bg-primary/90 disabled:opacity-50 transition-colors w-full sm:w-auto text-body-md">
+                class="inline-flex items-center justify-center gap-sm px-md sm:px-lg py-2.5 sm:py-md bg-[#000666] text-white font-bold sm:font-bold rounded-lg shadow-sm hover:bg-[#000666]/90 disabled:opacity-50 transition-colors text-xs sm:text-body-md group">
                 <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/>
                 </svg>
