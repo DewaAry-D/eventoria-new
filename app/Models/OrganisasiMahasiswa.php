@@ -11,7 +11,7 @@ class OrganisasiMahasiswa extends Model
     protected $fillable = [
         'user_id', 'nama_organisasi', 'no_organisasi', 'ig_url', 
         'linkedin_url', 'logo_url', 'status', 'tingkat_organisasi', 
-        'fakultas_id', 'prodi_id', 'pesan_penolakan'
+        'fakultas_id', 'prodi_id', 'pesan_penolakan', 'deskripsi', 'visi', 'misi','ad_art', 'sk'
     ];
 
     protected function casts(): array
