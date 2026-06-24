@@ -32,6 +32,7 @@ Route::middleware('auth')->group(function () {
     //admin
     Volt::route('/dashboard-admin', 'pages.admin.dashboard')->name('admin.dashboard');
     Volt::route('/moderasi-organisasi', 'pages.admin.moderasi-organisasi')->name('admin.moderasi-organisasi');
+    Volt::route('/moderasi-organisasi/{id}', 'pages.admin.detail-organisasi')->name('admin.moderasi-organisasi.detail');
 });
 
 
