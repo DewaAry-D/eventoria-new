@@ -29,12 +29,17 @@ Route::middleware('auth')->group(function () {
     Volt::route('/organisasi/events/{event}/form-builder', 'pages.organisasi.event-form-builder')->name('organisasi.events.form-builder');
     Volt::route('/organisasi/events/{event}/sertifikat-builder', 'pages.organisasi.sertifikat-builder')->name('organisasi.events.sertifikat-builder');
     Volt::route('/organisasi/profil', 'pages.organisasi.profil')->name('organisasi.profil');
+    Volt::route('/events/{event}/pendaftar', 'pages.organisasi.kelola-pendaftaran')->name('organisasi.events.pendaftar');
 
 
     //admin
+    // Volt::route('/dashboard-admin', 'pages.admin.dashboard')->name('admin.dashboard');
+    Volt::route('/moderasi-organisasi', 'pages.admin.moderasi-organisasi')->name('admin.moderasi-organisasi');
+    Volt::route('/moderasi-organisasi/{id}', 'pages.admin.detail-organisasi')->name('admin.moderasi-organisasi.detail');
+    Volt::route('/moderasi-event', 'pages.admin.moderasi-event')->name('admin.moderasi-event');
+    
     Route::get('/dashboard-admin', Dashboard::class)->name('admin.dashboard');
     Route::get('/admin/moderasi-event', EventManagement::class)->name('admin.event.master');
-
     // Rute detail event admin
     Route::get('/admin/moderasi-event/detail/{id}', EventDetail::class)->name('admin.event.detail');
 });

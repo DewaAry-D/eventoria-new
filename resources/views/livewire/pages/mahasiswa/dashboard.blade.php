@@ -61,13 +61,13 @@ new #[Layout('layouts.mahasiswa')] class extends Component
 
         // 3. Ambil Event Terdaftar
         $registeredEvents = \App\Models\EventRegistration::with(['event.kategori', 'event.timeLines'])
-            ->where('mahasiswa_id', $mahasiswa?->id)
+            ->where('mahasiswa_id', $mahasiswa->id)
             ->latest()
             ->take(4)
             ->get();
 
-        $totalTerdaftar = \App\Models\EventRegistration::where('mahasiswa_id', $mahasiswa?->id)->count();
-        $totalSertifikat = \App\Models\EventRegistration::where('mahasiswa_id', $mahasiswa?->id)
+        $totalTerdaftar = \App\Models\EventRegistration::where('mahasiswa_id', $mahasiswa->id)->count();
+        $totalSertifikat = \App\Models\EventRegistration::where('mahasiswa_id', $mahasiswa->id)
             ->where('status_pendaftaran', \App\Enums\RegistrationStatus::COMPLETED)
             ->count();
 

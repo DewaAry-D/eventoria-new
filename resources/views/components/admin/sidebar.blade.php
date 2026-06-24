@@ -28,7 +28,7 @@
             </a>
 
             <!-- Halaman Moderasi Organisasi -->
-            <a href="#" 
+            <a href="{{ route('admin.moderasi-organisasi') }}" 
                 class="flex items-center gap-md px-md py-sm rounded-xl transition-all group
                 {{ $active === 'moderasi-organisasi' ? 'bg-secondary-container text-primary shadow-sm' : 'text-secondary hover:bg-surface-container hover:text-on-surface' }}">
                 <svg width="15" height="19" class="{{ $active === 'moderasi-organisasi' ? 'text-primary' : 'text-secondary/70 group-hover:text-on-surface' }}" viewBox="0 0 15 19" fill="none" xmlns="http://www.w3.org/2000/svg">
