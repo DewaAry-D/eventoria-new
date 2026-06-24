@@ -85,7 +85,7 @@ new #[Layout('layouts.guest')] class extends Component
 
         $validated = $this->validate($rules);
 
-        DB::transaction(function () {
+        $user = DB::transaction(function () {
             $user = User::create([
                 'email' => $this->email,
                 'password' => Hash::make($this->password),
@@ -124,6 +124,8 @@ new #[Layout('layouts.guest')] class extends Component
 
             event(new Registered($user));
             Auth::login($user);
+
+            return $user;
         });
 
         if ($user->role === 'mahasiswa') {

@@ -14,7 +14,7 @@ class Event extends Model
         'kategori_id', 'admin_acc_id', 'organisasi_id', 'nama_event',
         'slug', 'penyelenggara', 'status', 'deskripsi', 'nama_lokasi',
         'lokasi_url', 'kuota', 'sisa_kuota', 'narasumber', 'link_event',
-        'catatan_revisi', 'proposal_url', 'flyer_url', 'tingkat_event'
+        'catatan_revisi', 'proposal_url', 'flyer_url', 'tingkat_event',
     ];
 
     protected function casts(): array

@@ -26,10 +26,12 @@ Route::middleware('auth')->group(function () {
     Volt::route('/organisasi/events/{event}/form-builder', 'pages.organisasi.event-form-builder')->name('organisasi.events.form-builder');
     Volt::route('/organisasi/events/{event}/sertifikat-builder', 'pages.organisasi.sertifikat-builder')->name('organisasi.events.sertifikat-builder');
     Volt::route('/organisasi/profil', 'pages.organisasi.profil')->name('organisasi.profil');
+    Volt::route('/events/{event}/pendaftar', 'pages.organisasi.kelola-pendaftaran')->name('organisasi.events.pendaftar');
 
 
     //admin
     Volt::route('/dashboard-admin', 'pages.admin.dashboard')->name('admin.dashboard');
+    Volt::route('/moderasi-organisasi', 'pages.admin.moderasi-organisasi')->name('admin.moderasi-organisasi');
 });
 
 
