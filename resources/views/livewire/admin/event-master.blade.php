@@ -253,6 +253,7 @@
         </table>
     </div>
 
+    <!-- Pagination -->
     @if(!$isDashboard && $paginationData && $paginationData['totalPages'] > 1)
         <div class="flex flex-col items-center justify-center gap-md sm:flex-row sm:items-center sm:justify-between border-t border-outline-variant/20 mt-lg pt-md font-medium select-none">
             

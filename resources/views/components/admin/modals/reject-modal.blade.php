@@ -5,9 +5,8 @@
     'wireAction'
 ])
 
-<div wire:ignore
-    x-data="{ open: false, eventId: null, alasan: '', error: '' }"
-    @open-modal-{{ $id }}.window="open = true; eventId = $event.detail.id; alasan = ''; error = ''"
+<div x-data="{ open: false, eventId: null }"
+    @open-modal-{{ $id }}.window="open = true; eventId = $event.detail.id; $wire.set('alasanPenolakan', '')"
     @close-modal-{{ $id }}.window="open = false"
     @keydown.escape.window="if (open) open = false"
     :class="open ? 'pointer-events-auto' : 'pointer-events-none'"
@@ -15,8 +14,7 @@
     x-cloak>
 
     <!-- Backdrop -->
-    <div
-        x-show="open"
+    <div x-show="open"
         x-transition:enter="transition ease-out duration-300"
         x-transition:enter-start="opacity-0"
         x-transition:enter-end="opacity-100"
@@ -28,8 +26,7 @@
     </div>
 
     <!-- Modal Content -->
-    <div
-        x-show="open"
+    <div x-show="open"
         x-transition:enter="transition ease-out duration-300"
         x-transition:enter-start="opacity-0 scale-95 translate-y-4 sm:translate-y-0"
         x-transition:enter-end="opacity-100 scale-100 translate-y-0"
@@ -51,18 +48,19 @@
             <label class="text-body-sm font-bold text-primary select-none mb-xs block">
                 Alasan Penolakan
             </label>
+            
             <textarea
-                x-model="alasan"
-                @input="error = ''"
+                wire:model="alasanPenolakan"
                 placeholder="Tulis alasan di sini..."
                 rows="4"
-                class="w-full text-body-md p-sm bg-surface-container/20 border rounded-2xl focus:outline-none text-primary placeholder-secondary/40 font-medium resize-none transition-all"
-                :class="error ? 'border-error/50 focus:border-error' : 'border-outline-variant/50 focus:border-primary/30'">
+                class="w-full text-body-md p-sm bg-surface-container/20 border rounded-2xl focus:outline-none text-primary placeholder-secondary/40 font-medium resize-none transition-all @error('alasanPenolakan') border-error focus:border-error @else border-outline-variant/50 focus:border-primary/30 @enderror">
             </textarea>
 
-            <template x-if="error">
-                <span class="text-caption font-semibold text-error mt-xs block" x-text="error"></span>
-            </template>
+            @error('alasanPenolakan')
+                <span class="text-caption font-semibold text-error mt-xs block">
+                    {{ $message }}
+                </span>
+            @enderror
 
             <div class="flex items-start gap-xs text-secondary/50 mt-sm leading-tight">
                 <svg class="w-3.5 h-3.5 shrink-0 mt-[2px]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -80,17 +78,17 @@
             </button>
 
             <button type="button"
-                @click="
-                    if (alasan.trim().length < 5) {
-                        error = 'Alasan terlalu singkat, minimal 5 karakter.';
-                    } else {
-                        error = '';
+                @click="$wire.{{ $wireAction }}(eventId).then(() => { 
+                    if (!$wire.get('errors') || !$wire.get('errors').alasanPenolakan) {
                         open = false;
-                        $nextTick(() => $wire.{{ $wireAction }}(eventId, alasan));
                     }
-                "
-                class="flex-1 px-md py-2.5 text-body-sm font-bold text-on-error bg-error hover:bg-error/90 rounded-full shadow-md transition-all active:scale-95">
-                Kirim Penolakan
+                })"
+                wire:loading.attr="disabled"
+                wire:target="{{ $wireAction }}"
+                class="flex-1 px-md py-2.5 text-body-sm font-bold text-on-error bg-error hover:bg-error/90 rounded-full shadow-md transition-all active:scale-95 disabled:opacity-50">
+                
+                <span wire:loading.remove wire:target="{{ $wireAction }}">Kirim Penolakan</span>
+                <span wire:loading wire:target="{{ $wireAction }}">Memproses...</span>
             </button>
         </div>
     </div>

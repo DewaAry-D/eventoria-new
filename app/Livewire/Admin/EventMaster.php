@@ -24,7 +24,7 @@ class EventMaster extends Component
     public bool $showRejectModal = false;
     public ?int $selectedEventId = null;
     public string $selectedEventName = '';
-    public string $alasanPenolakan = '';
+    public ?string $alasanPenolakan = '';
 
     // State untuk Filter
     public ?string $filterPeriode = '';
@@ -110,22 +110,40 @@ class EventMaster extends Component
             $event->update([
                 'status'       => EventStatus::PUBLISHED->value,
                 'admin_acc_id' => $adminDpm?->id,
+                'catatan_revisi' => null,
             ]);
 
             // Refresh Global
             $this->dispatch('trigger-global-refresh');
-
             session()->flash('success', "Event '{$event->nama_event}' berhasil disetujui!");
+            $this->closeModal();
         } else {
             session()->flash('error', "Aksi ilegal terdeteksi. Data tidak ditemukan di wilayah Anda.");
         }
     }
 
-    public function rejectEvent(int $eventId, string $alasan)
+    public function rejectEvent(int $eventId, ?string $alasan = null)
     {
+        // Validasi Input
+        $this->validate([
+            'alasanPenolakan' => 'required|string|min:5|max:500'
+        ], [
+            'alasanPenolakan.required' => 'Alasan wajib diisi agar panitia mengetahui kekurangannya.',
+            'alasanPenolakan.string'   => 'Format ulasan alasan penolakan tidak valid.',
+            'alasanPenolakan.min'      => 'Alasan terlalu singkat, berikan ulasan yang jelas minimal 5 karakter.',
+            'alasanPenolakan.max'      => 'Alasan terlalu panjang, batasi ulasan maksimal 500 karakter saja.'
+        ]);
+
         $event = $this->baseEventQuery()->find($eventId);
 
         if ($event) {
+            $alasan = strip_tags($this->alasanPenolakan);
+
+            if (strlen(trim($alasan)) < 5) {
+                $this->addError('alasanPenolakan', 'Alasan tidak boleh hanya berisi tag HTML kosong.');
+                return;
+            }
+
             $event->update([
                 'status'         => EventStatus::REVISION->value,
                 'catatan_revisi' => $alasan,
@@ -133,8 +151,8 @@ class EventMaster extends Component
 
             // Refresh Global
             $this->dispatch('trigger-global-refresh');
-
             session()->flash('success', "Event '{$event->nama_event}' dikembalikan untuk direvisi.");
+            $this->closeModal();
         } else {
             session()->flash('error', "Aksi ilegal terdeteksi. Data tidak ditemukan di wilayah Anda.");
         }
