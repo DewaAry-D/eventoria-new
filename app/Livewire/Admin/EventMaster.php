@@ -167,6 +167,8 @@ class EventMaster extends Component
         $this->selectedEventName = '';
         $this->alasanPenolakan = '';
         $this->resetErrorBag();
+
+        $this->dispatch('modal-closed');
     }
 
     #[On('trigger-global-refresh')]
@@ -178,6 +180,9 @@ class EventMaster extends Component
         $this->filterKategoriId = null;
         $this->filterOrganisasiId = null;
 
+        $this->resetErrorBag(); 
+        $this->alasanPenolakan = '';
+        
         $this->resetPage(); // Kembalikan paginasi ke halaman 1
     }
 

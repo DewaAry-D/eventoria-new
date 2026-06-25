@@ -7,7 +7,7 @@
 
 <div x-data="{ open: false, eventId: null }"
     @open-modal-{{ $id }}.window="open = true; eventId = $event.detail.id; $wire.set('alasanPenolakan', '')"
-    @close-modal-{{ $id }}.window="open = false"
+    @modal-closed.window="open = false"
     @keydown.escape.window="if (open) open = false"
     :class="open ? 'pointer-events-auto' : 'pointer-events-none'"
     class="fixed inset-0 z-50 flex items-center justify-center p-md select-none"
@@ -21,7 +21,7 @@
         x-transition:leave="transition ease-in duration-200"
         x-transition:leave-start="opacity-100"
         x-transition:leave-end="opacity-0"
-        @click="open = false"
+        @click="open = false; $wire.closeModal()"
         class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm">
     </div>
 
@@ -66,23 +66,19 @@
                 <svg class="w-3.5 h-3.5 shrink-0 mt-[2px]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
-                <span class="text-[11px] font-medium">Alasan ini akan dikirimkan ke email pendaftar sebagai feedback.</span>
+                <span class="text-caption font-medium">Alasan ini akan dikirimkan ke email pendaftar sebagai feedback.</span>
             </div>
         </div>
 
         <div class="flex items-center justify-center gap-sm mt-lg">
             <button type="button"
-                @click="open = false"
+                @click="open = false; $wire.closeModal()"
                 class="flex-1 px-md py-2.5 text-body-sm font-bold text-secondary/80 hover:bg-surface-container rounded-full transition-colors active:scale-95">
                 Batal
             </button>
 
             <button type="button"
-                @click="$wire.{{ $wireAction }}(eventId).then(() => { 
-                    if (!$wire.get('errors') || !$wire.get('errors').alasanPenolakan) {
-                        open = false;
-                    }
-                })"
+                @click="$wire.{{ $wireAction }}(eventId)"
                 wire:loading.attr="disabled"
                 wire:target="{{ $wireAction }}"
                 class="flex-1 px-md py-2.5 text-body-sm font-bold text-on-error bg-error hover:bg-error/90 rounded-full shadow-md transition-all active:scale-95 disabled:opacity-50">
