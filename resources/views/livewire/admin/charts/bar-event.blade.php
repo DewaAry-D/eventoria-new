@@ -2,7 +2,7 @@
     
     <div class="flex justify-between items-start gap-md mb-lg select-none">
         <div>
-            <h3 class="text-title-lg md:text-headline-md font-bold text-primary tracking-tight">
+            <h3 class="text-title-lg md:text-headline-md font-bold md:font-bold text-primary tracking-tight">
                 {{ $title ?? 'Jumlah Event Per Bulan' }}
             </h3>
             @if(isset($description))

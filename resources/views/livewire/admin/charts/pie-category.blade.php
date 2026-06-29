@@ -1,7 +1,7 @@
 <div class="bg-surface-container-lowest p-md sm:p-lg rounded-2xl border border-outline-variant/30 shadow-sm w-full">
 
     <div class="mb-md">
-        <h4 class="text-title-sm sm:text-title-md font-bold sm:font-bold text-primary tracking-tight">
+        <h4 class="text-title-sm md:text-title-md font-bold md:font-bold text-primary tracking-tight">
             {{ $title }}
         </h4>
         

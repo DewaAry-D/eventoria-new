@@ -23,12 +23,11 @@ class ActivityHighlight extends Component
     #[On('trigger-global-refresh')]
     public function refreshHighlight()
     {
-        // Biarkan kosong, Livewire otomatis memicu ulang fungsi render() di bawah
+        // Biarkan kosong, Livewire otomatis memicu ulang fungsi render()
     }
 
     public function render()
     {
-        // Ambil data profil Admin DPM yang sedang login
         $adminDpm = AdminDpm::query()->where('user_id', Auth::id())->first();
 
         $baseEventQuery = Event::whereHas('organisasi', function ($q) use ($adminDpm) {
@@ -40,9 +39,11 @@ class ActivityHighlight extends Component
             }
         });
 
-        // Cari Kategori Terpopuler Bulan Ini (Status Published)
+        $baseEventQuery->where('status', '!=', EventStatus::DRAFT->value);
+
+        // Kategori Terpopuler
         $popularCategory = (clone $baseEventQuery)
-            ->where('status', EventStatus::PUBLISHED->value)
+            ->whereIn('status', [EventStatus::PUBLISHED->value, EventStatus::COMPLETED->value])
             ->whereMonth('created_at', Carbon::now()->month)
             ->select('kategori_id', DB::raw('count(*) as total'))
             ->groupBy('kategori_id')
@@ -50,9 +51,9 @@ class ActivityHighlight extends Component
             ->orderByDesc('total')
             ->first();
 
-        // Cari Organisasi Teraktif (Punya Event Published Terbanyak)
+        // Organisasi Teraktif
         $activeOrg = (clone $baseEventQuery)
-            ->where('status', EventStatus::PUBLISHED->value)
+            ->whereIn('status', [EventStatus::PUBLISHED->value, EventStatus::COMPLETED->value])
             ->select('organisasi_id', DB::raw('count(*) as total'))
             ->groupBy('organisasi_id')
             ->with('organisasi')

@@ -6,6 +6,7 @@ use Livewire\Component;
 use Livewire\Attributes\On;
 use App\Models\OrganisasiMahasiswa;
 use App\Models\AdminDpm;
+use App\Enums\OrganisasiStatus; // 🟢 Tambahkan enum status jika ada
 use Illuminate\Support\Facades\Auth;
 
 class NewOrganizations extends Component
@@ -20,7 +21,7 @@ class NewOrganizations extends Component
     #[On('trigger-global-refresh')]
     public function refreshNewOrganizations()
     {
-        // Biarkan kosong, Livewire otomatis memicu ulang fungsi render() di bawah
+        // Biarkan kosong, Livewire otomatis memicu ulang fungsi render()
     }
 
     public function render()
@@ -28,7 +29,9 @@ class NewOrganizations extends Component
         $adminDpm = AdminDpm::query()->where('user_id', Auth::id())->first();
 
         $query = OrganisasiMahasiswa::query();
-        $query->where('status', 'pending');
+        
+        // Ambil organisasi baru yang di setujui
+        $query->where('status', OrganisasiStatus::APPROVED->value); 
 
         if ($adminDpm && $adminDpm->fakultas_id !== null) {
             $query->where('fakultas_id', $adminDpm->fakultas_id);

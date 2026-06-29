@@ -43,7 +43,7 @@ class Dashboard extends Component
     {
         $this->cardsData = [
             'orgAktif'         => $this->baseOrgQuery()->where('status', OrganisasiStatus::APPROVED->value)->count(),
-            'eventBerlangsung' => $this->baseEventQuery()->where('status', EventStatus::PUBLISHED->value)->count(),
+            'eventBerlangsung' => $this->baseEventQuery()->whereIn('status', [EventStatus::PUBLISHED->value, EventStatus::COMPLETED->value])->count(),
             'pendingOrg'       => $this->baseOrgQuery()->where('status', OrganisasiStatus::PENDING->value)->count(),
             'pendingEvent'     => $this->baseEventQuery()->where('status', EventStatus::PENDING_APPROVAL->value)->count(),
         ];
@@ -54,11 +54,13 @@ class Dashboard extends Component
     // Untuk menyaring query dasar event
     protected function baseEventQuery()
     {
-        return Event::whereHas('organisasi', function ($q) {
+        $query = Event::whereHas('organisasi', function ($q) {
             $this->fakultasId
                 ? $q->where('fakultas_id', $this->fakultasId)
                 : $q->where('tingkat_organisasi', TingkatOrganisasi::UNIVERSITAS->value);
         });
+
+        return $query->where('status', '!=', EventStatus::DRAFT->value);
     }
 
     // Untuk menyaring query dasar organisasi mahasiswa
@@ -81,34 +83,58 @@ class Dashboard extends Component
 
         $statusCounts = array_change_key_case($statusCounts, CASE_LOWER);
 
+        $published = $statusCounts[strtolower(EventStatus::PUBLISHED->value)] ?? 0;
+        $completed = $statusCounts[strtolower(EventStatus::COMPLETED->value)] ?? 0;
+
         return [
-            'disetujui' => $statusCounts[strtolower(EventStatus::PUBLISHED->value)] ?? 0,
+            'disetujui' => $published + $completed, 
             'menunggu'  => $statusCounts[strtolower(EventStatus::PENDING_APPROVAL->value)] ?? 0,
-            'ditolak'   => $statusCounts[strtolower(EventStatus::REVISION->value)] ?? 0,
+            'revisi'    => $statusCounts[strtolower(EventStatus::REVISION->value)] ?? 0,
         ];
     }
 
     // Fitur Export CSV
     public function exportReport()
     {
-        $events = $this->baseEventQuery()->with('organisasi')->latest()->get();
+        $events = $this->baseEventQuery()
+            ->with(['organisasi', 'kategori']) 
+            ->latest()
+            ->get();
 
-        // Judul Kolom CSV
-        $csv = "ID Event,Nama Event,Penyelenggara,Status,Tanggal Pengajuan,Tingkat\n";
+        $headers = [
+            'ID Event', 'Nama Event', 'Kategori', 'Penyelenggara', 
+            'Tingkat', 'Status', 'Kuota Total', 'Sisa Kuota', 
+            'Narasumber', 'Nama Lokasi', 'URL Lokasi', 'Link Pendaftaran', 
+            'Tanggal Diajukan'
+        ];
+        
+        $csv = implode(',', $headers) . "\n";
         
         foreach ($events as $event) {
-            $csv .= implode(',', [
+            $status = is_object($event->status) ? ($event->status?->value ?? '-') : $event->status;
+            $tingkat = is_object($event->tingkat_event) ? ($event->tingkat_event?->value ?? '-') : $event->tingkat_event;
+
+            $row = [
                 $event->id,
-                str_replace(',', ' ', $event->nama_event),
-                $event->organisasi->nama_organisasi ?? '-',
-                strtoupper(is_object($event->status) ? $event->status->value : $event->status),
-                $event->created_at->format('Y-m-d'),
-                strtoupper(is_object($event->tingkat_event) ? $event->tingkat_event->value : $event->tingkat_event),
-            ]) . "\n";
+                '"' . str_replace('"', '""', $event->nama_event) . '"',
+                '"' . ($event->kategori?->nama_kategori ?? '-') . '"',
+                '"' . ($event->organisasi->nama_organisasi ?? '-') . '"',
+                strtoupper($tingkat ?? '-'),
+                strtoupper($status ?? '-'),
+                $event->kuota ?? 0,
+                $event->sisa_kuota ?? 0,
+                '"' . str_replace('"', '""', $event->narasumber ?? '-') . '"',
+                '"' . str_replace('"', '""', $event->nama_lokasi ?? '-') . '"',
+                $event->lokasi_url ?? '-',
+                $event->link_event ?? '-',
+                $event->created_at->format('Y-m-d H:i')
+            ];
+
+            $csv .= implode(',', $row) . "\n";
         }
 
         $suffix = $this->fakultasId ? "Fakultas_{$this->fakultasId}" : 'Universitas';
-        $fileName = "Laporan_Aktivitas_{$suffix}_" . date('Y_m_d') . '.csv';
+        $fileName = "Laporan_Aktivitas_Event_{$suffix}_" . date('Y_m_d_His') . '.csv';
 
         return response()->streamDownload(fn() => print($csv), $fileName, [
             'Content-Type' => 'text/csv',

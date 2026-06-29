@@ -71,6 +71,9 @@ class EventMaster extends Component
             }
         });
 
+        // buang status draft
+        $query->where('status', '!=', EventStatus::DRAFT->value);
+
         // logika Filter Status jika dipilih
         if (!$this->isDashboard && $this->filterStatus) {
             $query->where('status', $this->filterStatus);
@@ -122,9 +125,9 @@ class EventMaster extends Component
         }
     }
 
-    public function rejectEvent(int $eventId, ?string $alasan = null)
+    public function rejectEvent(int $eventId)
     {
-        // Validasi Input
+        // 1. Validasi Input sesuai aturan string
         $this->validate([
             'alasanPenolakan' => 'required|string|min:5|max:500'
         ], [
@@ -137,24 +140,26 @@ class EventMaster extends Component
         $event = $this->baseEventQuery()->find($eventId);
 
         if ($event) {
-            $alasan = strip_tags($this->alasanPenolakan);
+            $alasanBersih = strip_tags($this->alasanPenolakan);
 
-            if (strlen(trim($alasan)) < 5) {
-                $this->addError('alasanPenolakan', 'Alasan tidak boleh hanya berisi tag HTML kosong.');
+            if (strlen(trim($alasanBersih)) < 5) {
+                $this->addError('alasanPenolakan', 'Alasan tidak boleh hanya berisi spasi atau karakter kosong.');
                 return;
             }
 
             $event->update([
                 'status'         => EventStatus::REVISION->value,
-                'catatan_revisi' => $alasan,
+                'catatan_revisi' => trim($alasanBersih),
             ]);
 
-            // Refresh Global
+            $this->reset('alasanPenolakan');
+
+            // Refresh Global & Tutup Modal Konfirmasi
             $this->dispatch('trigger-global-refresh');
-            session()->flash('success', "Event '{$event->nama_event}' dikembalikan untuk direvisi.");
+            session()->flash('success', "Event '{$event->nama_event}' telah dikembalikan ke ormawa untuk direvisi.");
             $this->closeModal();
         } else {
-            session()->flash('error', "Aksi ilegal terdeteksi. Data tidak ditemukan di wilayah Anda.");
+            session()->flash('error', "Aksi ilegal terdeteksi. Data tidak ditemukan di wilayah otoritas Anda.");
         }
     }
 
@@ -209,7 +214,11 @@ class EventMaster extends Component
             }
 
             // Paginasi 5 data per halaman
-            $paginator = $query->orderByRaw("FIELD(status, '" . EventStatus::PENDING_APPROVAL->value . "', '" . EventStatus::PUBLISHED->value . "', '" . EventStatus::REVISION->value . "') ASC")
+            $paginator = $query->orderByRaw("FIELD(status, '" . 
+                                EventStatus::PENDING_APPROVAL->value . "', '" . 
+                                EventStatus::REVISION->value . "', '" .
+                                EventStatus::PUBLISHED->value . "', '" . 
+                                EventStatus::COMPLETED->value . "') ASC")
                             ->orderBy('created_at', 'desc')
                             ->paginate(6)
                             ->onEachSide(1);

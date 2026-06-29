@@ -40,25 +40,12 @@
             </x-slot>
         </x-admin.cards.stat-card-action>
 
-        <!-- Card 2: Menunggu Persetujuan -->
-        <x-admin.cards.stat-card-action 
-            title="Menunggu Persetujuan"
-            value="{{ $statCards['pending'] }}"
-            unit="Event"
-            footerLabel="Butuh Review"
-            footerType="error"
-            iconType="primary">
-            <x-slot name="icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-            </x-slot>
-        </x-admin.cards.stat-card-action>
-
-        <!-- Card 3: Event Disetujui -->
+        <!-- Card 2: Event Disetujui + Selesai -->
         <x-admin.cards.stat-card-action 
             title="Event Disetujui"
-            value="{{ $statCards['approved'] }}"
-            unit="Published"
-            footerLabel="Telah Tayang"
+            value="{{ $statCards['published'] + $statCards['completed'] }}"
+            unit="Event"
+            footerLabel="{{ $statCards['published'] }} Aktif & {{ $statCards['completed'] }} Selesai"
             footerType="success"
             iconType="success">
             <x-slot name="icon">
@@ -66,12 +53,25 @@
             </x-slot>
         </x-admin.cards.stat-card-action>
 
-        <!-- Card 4: Event Ditolak -->
+        <!-- Card 3: Menunggu Persetujuan -->
         <x-admin.cards.stat-card-action 
-            title="Event Ditolak"
-            value="{{ $statCards['rejected'] }}"
-            unit="Revisi"
-            footerLabel="Minta Perbaikan"
+            title="Menunggu Persetujuan"
+            value="{{ $statCards['pending'] }}"
+            unit="Event"
+            footerLabel="Butuh Review"
+            footerType="warning"
+            iconType="warning">
+            <x-slot name="icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            </x-slot>
+        </x-admin.cards.stat-card-action>
+
+        <!-- Card 4: Event Ditolak/Revisi -->
+        <x-admin.cards.stat-card-action 
+            title="Butuh Revisi"
+            value="{{ $statCards['revision'] }}"
+            unit="Event"
+            footerLabel="Menunggu Perbaikan"
             footerType="error"
             iconType="error">
             <x-slot name="icon">

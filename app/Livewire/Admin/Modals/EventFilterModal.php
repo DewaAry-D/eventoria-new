@@ -72,12 +72,20 @@ class EventFilterModal extends Component
 
     public function render()
     {
+        $organisasiQuery = OrganisasiMahasiswa::query();
+
+        if ($this->fakultasId) {
+            // Jika dalam lingkup fakultas, hanya tampilkan ormawa milik fakultas tersebut
+            $organisasiQuery->where('fakultas_id', $this->fakultasId);
+        } else {
+            // Jika dalam lingkup universitas, batasi hanya menampilkan ormawa tingkat universitas saja
+            $organisasiQuery->where('tingkat_organisasi', 'universitas');
+        }
+
         return view('livewire.admin.modals.event-filter-modal', [
             'listFakultas'   => Fakultas::orderBy('nama_fakultas', 'asc')->get(),
             'listKategori'   => Kategori::orderBy('nama_kategori', 'asc')->get(),
-            'listOrganisasi' => OrganisasiMahasiswa::query()->when($this->fakultasId, function($q) {
-                                    $q->where('fakultas_id', $this->fakultasId);
-                                    })->orderBy('nama_organisasi', 'asc')->get()
+            'listOrganisasi' => $organisasiQuery->orderBy('nama_organisasi', 'asc')->get()
         ]);
     }
 }

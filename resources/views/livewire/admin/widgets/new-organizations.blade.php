@@ -41,7 +41,7 @@
         <a href="/admin/moderasi-organisasi" wire:navigate 
             class="w-full py-2.5 flex items-center justify-center gap-xs text-body-sm font-bold text-primary bg-primary/[0.02] border border-primary/10 hover:bg-primary/[0.08] hover:border-primary/20 active:scale-[0.98] rounded-xl transition-all select-none shadow-sm group">
             
-            <span>Lihat Semua Antrean</span>
+            <span>Lihat Semua Organisasi</span>
             
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" 
                 class="mt-[1px] transform group-hover:translate-x-0.5 transition-transform duration-200">

@@ -166,8 +166,25 @@
             <tbody class="divide-y divide-outline-variant/10 text-body-md text-on-surface font-medium">
                 @forelse($events as $event)
                     @php 
-                        $eStatus = is_object($event->status) ? $event->status->value : $event->status; 
-                    @endphp
+                    $eStatus = is_object($event->status) ? $event->status->value : $event->status; 
+                
+                    $tdStatusColor = match($eStatus) {
+                        'published'        => 'text-success bg-success/10 border-success/10',
+                        'completed'        => 'text-primary bg-primary/10 border-primary/10',
+                        'revision'         => 'text-error bg-error/10 border-error/10',
+                        'pending_approval' => 'text-warning bg-warning/10 border-warning/10',
+                        default            => 'text-warning bg-warning/10 border-warning/10'
+                    };
+                
+                    $tdStatusText = match($eStatus) {
+                        'published'        => 'Terbit',
+                        'completed'        => 'Selesai',
+                        'revision'         => 'Revisi',
+                        'pending_approval' => 'Pending',
+                        default            => ucfirst($currentStatus)
+                    };
+                @endphp
+
                     <tr wire:key="event-row-{{ $event->id }}" class="transition-colors duration-150 bg-transparent even:bg-surface-container/30 hover:bg-primary/[0.01]">
                         
                         <td class="py-lg pr-md text-left alignment-left">
@@ -194,19 +211,28 @@
         
                         <td class="py-lg px-md text-center select-none">
                             <div class="inline-flex justify-center w-full">
-                                @if($eStatus === 'pending_approval' || $eStatus === 'pending')
-                                    <span class="inline-flex items-center gap-xs px-sm py-0.5 bg-amber-500/[0.08] text-amber-700 font-bold text-xs rounded-full border border-amber-500/20">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span> Pending
-                                    </span>
-                                @elseif($eStatus === 'published')
-                                    <span class="inline-flex items-center gap-xs px-sm py-0.5 bg-emerald-500/[0.08] text-emerald-700 font-bold text-xs rounded-full border border-emerald-500/20">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Diterima
-                                    </span>
-                                @else
-                                    <span class="inline-flex items-center gap-xs px-sm py-0.5 bg-red-500/[0.08] text-red-700 font-bold text-xs rounded-full border border-red-500/20">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> Revisi
-                                    </span>
-                                @endif
+                                <div class="px-2.5 py-1 rounded-xl border text-[11px] font-bold tracking-wide inline-flex items-center gap-xs shadow-2xs {{ $tdStatusColor }}">
+                                    
+                                    @if($eStatus === 'published')
+                                        <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                    @elseif($eStatus === 'completed')
+                                        <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 013-3h.375a2.625 2.625 0 000-5.25H20.25m-3.75 8.25v-3m0 3h3.75m-11.25-3c0-2.25 1.5-4.5 3.75-4.5h.75m-4.5 4.5H4.875a2.625 2.625 0 010-5.25H5.25m3.75 8.25v-3m0 3H5.25M12 3v9m0 0l3-3m-3 3L9 9"/>
+                                        </svg>
+                                    @elseif($eStatus === 'revision')
+                                        <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/>
+                                        </svg>
+                                    @else
+                                        <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                    @endif
+                        
+                                    <span>{{ $tdStatusText }}</span>
+                                </div>
                             </div>
                         </td>
         

@@ -14,7 +14,7 @@
             <div class="flex flex-col min-w-0">
                 <span class="text-body-md font-bold text-primary tracking-tight">Kategori Event Terpopuler</span>
                 <span class="text-caption text-on-surface-variant font-medium mt-0.5 truncate leading-relaxed">
-                    Kategori <span class="text-secondary font-bold bg-secondary/[0.06] px-1.5 py-0.5 rounded-md border border-secondary/10">{{ $kategoriNama }}</span> mendominasi bulan ini
+                    Kategori <span class="text-primary font-bold bg-secondary/[0.06] px-1.5 py-0.5 rounded-md border border-secondary/10">{{ $kategoriNama }}</span> mendominasi bulan ini
                 </span>
             </div>
         </div>

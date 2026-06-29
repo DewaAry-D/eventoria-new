@@ -31,7 +31,7 @@ class LineTrend extends Component
         // Ambil data profil Admin DPM yang sedang login
         $adminDpm = AdminDpm::query()->where('user_id', Auth::id())->first();
 
-        return Event::whereHas('organisasi', function ($q) use ($adminDpm) {
+        $query = Event::whereHas('organisasi', function ($q) use ($adminDpm) {
             if ($adminDpm && $adminDpm->fakultas_id !== null) {
                 $q->where('fakultas_id', $adminDpm->fakultas_id);
             } 
@@ -39,15 +39,17 @@ class LineTrend extends Component
                 $q->where('tingkat_organisasi', 'universitas');
             }
         });
+
+        return $query->where('status', '!=', EventStatus::DRAFT->value);
     }
 
     private function getLineChartConfig()
     {
         $startDate = Carbon::now()->subMonths(5)->startOfMonth();
 
-        // Mengambil tren dari data event berstatus PUBLISHED 6 bulan terakhir
+        // Mengambil tren dari data event berstatus published dan completed 6 bulan terakhir
         $activeOrgsCount = $this->baseEventQuery()
-            ->where('status', EventStatus::PUBLISHED->value)
+            ->whereIn('status', [EventStatus::PUBLISHED->value, EventStatus::COMPLETED->value])
             ->where('created_at', '>=', $startDate)
             ->selectRaw("DATE_FORMAT(created_at, '%Y-%m') as month, count(distinct organisasi_id) as total")
             ->groupBy('month')

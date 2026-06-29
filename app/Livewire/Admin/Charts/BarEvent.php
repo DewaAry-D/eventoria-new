@@ -30,7 +30,7 @@ class BarEvent extends Component
     {
         $adminDpm = AdminDpm::query()->where('user_id', Auth::id())->first();
 
-        return Event::whereHas('organisasi', function ($q) use ($adminDpm) {
+        $query = Event::whereHas('organisasi', function ($q) use ($adminDpm) {
             if ($adminDpm && $adminDpm->fakultas_id !== null) {
                 $q->where('fakultas_id', $adminDpm->fakultas_id);
             } 
@@ -38,13 +38,15 @@ class BarEvent extends Component
                 $q->where('tingkat_organisasi', 'universitas');
             }
         });
+
+        return $query->where('status', '!=', EventStatus::DRAFT->value);
     }
     private function getBarChartConfig()
     {
         $startDate = Carbon::now()->subMonths(5)->startOfMonth();
 
         $eventsCount = $this->baseEventQuery()
-            ->where('status', EventStatus::PUBLISHED->value)
+            ->whereIn('status', [EventStatus::PUBLISHED->value, EventStatus::COMPLETED->value])
             ->where('created_at', '>=', $startDate)
             ->selectRaw("DATE_FORMAT(created_at, '%Y-%m') as month, count(*) as total")
             ->groupBy('month')

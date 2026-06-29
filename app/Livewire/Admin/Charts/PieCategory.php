@@ -28,8 +28,7 @@ class PieCategory extends Component
         // Mengambil data profil Admin DPM yang sedang login saat ini
         $adminDpm = AdminDpm::query()->where('user_id', Auth::id())->first();
 
-        return Event::whereHas('organisasi', function ($q) use ($adminDpm) {
-
+        $query = Event::whereHas('organisasi', function ($q) use ($adminDpm) {
             if ($adminDpm && $adminDpm->fakultas_id !== null) {
                 $q->where('fakultas_id', $adminDpm->fakultas_id);
             } 
@@ -37,13 +36,15 @@ class PieCategory extends Component
                 $q->where('tingkat_organisasi', 'universitas');
             }
         });
+
+        return $query->where('status', '!=', EventStatus::DRAFT->value);
     }
 
     private function getPieChartConfig()
     {
         // Pengelompokan jumlah event berdasarkan kategori_id
         $categoryData = $this->baseEventQuery()
-            ->where('status', EventStatus::PUBLISHED->value)
+            ->whereIn('status', [EventStatus::PUBLISHED->value, EventStatus::COMPLETED->value])
             ->select('kategori_id', DB::raw('count(*) as total'))
             ->groupBy('kategori_id')
             ->with('kategori')

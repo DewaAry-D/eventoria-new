@@ -27,11 +27,13 @@ class EventManagement extends Component
 
     protected function baseEventQuery()
     {
-        return Event::whereHas('organisasi', function ($q) {
+        $query = Event::whereHas('organisasi', function ($q) {
             $this->fakultasId
                 ? $q->where('fakultas_id', $this->fakultasId)
                 : $q->where('tingkat_organisasi', 'universitas');
         });
+
+        return $query->where('status', '!=', EventStatus::DRAFT->value);
     }
 
     private function calculateStatCards()
@@ -44,16 +46,20 @@ class EventManagement extends Component
 
         $counts = array_change_key_case($counts, CASE_LOWER);
 
-        $total = array_sum($counts);
-        $pending = $counts[strtolower(EventStatus::PENDING_APPROVAL->value)] ?? 0;
-        $approved = $counts[strtolower(EventStatus::PUBLISHED->value)] ?? 0;
-        $rejected = $counts[strtolower(EventStatus::REVISION->value)] ?? 0;
+        $pending   = $counts[strtolower(EventStatus::PENDING_APPROVAL->value)] ?? 0;
+        $revision  = $counts[strtolower(EventStatus::REVISION->value)] ?? 0;
+        $published = $counts[strtolower(EventStatus::PUBLISHED->value)] ?? 0;
+        $completed = $counts[strtolower(EventStatus::COMPLETED->value)] ?? 0;
+
+        // jumlah dari seluruh event yang sudah resmi diajukan ke admin
+        $total = $pending + $revision + $published + $completed;
 
         return [
-            'total'    => $total,
-            'pending'  => $pending,
-            'approved' => $approved,
-            'rejected' => $rejected,
+            'total'     => $total,
+            'pending'   => $pending,
+            'published' => $published,
+            'completed' => $completed,
+            'revision'  => $revision,
         ];
     }
 

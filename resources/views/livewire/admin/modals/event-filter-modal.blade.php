@@ -40,9 +40,10 @@
                     <label class="text-xs font-bold text-secondary/60 uppercase tracking-wide">Status Kelayakan</label>
                     <select wire:model.live="status" class="w-full text-body-md px-sm py-2 bg-surface-container/40 border border-outline-variant/30 rounded-xl focus:outline-none focus:border-primary/30 text-primary font-medium">
                         <option value="">Semua Status</option>
-                        <option value="pending_approval">Pending (Menunggu Persetujuan)</option>
-                        <option value="published">Diterima (Telah Tayang)</option>
-                        <option value="revision">Ditolak (Butuh Revisi)</option>
+                        <option value="completed">Selesai (Kegiatan Selesai)</option>
+                        <option value="published">Terbit (Telah Disetujui / Aktif)</option>
+                        <option value="pending_approval">Pending (Menunggu Review)</option>
+                        <option value="revision">Revisi (Butuh Revisi)</option>
                     </select>
                 </div>
 
