@@ -24,7 +24,6 @@ new #[Layout('layouts.organisasi')] class extends Component
     public $narasumber;
     public $flyer;
 
-    // Array Dinamis untuk Timeline, Biaya, Narahubung, dan Tujuan Transfer
     public array $timelines = [];
     public array $biayas = [];
     public array $narahubungs = [];
@@ -34,33 +33,28 @@ new #[Layout('layouts.organisasi')] class extends Component
     {
         $organisasi = Auth::user()->load('organisasi')->organisasi;
 
-        // PROTEKSI KEAMANAN: Tendang user jika statusnya bukan approved
         if ($organisasi->status->value !== 'approved') {
             abort(403, 'Akses Ditolak. Akun organisasi Anda belum disetujui.');
         }
-        
+
         $this->timelines = [
             [
                 'nama_timeline' => 'Pendaftaran',
                 'deskripsi_timeline' => 'Masa pendaftaran peserta',
                 'tanggal_mulai' => '',
                 'tanggal_selesai' => '',
-                'is_default' => true 
+                'is_default' => true
             ]
         ];
 
-        // Set default biaya (Gratis)
         $this->biayas = [
             [
                 'kategori' => 'Umum',
                 'biaya' => 0
             ]
         ];
-        
-        // Narahubung dan Tujuan Transfer dibiarkan kosong sebagai default (opsional)
     }
 
-    // --- FUNGSI TIMELINE ---
     public function tambahTimeline()
     {
         $this->timelines[] = [
@@ -78,7 +72,6 @@ new #[Layout('layouts.organisasi')] class extends Component
         $this->timelines = array_values($this->timelines);
     }
 
-    // --- FUNGSI BIAYA ---
     public function tambahBiaya()
     {
         $this->biayas[] = [
@@ -93,7 +86,6 @@ new #[Layout('layouts.organisasi')] class extends Component
         $this->biayas = array_values($this->biayas);
     }
 
-    // --- FUNGSI NARAHUBUNG ---
     public function tambahNarahubung()
     {
         $this->narahubungs[] = [
@@ -108,7 +100,6 @@ new #[Layout('layouts.organisasi')] class extends Component
         $this->narahubungs = array_values($this->narahubungs);
     }
 
-    // --- FUNGSI TUJUAN TRANSFER ---
     public function tambahTujuanTransfer()
     {
         $this->tujuan_transfers[] = [
@@ -141,21 +132,17 @@ new #[Layout('layouts.organisasi')] class extends Component
             'deskripsi' => 'required|string',
             'kuota' => 'required|integer|min:1',
             'flyer' => 'nullable|image|max:2048',
-            
-            // Validasi Timeline
+
             'timelines.*.nama_timeline' => 'required|string|max:255',
             'timelines.*.tanggal_mulai' => 'required|date',
             'timelines.*.tanggal_selesai' => 'required|date|after:timelines.*.tanggal_mulai',
-            
-            // Validasi Biaya
+
             'biayas.*.kategori' => 'required|string|max:50',
             'biayas.*.biaya' => 'required|numeric|min:0',
-            
-            // Validasi Narahubung (jika ada)
+
             'narahubungs.*.nama' => 'required|string|max:255',
             'narahubungs.*.nomor' => 'required|string|max:50',
 
-            // Validasi Tujuan Transfer (jika ada)
             'tujuan_transfers.*.nama_bank' => 'required|string|max:25',
             'tujuan_transfers.*.no_rekening' => 'required|string|max:200',
             'tujuan_transfers.*.atas_nama' => 'required|string|max:255',
@@ -196,7 +183,6 @@ new #[Layout('layouts.organisasi')] class extends Component
                 'tingkat_event' => $this->tingkat_event,
             ]);
 
-            // Simpan Timeline
             foreach ($this->timelines as $tl) {
                 $event->timeLines()->create([
                     'nama_timeline' => $tl['nama_timeline'],
@@ -206,7 +192,6 @@ new #[Layout('layouts.organisasi')] class extends Component
                 ]);
             }
 
-            // Simpan Biaya
             foreach ($this->biayas as $by) {
                 $event->biayaEvents()->create([
                     'kategori' => $by['kategori'],
@@ -214,7 +199,6 @@ new #[Layout('layouts.organisasi')] class extends Component
                 ]);
             }
 
-            // Simpan Narahubung (jika ditambahkan)
             foreach ($this->narahubungs as $nh) {
                 $event->narahubung()->create([
                     'nama' => $nh['nama'],
@@ -222,7 +206,6 @@ new #[Layout('layouts.organisasi')] class extends Component
                 ]);
             }
 
-            // Simpan Tujuan Transfer (jika ditambahkan)
             foreach ($this->tujuan_transfers as $tt) {
                 $event->tujuanTransfer()->create([
                     'nama_bank' => $tt['nama_bank'],
@@ -240,21 +223,21 @@ new #[Layout('layouts.organisasi')] class extends Component
 <div>
     <div class="mb-6">
         <div class="flex items-center gap-3 mb-2">
-            <a href="{{ route('organisasi.events') }}" wire:navigate class="p-2 text-gray-500 bg-white border border-gray-200 rounded-lg hover:bg-gray-50">
+            <a href="{{ route('organisasi.events') }}" wire:navigate class="p-2 text-on-surface-variant bg-surface-container-lowest border border-outline-variant rounded-lg hover:bg-surface-container">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
             </a>
-            <h1 class="text-2xl font-bold text-gray-900">Buat Event Baru</h1>
+            <h1 class="text-2xl font-bold text-on-surface">Buat Event Baru</h1>
         </div>
-        <p class="text-gray-500 text-sm ml-12">Lengkapi informasi dasar acara. Anda bisa menyusun form pendaftaran setelah tahap ini selesai.</p>
+        <p class="text-on-surface-variant text-sm ml-12">Lengkapi informasi dasar acara. Anda bisa menyusun form pendaftaran setelah tahap ini selesai.</p>
     </div>
 
     <form wire:submit="simpanEvent" class="space-y-6">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            
+
             <div class="lg:col-span-2 space-y-6">
-                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                    <h2 class="text-lg font-bold text-gray-900 mb-4 border-b pb-2">Informasi Utama</h2>
-                    
+                <div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant shadow-card">
+                    <h2 class="text-lg font-bold text-on-surface mb-4 border-b border-outline-variant pb-2">Informasi Utama</h2>
+
                     <div class="space-y-4">
                         <div>
                             <x-input-label value="Nama Event" required />
@@ -265,7 +248,7 @@ new #[Layout('layouts.organisasi')] class extends Component
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <x-input-label value="Kategori Event" required />
-                                <select wire:model="kategori_id" class="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm">
+                                <select wire:model="kategori_id" class="block w-full mt-1 border-outline-variant rounded-md shadow-sm focus:ring-primary focus:border-primary text-sm">
                                     <option value="">-- Pilih Kategori --</option>
                                     @foreach($daftar_kategori as $kategori)
                                         <option value="{{ $kategori->id }}">{{ $kategori->nama_kategori }}</option>
@@ -275,7 +258,7 @@ new #[Layout('layouts.organisasi')] class extends Component
                             </div>
                             <div>
                                 <x-input-label value="Tingkat Akses Event" required />
-                                <select wire:model="tingkat_event" class="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm">
+                                <select wire:model="tingkat_event" class="block w-full mt-1 border-outline-variant rounded-md shadow-sm focus:ring-primary focus:border-primary text-sm">
                                     <option value="">-- Pilih Akses --</option>
                                     <option value="universitas">Tingkat Universitas (Terbuka)</option>
                                     <option value="fakultas">Tingkat Fakultas (Internal)</option>
@@ -293,7 +276,7 @@ new #[Layout('layouts.organisasi')] class extends Component
 
                         <div>
                             <x-input-label value="Deskripsi Lengkap Event" required />
-                            <textarea wire:model="deskripsi" rows="5" class="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm" placeholder="Jelaskan secara detail tentang acara ini..."></textarea>
+                            <textarea wire:model="deskripsi" rows="5" class="block w-full mt-1 border-outline-variant rounded-md shadow-sm focus:ring-primary focus:border-primary text-sm" placeholder="Jelaskan secara detail tentang acara ini..."></textarea>
                             <x-input-error :messages="$errors->get('deskripsi')" class="mt-2" />
                         </div>
 
@@ -304,8 +287,8 @@ new #[Layout('layouts.organisasi')] class extends Component
                     </div>
                 </div>
 
-                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                    <h2 class="text-lg font-bold text-gray-900 mb-4 border-b pb-2">Lokasi & Tautan</h2>
+                <div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant shadow-card">
+                    <h2 class="text-lg font-bold text-on-surface mb-4 border-b border-outline-variant pb-2">Lokasi & Tautan</h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <x-input-label value="Nama Lokasi / Gedung" />
@@ -318,17 +301,17 @@ new #[Layout('layouts.organisasi')] class extends Component
                     </div>
                 </div>
 
-                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                    <div class="flex items-center justify-between mb-4 border-b pb-2">
-                        <h2 class="text-lg font-bold text-gray-900">Narahubung (Opsional)</h2>
-                        <button type="button" wire:click="tambahNarahubung" class="text-xs font-bold text-indigo-600 hover:text-indigo-800 bg-indigo-50 px-2 py-1 rounded">
+                <div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant shadow-card">
+                    <div class="flex items-center justify-between mb-4 border-b border-outline-variant pb-2">
+                        <h2 class="text-lg font-bold text-on-surface">Narahubung (Opsional)</h2>
+                        <button type="button" wire:click="tambahNarahubung" class="text-xs font-bold text-primary hover:text-primary/80 bg-primary/10 px-2 py-1 rounded">
                             + Tambah Kontak
                         </button>
                     </div>
-                    
+
                     <div class="space-y-3">
                         @forelse($narahubungs as $index => $nh)
-                            <div class="flex gap-2 items-start relative bg-gray-50 p-3 border border-gray-100 rounded-lg">
+                            <div class="flex gap-2 items-start relative bg-surface-container p-3 border border-outline-variant/50 rounded-lg">
                                 <div class="w-1/2">
                                     <x-input-label value="Nama Narahubung" required />
                                     <x-text-input wire:model="narahubungs.{{ $index }}.nama" class="block w-full mt-1 text-sm" type="text" placeholder="Cth: Budi" />
@@ -339,27 +322,27 @@ new #[Layout('layouts.organisasi')] class extends Component
                                     <x-text-input wire:model="narahubungs.{{ $index }}.nomor" class="block w-full mt-1 text-sm" type="text" placeholder="Cth: 08123456789" />
                                     <x-input-error :messages="$errors->get('narahubungs.'.$index.'.nomor')" class="mt-1 text-xs" />
                                 </div>
-                                <button type="button" wire:click="hapusNarahubung({{ $index }})" class="mt-7 text-red-500 hover:text-red-700 p-1">
+                                <button type="button" wire:click="hapusNarahubung({{ $index }})" class="mt-7 text-error hover:text-error/70 p-1">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                                 </button>
                             </div>
                         @empty
-                            <p class="text-sm text-gray-500 italic text-center py-2">Belum ada narahubung yang ditambahkan.</p>
+                            <p class="text-sm text-on-surface-variant italic text-center py-2">Belum ada narahubung yang ditambahkan.</p>
                         @endforelse
                     </div>
                 </div>
 
-                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                    <div class="flex items-center justify-between mb-4 border-b pb-2">
-                        <h2 class="text-lg font-bold text-gray-900">Rekening Pembayaran (Opsional)</h2>
-                        <button type="button" wire:click="tambahTujuanTransfer" class="text-xs font-bold text-indigo-600 hover:text-indigo-800 bg-indigo-50 px-2 py-1 rounded">
+                <div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant shadow-card">
+                    <div class="flex items-center justify-between mb-4 border-b border-outline-variant pb-2">
+                        <h2 class="text-lg font-bold text-on-surface">Rekening Pembayaran (Opsional)</h2>
+                        <button type="button" wire:click="tambahTujuanTransfer" class="text-xs font-bold text-primary hover:text-primary/80 bg-primary/10 px-2 py-1 rounded">
                             + Tambah Rekening
                         </button>
                     </div>
-                    
+
                     <div class="space-y-3">
                         @forelse($tujuan_transfers as $index => $tt)
-                            <div class="grid grid-cols-12 gap-2 items-start relative bg-gray-50 p-3 border border-gray-100 rounded-lg">
+                            <div class="grid grid-cols-12 gap-2 items-start relative bg-surface-container p-3 border border-outline-variant/50 rounded-lg">
                                 <div class="col-span-3">
                                     <x-input-label value="Bank/E-Wallet" required />
                                     <x-text-input wire:model="tujuan_transfers.{{ $index }}.nama_bank" class="block w-full mt-1 text-sm" type="text" placeholder="BCA / DANA" />
@@ -376,13 +359,13 @@ new #[Layout('layouts.organisasi')] class extends Component
                                     <x-input-error :messages="$errors->get('tujuan_transfers.'.$index.'.atas_nama')" class="mt-1 text-xs" />
                                 </div>
                                 <div class="col-span-1 text-right mt-6">
-                                    <button type="button" wire:click="hapusTujuanTransfer({{ $index }})" class="text-red-500 hover:text-red-700 p-1">
+                                    <button type="button" wire:click="hapusTujuanTransfer({{ $index }})" class="text-error hover:text-error/70 p-1">
                                         <svg class="w-5 h-5 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                                     </button>
                                 </div>
                             </div>
                         @empty
-                            <p class="text-sm text-gray-500 italic text-center py-2">Belum ada rekening pembayaran yang ditambahkan.</p>
+                            <p class="text-sm text-on-surface-variant italic text-center py-2">Belum ada rekening pembayaran yang ditambahkan.</p>
                         @endforelse
                     </div>
                 </div>
@@ -390,23 +373,23 @@ new #[Layout('layouts.organisasi')] class extends Component
             </div>
 
             <div class="space-y-6">
-                
-                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                    <div class="flex items-center justify-between mb-4 border-b pb-2">
+
+                <div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant shadow-card">
+                    <div class="flex items-center justify-between mb-4 border-b border-outline-variant pb-2">
                         <div class="flex items-center gap-2">
-                            <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                            <h2 class="text-lg font-bold text-gray-900">Timeline Event</h2>
+                            <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                            <h2 class="text-lg font-bold text-on-surface">Timeline Event</h2>
                         </div>
-                        <button type="button" wire:click="tambahTimeline" class="text-xs font-bold text-indigo-600 hover:text-indigo-800 bg-indigo-50 px-2 py-1 rounded">
+                        <button type="button" wire:click="tambahTimeline" class="text-xs font-bold text-primary hover:text-primary/80 bg-primary/10 px-2 py-1 rounded">
                             + Tambah Jadwal
                         </button>
                     </div>
-                    
+
                     <div class="space-y-6">
                         @foreach($timelines as $index => $tl)
-                            <div class="relative p-4 border border-gray-100 bg-gray-50 rounded-lg shadow-inner">
+                            <div class="relative p-4 border border-outline-variant/50 bg-surface-container rounded-lg shadow-inner">
                                 @if(!isset($tl['is_default']) || !$tl['is_default'])
-                                    <button type="button" wire:click="hapusTimeline({{ $index }})" class="absolute top-2 right-2 text-red-500 hover:text-red-700">
+                                    <button type="button" wire:click="hapusTimeline({{ $index }})" class="absolute top-2 right-2 text-error hover:text-error/70">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                                     </button>
                                 @endif
@@ -415,7 +398,7 @@ new #[Layout('layouts.organisasi')] class extends Component
                                     <div>
                                         <x-input-label value="Nama Jadwal" required />
                                         @if(isset($tl['is_default']) && $tl['is_default'])
-                                            <x-text-input wire:model="timelines.{{ $index }}.nama_timeline" class="block w-full mt-1 text-sm bg-gray-200 cursor-not-allowed" type="text" readonly />
+                                            <x-text-input wire:model="timelines.{{ $index }}.nama_timeline" class="block w-full mt-1 text-sm bg-surface-container-high cursor-not-allowed" type="text" readonly />
                                         @else
                                             <x-text-input wire:model="timelines.{{ $index }}.nama_timeline" class="block w-full mt-1 text-sm" type="text" placeholder="Cth: Hari H Pelaksanaan" />
                                         @endif
@@ -439,21 +422,21 @@ new #[Layout('layouts.organisasi')] class extends Component
                     </div>
                 </div>
 
-                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                    <div class="flex items-center justify-between mb-4 border-b pb-2">
-                        <h2 class="text-lg font-bold text-gray-900">Kuota & Biaya</h2>
-                        <button type="button" wire:click="tambahBiaya" class="text-xs font-bold text-green-600 hover:text-green-800 bg-green-50 px-2 py-1 rounded">
+                <div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant shadow-card">
+                    <div class="flex items-center justify-between mb-4 border-b border-outline-variant pb-2">
+                        <h2 class="text-lg font-bold text-on-surface">Kuota & Biaya</h2>
+                        <button type="button" wire:click="tambahBiaya" class="text-xs font-bold text-success hover:text-success/80 bg-success/10 px-2 py-1 rounded">
                             + Tambah Tiket
                         </button>
                     </div>
-                    
+
                     <div class="mb-4">
                         <x-input-label value="Total Kuota Keseluruhan" required />
                         <x-text-input wire:model="kuota" class="block w-full mt-1" type="number" min="1" placeholder="Cth: 100" />
                         <x-input-error :messages="$errors->get('kuota')" class="mt-2" />
                     </div>
 
-                    <div class="space-y-3 border-t pt-4">
+                    <div class="space-y-3 border-t border-outline-variant pt-4">
                         @foreach($biayas as $index => $by)
                             <div class="flex gap-2 items-start relative">
                                 <div class="w-1/2">
@@ -466,9 +449,9 @@ new #[Layout('layouts.organisasi')] class extends Component
                                     <x-text-input wire:model="biayas.{{ $index }}.biaya" class="block w-full mt-1 text-sm" type="number" min="0" placeholder="0 (Gratis)" />
                                     <x-input-error :messages="$errors->get('biayas.'.$index.'.biaya')" class="mt-1 text-xs" />
                                 </div>
-                                
+
                                 @if(count($biayas) > 1)
-                                    <button type="button" wire:click="hapusBiaya({{ $index }})" class="mt-7 text-red-500 hover:text-red-700 p-1">
+                                    <button type="button" wire:click="hapusBiaya({{ $index }})" class="mt-7 text-error hover:text-error/70 p-1">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                                     </button>
                                 @endif
@@ -477,14 +460,14 @@ new #[Layout('layouts.organisasi')] class extends Component
                     </div>
                 </div>
 
-                <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                    <h2 class="text-lg font-bold text-gray-900 mb-4 border-b pb-2">Poster Event</h2>
-                    <input wire:model="flyer" class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none" type="file" accept="image/*">
+                <div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant shadow-card">
+                    <h2 class="text-lg font-bold text-on-surface mb-4 border-b border-outline-variant pb-2">Poster Event</h2>
+                    <input wire:model="flyer" class="block w-full text-sm text-on-surface border border-outline-variant rounded-lg cursor-pointer bg-surface-container focus:outline-none" type="file" accept="image/*">
                     <x-input-error :messages="$errors->get('flyer')" class="mt-2" />
-                    
+
                     @if ($flyer)
                         <div class="mt-4">
-                            <img src="{{ $flyer->temporaryUrl() }}" class="w-full h-auto rounded-lg border border-gray-200">
+                            <img src="{{ $flyer->temporaryUrl() }}" class="w-full h-auto rounded-lg border border-outline-variant">
                         </div>
                     @endif
                 </div>
@@ -492,9 +475,9 @@ new #[Layout('layouts.organisasi')] class extends Component
             </div>
         </div>
 
-        <div class="flex items-center justify-end gap-4 py-4 border-t border-gray-200">
-            <a href="{{ route('organisasi.events') }}" wire:navigate class="px-6 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">Batal</a>
-            <button type="submit" wire:loading.attr="disabled" class="px-6 py-2.5 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 flex items-center">
+        <div class="flex items-center justify-end gap-4 py-4 border-t border-outline-variant">
+            <a href="{{ route('organisasi.events') }}" wire:navigate class="px-6 py-2.5 text-sm font-medium text-on-surface-variant bg-surface-container-lowest border border-outline-variant rounded-lg hover:bg-surface-container">Batal</a>
+            <button type="submit" wire:loading.attr="disabled" class="px-6 py-2.5 text-sm font-medium text-on-primary bg-primary rounded-lg hover:bg-primary/90 flex items-center">
                 <span wire:loading.remove wire:target="simpanEvent">Simpan sebagai Draft</span>
                 <span wire:loading wire:target="simpanEvent">Menyimpan...</span>
             </button>

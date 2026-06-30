@@ -111,7 +111,7 @@
         </div>
 
         <!-- Modal untuk Logout -->
-        <x-admin.modals.logout-modal />
+        <x-admin.modals.logout-modal target="admin"/>
 
         @livewireScripts
     </body>

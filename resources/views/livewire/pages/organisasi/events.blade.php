@@ -71,11 +71,11 @@ new #[Layout('layouts.organisasi')] class extends Component
             <p class="text-gray-500 text-sm">Kelola seluruh kegiatan, pantau status birokrasi, dan atur pendaftar.</p>
         </div>
         @if($organisasi->status->value === 'approved')
-                <a href="{{ route('organisasi.events.create') }}" wire:navigate class="px-4 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition shadow-sm text-sm inline-flex items-center gap-2">
+                <a href="{{ route('organisasi.events.create') }}" wire:navigate class="px-4 py-2 bg-primary text-white font-medium rounded-lg hover:bg-primary/90 transition shadow-sm text-sm inline-flex items-center gap-2">
                     + Buat Event Baru
                 </a>
         @else
-                <button disabled class="px-4 py-2 bg-indigo-600 text-white font-medium rounded-lg shadow-sm text-sm opacity-50 cursor-not-allowed inline-flex items-center gap-2">
+                <button disabled class="px-4 py-2 bg-primary text-white font-medium rounded-lg shadow-sm text-sm opacity-50 cursor-not-allowed inline-flex items-center gap-2">
                     + Buat Event Baru
                 </button>
         @endif
@@ -183,7 +183,7 @@ new #[Layout('layouts.organisasi')] class extends Component
                                         </button>
                                     @endif
 
-                                    <a href="{{ route('organisasi.events.form-builder', $event->id) }}" wire:navigate title="Setup Form Pendaftaran" class="p-1.5 text-gray-500 hover:bg-indigo-50 hover:text-indigo-600 rounded-md transition">
+                                    <a href="{{ route('organisasi.events.form-builder', $event->id) }}" wire:navigate title="Setup Form Pendaftaran" class="p-1.5 text-gray-500 hover:bg-indigo-50 hover:text-primary rounded-md transition">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
                                     </a>
 

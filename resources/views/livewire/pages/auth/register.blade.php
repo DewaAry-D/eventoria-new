@@ -118,9 +118,9 @@ new #[Layout('layouts.guest')] class extends Component
                     'role' => 'organisasi', 
                 ]);
 
-                $logoPath = $this->logo_url ? $this->logo_url->store('organisasi_files/logos', 'public') : null;
-                $adArtPath = $this->ad_art ? $this->ad_art->store('organisasi_files/dokumen', 'public') : null;
-                $skPath = $this->sk ? $this->sk->store('organisasi_files/dokumen', 'public') : null;
+                $logoPath = $this->logo_url ? $this->logo_url->store('logo', 'public') : null;
+                $adArtPath = $this->ad_art ? $this->ad_art->store('dokumen/ad-art', 'public') : null;
+                $skPath = $this->sk ? $this->sk->store('dokumen/sk', 'public') : null;
 
                 OrganisasiMahasiswa::create([
                     'user_id' => $user->id,
