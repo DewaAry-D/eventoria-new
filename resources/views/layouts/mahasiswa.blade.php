@@ -4,80 +4,113 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Eventoria - Mahasiswa</title>
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" />
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="font-sans antialiased bg-gray-50 text-gray-900" x-data="{ sidebarOpen: false }">
-    <div class="flex h-screen overflow-hidden">
-        
-        <div x-show="sidebarOpen" class="fixed inset-0 z-20 transition-opacity bg-black opacity-50 lg:hidden" @click="sidebarOpen = false"></div>
+<body class="font-sans antialiased bg-background text-on-background">
+    <div class="min-h-screen bg-background">
+        {{-- Top Navigation Bar --}}
+        <nav x-data="{ mobileMenuOpen: false }" class="bg-surface-container-lowest border-b border-outline-variant sticky top-0 z-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between h-16 relative">
+                    {{-- Brand --}}
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0 flex items-center gap-2 font-bold text-xl text-primary">
+                            <svg class="w-8 h-8 text-primary" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72l5 2.73 5-2.73v3.72z"/></svg>
+                            Eventoria
+                        </div>
+                    </div>
+                    
+                    {{-- Desktop Nav Links --}}
+                    <div class="hidden md:flex space-x-8 items-center h-full absolute left-1/2 transform -translate-x-1/2">
+                        <a href="{{ route('mahasiswa.dashboard') }}" class="inline-flex items-center h-full px-1 pt-1 border-b-2 {{ request()->routeIs('mahasiswa.dashboard') ? 'border-primary text-primary font-bold' : 'border-transparent text-on-surface-variant hover:text-primary hover:border-outline' }} text-sm font-medium transition duration-150">
+                            Dashboard
+                        </a>
+                        <a href="#" class="inline-flex items-center h-full px-1 pt-1 border-b-2 border-transparent text-on-surface-variant hover:text-primary hover:border-outline text-sm font-medium transition duration-150">
+                            Sertifikat
+                        </a>
+                        <a href="{{ route('mahasiswa.schedule') }}" wire:navigate class="inline-flex items-center h-full px-1 pt-1 border-b-2 {{ request()->routeIs('mahasiswa.schedule') ? 'border-primary text-primary font-bold' : 'border-transparent text-on-surface-variant hover:text-primary hover:border-outline' }} text-sm font-medium transition duration-150">
+                            Schedule
+                        </a>
+                        <a href="{{ route('mahasiswa.my-events') }}" wire:navigate class="inline-flex items-center h-full px-1 pt-1 border-b-2 {{ request()->routeIs('mahasiswa.my-events') ? 'border-primary text-primary font-bold' : 'border-transparent text-on-surface-variant hover:text-primary hover:border-outline' }} text-sm font-medium transition duration-150">
+                            My Event
+                        </a>
+                    </div>
 
-        <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'" class="fixed inset-y-0 left-0 z-30 w-64 overflow-y-auto transition duration-300 transform bg-white border-r border-gray-200 lg:translate-x-0 lg:static lg:inset-auto">
-            <div class="flex items-center justify-center h-16 border-b border-gray-200 px-6">
-                <div class="flex items-center gap-2 font-bold text-xl text-indigo-900">
-                    <svg class="w-8 h-8 text-indigo-600" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72l5 2.73 5-2.73v3.72z"/></svg>
-                    Eventoria
+                    {{-- Right Actions --}}
+                    <div class="hidden md:flex items-center gap-4">
+                        {{-- Profile Dropdown --}}
+                        <div x-data="{ open: false }" class="relative">
+                            <button @click="open = !open" class="flex items-center gap-2 focus:outline-none py-1">
+                                <img class="w-9 h-9 rounded-full bg-surface-container-high object-cover border border-outline-variant" src="https://ui-avatars.com/api/?name={{ Auth::user()->mahasiswa->nama ?? 'User' }}&background=e0e0ff&color=000666" alt="Profile">
+                                <svg class="w-4 h-4 text-on-surface-variant" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                            </button>
+                            
+                            <div x-show="open" @click.away="open = false" x-transition class="absolute right-0 mt-2 w-52 bg-surface-container-lowest rounded-lg shadow-lg border border-outline-variant py-1 z-50">
+                                <div class="px-4 py-2 border-b border-outline-variant">
+                                    <p class="text-sm font-bold text-on-surface">{{ Auth::user()->mahasiswa->nama ?? 'Mahasiswa' }}</p>
+                                    <p class="text-[10px] text-on-surface-variant">{{ Auth::user()->mahasiswa->prodi->nama_prodi ?? 'Prodi' }}</p>
+                                </div>
+                                <a href="{{ route('profile') }}" class="block px-4 py-2 text-sm text-on-surface hover:bg-surface-container-low transition duration-150">Profil Saya</a>
+                                <form method="POST" action="{{ route('logout') }}" onsubmit="return confirm('Apakah Anda yakin ingin keluar?');">
+                                    @csrf
+                                    <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-error hover:bg-error-container hover:bg-opacity-20 transition duration-150">Keluar</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Hamburger Button --}}
+                    <div class="flex items-center md:hidden">
+                        <button @click="mobileMenuOpen = !mobileMenuOpen" class="text-on-surface-variant hover:text-primary focus:outline-none">
+                            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path x-show="!mobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                                <path x-show="mobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
             </div>
-            
-            <nav class="p-4 space-y-2">
-                <a href="{{ route('beranda.mahasiswa') }}" class="flex items-center px-4 py-3 text-sm font-medium text-indigo-700 bg-indigo-50 rounded-lg">
-                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
-                    Dashboard
-                </a>
-                <a href="#" class="flex items-center px-4 py-3 text-sm font-medium text-gray-600 rounded-lg hover:bg-gray-100">
-                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                    Events
-                </a>
-                <a href="#" class="flex items-center px-4 py-3 text-sm font-medium text-gray-600 rounded-lg hover:bg-gray-100">
-                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
-                    Sertifikat
-                </a>
-                <a href="#" class="flex items-center px-4 py-3 text-sm font-medium text-gray-600 rounded-lg hover:bg-gray-100">
-                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    Schedule
-                </a>
-            </nav>
 
-            <div class="absolute bottom-0 w-full p-4 border-t border-gray-200 bg-white">
-                <div class="absolute bottom-0 w-full p-4 border-t border-gray-200 bg-white">
-                    <form method="POST" action="{{ route('logout') }}" onsubmit="return confirm('Apakah Anda yakin ingin mengakhiri sesi dan keluar dari aplikasi?');">
+            {{-- Mobile Nav Links --}}
+            <div x-show="mobileMenuOpen" x-transition class="md:hidden border-t border-outline-variant bg-surface-container-lowest">
+                <div class="px-2 pt-2 pb-3 space-y-1">
+                    <a href="{{ route('mahasiswa.dashboard') }}" class="block px-3 py-2 rounded-md text-base font-medium {{ request()->routeIs('mahasiswa.dashboard') ? 'bg-primary-fixed text-primary font-bold' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-primary' }}">
+                        Dashboard
+                    </a>
+                    <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-on-surface-variant hover:bg-surface-container-low hover:text-primary">
+                        Sertifikat
+                    </a>
+                    <a href="{{ route('mahasiswa.schedule') }}" wire:navigate class="block px-3 py-2 rounded-md text-base font-medium {{ request()->routeIs('mahasiswa.schedule') ? 'bg-primary-fixed text-primary font-bold' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-primary' }}">
+                        Schedule
+                    </a>
+                    <a href="{{ route('mahasiswa.my-events') }}" wire:navigate class="block px-3 py-2 rounded-md text-base font-medium {{ request()->routeIs('mahasiswa.my-events') ? 'bg-primary-fixed text-primary font-bold' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-primary' }}">
+                        My Event
+                    </a>
+                    <a href="{{ route('profile') }}" class="block px-3 py-2 rounded-md text-base font-medium text-on-surface-variant hover:bg-surface-container-low hover:text-primary">
+                        Profil Saya
+                    </a>
+                    <form method="POST" action="{{ route('logout') }}" onsubmit="return confirm('Apakah Anda yakin ingin keluar?');" class="block w-full">
                         @csrf
-                        <button type="submit" class="flex items-center w-full px-4 py-3 text-sm font-medium text-red-600 rounded-lg hover:bg-red-50 transition duration-150">
-                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                            </svg>
+                        <button type="submit" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-error hover:bg-error-container hover:bg-opacity-20">
                             Keluar
                         </button>
                     </form>
                 </div>
             </div>
-        </aside>
+        </nav>
 
-        <div class="flex flex-col flex-1 overflow-hidden">
-            <header class="flex items-center justify-between px-6 py-4 bg-white border-b border-gray-200">
-                <button @click="sidebarOpen = true" class="text-gray-500 focus:outline-none lg:hidden">
-                    <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 6H20M4 12H20M4 18H11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                </button>
-                <div class="flex-1 lg:flex-none"></div> <div class="flex items-center gap-4">
-                    <button class="text-gray-400 hover:text-gray-600">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
-                    </button>
-                    <a href="{{ route('profile') }}" class="flex items-center gap-3 text-left">
-                        <img class="w-10 h-10 rounded-full bg-gray-300" src="https://ui-avatars.com/api/?name={{ Auth::user()->mahasiswa->nama ?? 'User' }}&background=E0E7FF&color=4338CA" alt="Profile">
-                        <div class="hidden md:block">
-                            <p class="text-sm font-bold text-gray-900">{{ Auth::user()->mahasiswa->nama ?? 'Mahasiswa' }}</p>
-                            <p class="text-xs text-gray-500">{{ Auth::user()->mahasiswa->prodi->nama_prodi ?? 'Prodi' }}</p>
-                        </div>
-                    </a>
-                </div>
-            </header>
-
-            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50">
-                <div class="container px-6 py-8 mx-auto">
-                    {{ $slot }}
-                </div>
-            </main>
-        </div>
+        {{-- Main content slot --}}
+        <main class="py-8">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                {{ $slot }}
+            </div>
+        </main>
     </div>
 </body>
 </html>

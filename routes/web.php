@@ -17,6 +17,10 @@ Route::view('profile', 'profile')
 // Rute Sementara untuk menghindari error setelah Login/Register
 Route::middleware('auth')->group(function () {
     Volt::route('/dashboard-mahasiswa', 'pages.mahasiswa.dashboard')->name('mahasiswa.dashboard');
+    Volt::route('/mahasiswa/events/{event:slug}', 'pages.mahasiswa.event-detail')->name('mahasiswa.event-detail');
+    Volt::route('/mahasiswa/events/{event:slug}/daftar', 'pages.mahasiswa.event-register')->name('mahasiswa.event-register');
+    Volt::route('/mahasiswa/my-events', 'pages.mahasiswa.my-events')->name('mahasiswa.my-events');
+    Volt::route('/mahasiswa/schedule', 'pages.mahasiswa.schedule')->name('mahasiswa.schedule');
 
     //organisasi
     Volt::route('/dashboard-organisasi', 'pages.organisasi.dashboard')->name('organisasi.dashboard');
