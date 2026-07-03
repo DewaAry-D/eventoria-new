@@ -33,7 +33,7 @@
         
         <!-- Bagian Kiri -->
         <div class="lg:col-span-8 space-y-md lg:space-y-lg min-w-0">
-            <div class="flex items-center justify-center gap-xl border-b border-outline-variant/30 text-body-sm font-semibold select-none">
+            <div class="flex items-center justify-center gap-lg sm:gap-xl border-b border-outline-variant/30 text-body-sm font-semibold select-none">
                 
                 <button wire:click="$set('activeTab', 'detail')" 
                         class="py-sm cursor-pointer border-b-2 transition-all duration-200 {{ $activeTab === 'detail' ? 'border-primary text-primary font-bold' : 'border-transparent text-secondary/60 hover:text-secondary' }}">

@@ -75,7 +75,7 @@ $footer_links = [
 <section class="bg-surface-container-low py-16 md:py-20 text-center">
     <div class="max-w-container mx-auto px-6 w-full">
         <span class="inline-block text-xs font-bold tracking-[1.5px] uppercase text-primary-container mb-5">Platform Event Kampus #1</span>
-        <h1 class="text-headline-lg-mobile md:text-headline-lg font-black text-primary max-w-[700px] mx-auto mb-5 tracking-tight">Temukan Event Campus Terbaik dengan Mudah</h1>
+        <h1 class="text-headline-lg-mobile md:text-headline-lg font-black md:font-black text-primary max-w-[700px] mx-auto mb-5 tracking-tight">Temukan Event Campus Terbaik dengan Mudah</h1>
         <p class="max-w-[520px] mx-auto text-on-surface-variant text-body-lg mb-9">Platform manajemen event modern untuk mahasiswa dan organisasi kampus. Kelola, cari, dan ikuti berbagai kegiatan akademik serta kreatif dalam satu tempat.</p>
 
         <div class="flex flex-wrap justify-center gap-3.5 mb-10">

@@ -6,7 +6,7 @@
     
     <div class="space-y-1 min-w-0 w-full md:w-auto flex flex-col items-center md:items-start">
         <!-- Judul Halaman -->
-        <h3 class="text-headline-sm sm:text-headline-md md:text-headline-lg font-bold sm:font-bold md:font-bold text-primary tracking-tight leading-snug md:leading-none">
+        <h3 class="text-headline-md md:text-headline-lg font-bold sm:font-bold md:font-bold text-primary tracking-tight leading-snug md:leading-none">
             {{ $title }}
         </h3>
         

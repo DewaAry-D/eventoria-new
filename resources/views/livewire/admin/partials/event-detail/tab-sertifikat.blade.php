@@ -148,14 +148,14 @@
                     <div class="grid grid-cols-2 gap-sm">
 
                         <div class="p-sm bg-surface-container-low rounded-xl flex items-center gap-sm border border-outline-variant/10">
-                            <div class="w-8 h-8 rounded-lg bg-surface-container text-primary flex items-center justify-center shrink-0 font-mono font-bold text-[10px] select-none">
+                            <div class="w-8 h-8 rounded-lg bg-surface-container text-primary flex items-center justify-center shrink-0 font-bold text-[10px] select-none">
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M18 21V11M20 18.5L18 21L16 18.5M20 13L18 11L16 13M9 5V17M9 17H7M9 17H11M15 7V5H3V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                                 </svg>
                             </div>
                             <div class="flex flex-col">
                                 <span class="text-[10px] text-secondary/50 font-bold tracking-wider uppercase leading-none">Ukuran</span>
-                                <span class="text-body-sm text-on-surface font-bold mt-0.5 font-mono">
+                                <span class="text-body-sm text-on-surface font-bold mt-0.5">
                                     {{ $event->templateSertifikat->ukuran_font }} px
                                 </span>
                             </div>
@@ -166,7 +166,7 @@
                                 style="background-color: {{ $event->templateSertifikat->warna_font }};"></div>
                             <div class="flex flex-col min-w-0">
                                 <span class="text-[10px] text-secondary/50 font-bold tracking-wider uppercase leading-none">Warna</span>
-                                <span class="text-body-sm text-on-surface font-bold mt-0.5 font-mono uppercase truncate">
+                                <span class="text-body-sm text-on-surface font-bold mt-0.5 uppercase truncate">
                                     {{ $event->templateSertifikat->warna_font }}
                                 </span>
                             </div>
@@ -210,7 +210,7 @@
                                 </svg>
                                 Sumbu X
                             </span>
-                            <span class="text-title-md font-extrabold text-primary font-mono mt-1 leading-none">
+                            <span class="text-title-md font-extrabold text-primary mt-1 leading-none">
                                 {{ $event->templateSertifikat->posisi_x }}<span class="text-caption font-normal text-secondary/40 ml-0.5">%</span>
                             </span>
                         </div>
@@ -222,7 +222,7 @@
                                 </svg>
                                 Sumbu Y
                             </span>
-                            <span class="text-title-md font-extrabold text-primary font-mono mt-1 leading-none">
+                            <span class="text-title-md font-extrabold text-primary mt-1 leading-none">
                                 {{ $event->templateSertifikat->posisi_y }}<span class="text-caption font-normal text-secondary/40 ml-0.5">%</span>
                             </span>
                         </div>

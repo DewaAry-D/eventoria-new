@@ -132,8 +132,14 @@
                     </div>
 
                     <div class="flex items-center gap-sm mt-xs">
-                        <div class="w-7 h-7 rounded-lg bg-surface-container border border-outline-variant/30 flex items-center justify-center text-secondary/60 flex-shrink-0 overflow-hidden">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+                        <div class="w-7 h-7 rounded-lg bg-surface-container border border-outline-variant/30 flex items-center justify-center font-black text-xs text-primary flex-shrink-0 overflow-hidden">
+                            @if(!empty($event->organisasi->logo_url))
+                                <img class="w-full h-full object-cover" 
+                                        src="{{ asset('storage/logos/' . $event->organisasi->logo_url) }}" 
+                                        alt="Logo {{ $event->organisasi->nama_organisasi }}">
+                            @else
+                                {{ strtoupper(substr($event->organisasi->nama_organisasi, 0, 2)) }}
+                            @endif
                         </div>
                         <span class="text-body-sm text-secondary/80 font-semibold tracking-tight leading-tight truncate max-w-[160px]">
                             {{ $event->organisasi->nama_organisasi ?? '-' }}

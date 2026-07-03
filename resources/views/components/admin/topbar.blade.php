@@ -1,5 +1,5 @@
 <header class="w-full bg-surface-container-lowest border-b border-outline-variant/30 px-md py-sm sm:py-md flex items-center justify-end sticky top-0 z-30">
-
+    
     <div x-data="{ dropdownOpen: false }" class="relative">
         
         <button @click="dropdownOpen = !dropdownOpen" 
@@ -27,7 +27,7 @@
                 x-transition:leave="transition ease-in duration-150"
                 x-transition:leave-start="opacity-100 scale-100 translate-y-0"
                 x-transition:leave-end="opacity-0 scale-95 translate-y-1"
-                class="absolute right-0 mt-2 w-48 bg-surface-container-lowest rounded-xl shadow-xl border border-outline-variant/20 py-1.5 z-50 select-none" 
+                class="absolute right-0 mt-2 w-48 bg-surface-container-lowest rounded-lg shadow-xl border border-outline-variant/20 py-1.5 z-50 select-none" 
                 style="display: none;"
                 x-cloak>
             

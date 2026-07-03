@@ -43,7 +43,7 @@
         <div class="flex items-center justify-between gap-md mb-lg select-none w-full">
             <div>
                 <h4 class="text-title-sm sm:text-title-md font-bold text-primary tracking-tight">
-                    Daftar Pendaftaran Baru
+                    Daftar Pendaftaran Organisasi
                 </h4>
             </div>
 
@@ -141,7 +141,7 @@
                         <div class="flex items-center gap-md mt-sm">
                             <div class="w-11 h-11 rounded-xl border border-outline-variant/30 bg-surface-container overflow-hidden shadow-2xs flex items-center justify-center font-black text-xs text-primary shrink-0">
                                 @if($org->logo_url)
-                                    <img src="{{ asset('storage/logo/' . $org->logo_url) }}" class="w-full h-full object-cover">
+                                    <img src="{{ asset('storage/logos/' . $org->logo_url) }}" class="w-full h-full object-cover">
                                 @else
                                     {{ strtoupper(substr($org->nama_organisasi, 0, 2)) }}
                                 @endif
