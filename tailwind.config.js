@@ -75,7 +75,6 @@ export default {
                 "on-background": "#1b1b21",
                 "surface-variant": "#e4e1ea",
             },
-
             fontFamily: {
                 sans: ["Inter", ...defaultTheme.fontFamily.sans],
             },
