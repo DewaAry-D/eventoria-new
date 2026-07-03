@@ -40,11 +40,11 @@ class NewOrganizations extends Component
             $query->where('tingkat_organisasi', 'universitas');
         }
 
-        $newOrgs = $query->with('fakultas')
+        $newOrgs = $query->with(['user', 'fakultas'])
             ->latest()
             ->take(3)
             ->get();
-
+            
         return view('livewire.admin.widgets.new-organizations', [
             'organizations' => $newOrgs
         ]);

@@ -5,7 +5,7 @@
         <div class="flex items-center gap-sm">
             <div class="w-11 h-11 rounded-xl bg-surface-container border border-outline-variant/20 flex items-center justify-center text-primary font-bold overflow-hidden shadow-inner shrink-0">
                 @if($event->organisasi?->logo_url)
-                    <img src="{{ asset('storage/logo/' . $event->organisasi->logo_url) }}" alt="Logo {{ $event->organisasi->nama_organisasi }}" class="w-full h-full object-cover">
+                    <img src="{{ asset('storage/logos/' . $event->organisasi->logo_url) }}" alt="Logo {{ $event->organisasi->nama_organisasi }}" class="w-full h-full object-cover">
                 @else
                     <span class="text-[11px] font-extrabold tracking-tight">
                         {{ strtoupper(substr($event->organisasi->nama_organisasi ?? 'O', 0, 2)) }}
@@ -55,6 +55,12 @@
                             <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" fill="currentColor"/>
                         </svg>
                     </a>
+                @endif
+
+                @if(!$event->organisasi?->ig_url && !$event->organisasi?->linkedin_url)
+                    <div class="text-[10px] font-bold text-secondary/30 border border-dashed border-outline-variant/40 px-2 py-1 rounded-lg" title="Tidak ada kontak eksternal">
+                        No Links
+                    </div>
                 @endif
             </div>
         </div>
@@ -131,24 +137,29 @@
     @endphp
 
     @if($eStatus === 'pending_approval')
-        <div class="p-md bg-surface-container-lowest rounded-3xl border border-outline-variant/30 shadow-card flex items-center justify-between gap-sm select-none animate-fade-in">
-            <button type="button" 
-                    @click="$dispatch('open-modal-reject-event', { id: {{ $event->id }}, name: '{{ addslashes($event->nama_event) }}' })"
-                    class="flex-1 py-2.5 rounded-xl border border-red-500/30 text-red-600 hover:bg-red-500/[0.03] font-bold text-body-sm flex items-center justify-center gap-xs transition-all active:scale-95 shadow-2xs cursor-pointer">
-                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span>Tolak Event</span>
-            </button>
-
+        <div class="w-full flex flex-col gap-sm select-none animate-fade-in mt-xs">
+            
             <button type="button" 
                     @click="$dispatch('open-modal-approve-event', { id: {{ $event->id }}, name: '{{ addslashes($event->nama_event) }}' })"
-                    class="flex-1 py-2.5 rounded-xl bg-[#000666] hover:bg-[#000666]/90 text-white font-bold text-body-sm flex items-center justify-center gap-xs transition-all active:scale-95 shadow-2xs cursor-pointer">
+                    class="w-full py-3 rounded-2xl text-on-primary bg-success hover:bg-success/90 border border-success font-bold text-body-sm flex items-center justify-center gap-xs transition-all duration-200 active:scale-[0.98] shadow-md hover:shadow cursor-pointer">
                 <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <span>Setujui Event</span>
+                <span>Setujui Publikasi Event</span>
             </button>
+
+            <button type="button" 
+                    @click="$dispatch('open-modal-reject-event', { id: {{ $event->id }}, name: '{{ addslashes($event->nama_event) }}' })"
+                    class="w-full py-2.5 rounded-2xl border border-error/30 text-error hover:bg-error/5 font-bold text-body-sm flex items-center justify-center gap-xs transition-all duration-200 active:scale-[0.98] shadow-2xs cursor-pointer">
+                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>Tolak Pengajuan Event</span>
+            </button>
+
+            <p class="text-[11px] text-secondary/50 font-medium text-center leading-tight mt-xs px-xs">
+                Pastikan detail substansi, pamflet, dan tanggal pelaksanaan event telah sesuai dengan ketentuan institusi.
+            </p>
         </div>
     @endif
 
@@ -156,8 +167,12 @@
     <x-admin.modals.confirm-modal 
         id="approve-event"
         title="Setujui Pengajuan Event"
-        wireAction="approveEvent"
-    />
+        wireAction="approveEvent">
+
+        Apakah Anda yakin ingin menerbitkan event 
+        <strong class="text-primary font-bold">"<span x-text="targetName"></span>"</strong>? 
+        Event ini akan langsung dipublikasikan ke publik.
+    </x-admin.modals.confirm-modal>
 
     <!-- Reject Modal -->
     <x-admin.modals.reject-modal 

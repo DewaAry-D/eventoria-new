@@ -38,7 +38,7 @@
     </div>
 
     <div class="mt-md pt-xs border-t border-outline-variant/20">
-        <a href="/admin/moderasi-organisasi" wire:navigate 
+        <a href="{{ route('admin.moderasi.organisasi') }}" wire:navigate 
             class="w-full py-2.5 flex items-center justify-center gap-xs text-body-sm font-bold text-primary bg-primary/[0.02] border border-primary/10 hover:bg-primary/[0.08] hover:border-primary/20 active:scale-[0.98] rounded-xl transition-all select-none shadow-sm group">
             
             <span>Lihat Semua Organisasi</span>

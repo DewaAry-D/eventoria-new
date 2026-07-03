@@ -6,15 +6,36 @@
                 {{ $title }}
             </h4>
         </div>
+
+        <!-- Flash Alert -->
+        <x-admin.modals.toast-alert />
         
         @if(!$isDashboard)
             <div class="items-center gap-sm w-full sm:w-auto hidden sm:flex">
                 <!-- Input Cari Desktop -->
-                <div class="relative flex-1 sm:w-64">
+                <div class="relative flex-1 sm:w-64" x-data="{ search: @entangle('search').live }">
                     <span class="absolute inset-y-0 left-0 flex items-center pl-sm text-secondary/50">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="currentColor"/></svg>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="currentColor"/>
+                        </svg>
                     </span>
-                    <input type="text" wire:model.live.debounce.300ms="search" placeholder="Cari pengajuan event..." class="w-full text-body-md pl-9 pr-sm py-1.5 bg-surface-container/40 border border-outline-variant/30 rounded-xl focus:outline-none focus:border-primary/30 text-primary placeholder-secondary/40 font-medium">
+                    
+                    <input type="text" 
+                            wire:model.live.debounce.300ms="search" 
+                            placeholder="Cari pengajuan event..." 
+                            class="w-full text-body-md pl-9 pr-8 py-1.5 bg-surface-container/40 border border-outline-variant/30 rounded-xl focus:outline-none focus:border-primary/30 text-primary placeholder-secondary/40 font-medium">
+                
+                    <button type="button" 
+                            x-show="search.length > 0"
+                            @click="@this.set('search', ''); $dispatch('trigger-global-refresh')"
+                            x-transition
+                            class="absolute inset-y-0 right-0 flex items-center pr-sm text-secondary/40 hover:text-error transition-colors cursor-pointer"
+                            title="Bersihkan pencarian"
+                            x-cloak>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
                 </div>
 
                 <!-- Tombol Filter Desktop -->
@@ -35,7 +56,7 @@
             </button>
         @else
             <!-- Nav Lihat Semua di Dashboard -->
-            <a href="{{ route('admin.event.master') }}" wire:navigate 
+            <a href="{{ route('admin.moderasi.event') }}" wire:navigate 
                 class="inline-flex items-center gap-x-1 text-body-sm sm:text-body-md font-bold text-primary hover:text-primary/80 group transition-all whitespace-nowrap flex-shrink-0">
                 <span>Lihat Semua</span>
                 <svg class="w-4 h-4 transform group-hover:translate-x-0.5 transition-transform duration-200" 
@@ -49,11 +70,29 @@
     <!-- Input Search Mobile -->
     @if(!$isDashboard)
         <div class="flex items-center gap-sm w-full mb-lg sm:hidden">
-            <div class="relative flex-1">
+            <div class="relative flex-1 sm:w-64" x-data="{ search: @entangle('search').live }">
                 <span class="absolute inset-y-0 left-0 flex items-center pl-sm text-secondary/50">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="currentColor"/></svg>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="currentColor"/>
+                    </svg>
                 </span>
-                <input type="text" wire:model.live.debounce.300ms="search" placeholder="Cari pengajuan..." class="w-full text-body-md pl-9 pr-sm py-1.5 bg-surface-container/40 border border-outline-variant/30 rounded-xl focus:outline-none focus:border-primary/30 text-primary placeholder-secondary/40 font-medium">
+                
+                <input type="text" 
+                        wire:model.live.debounce.300ms="search" 
+                        placeholder="Cari organisasi atau email..." 
+                        class="w-full text-body-md pl-9 pr-8 py-1.5 bg-surface-container/40 border border-outline-variant/30 rounded-xl focus:outline-none focus:border-primary/30 text-primary placeholder-secondary/40 font-medium">
+            
+                <button type="button" 
+                        x-show="search.length > 0"
+                        @click="@this.set('search', ''); $dispatch('trigger-global-refresh')"
+                        x-transition
+                        class="absolute inset-y-0 right-0 flex items-center pr-sm text-secondary/40 hover:text-error transition-colors cursor-pointer"
+                        title="Bersihkan pencarian"
+                        x-cloak>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
             </div>
         </div>
     @endif
@@ -280,89 +319,20 @@
     </div>
 
     <!-- Pagination -->
-    @if(!$isDashboard && $paginationData && $paginationData['totalPages'] > 1)
-        <div class="flex flex-col items-center justify-center gap-md sm:flex-row sm:items-center sm:justify-between border-t border-outline-variant/20 mt-lg pt-md font-medium select-none">
-            
-            <!-- Info Text Kiri Bawah -->
-            <div class="hidden sm:block text-body-sm text-secondary/60">
-                Menampilkan <span class="font-bold text-primary/80">{{ $paginationData['from'] }}-{{ $paginationData['to'] }}</span> dari <span class="font-bold text-primary/80">{{ $paginationData['total'] }}</span> pengajuan event
-            </div>
-            
-            <!-- Tombol Kontrol Paginasi -->
-            <div class="inline-flex items-center gap-xs text-body-sm">
-                
-                <!-- Tombol Previous -->
-                <button type="button" 
-                        wire:click="previousPage"
-                        class="w-8 h-8 rounded-xl border border-outline-variant/30 flex items-center justify-center transition-colors {{ $paginationData['currentPage'] == 1 ? 'text-secondary/40 bg-surface-container/10 cursor-not-allowed' : 'text-secondary/70 hover:bg-surface-container/40' }}"
-                        {{ $paginationData['currentPage'] == 1 ? 'disabled' : '' }}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" fill="currentColor"/></svg>
-                </button>
-                
-                @php
-                    $currentPage = $paginationData['currentPage'];
-                    $totalPages = $paginationData['totalPages'];
-                    
-                    // Radius halaman aktif (1 kanan, 1 kiri)
-                    $sidePages = 1; 
-                    
-                    $startPage = max(1, $currentPage - $sidePages);
-                    $endPage = min($totalPages, $currentPage + $sidePages);
-                @endphp
-
-                <!-- Tampilkan Angka 1 Permanen di Awal -->
-                @if($startPage > 1)
-                    <button type="button" wire:click="gotoPage(1)" class="w-8 h-8 rounded-xl border border-outline-variant/30 flex items-center justify-center text-secondary/70 bg-surface-container-lowest font-medium transition-all duration-150 hover:bg-[#000666]/[0.06] hover:border-[#000666]/30 hover:text-[#000666] active:scale-95">
-                        1
-                    </button>
-
-                    @if($startPage > 2)
-                        <span class="w-8 h-8 flex items-center justify-center text-secondary/40 font-bold text-xs">...</span>
-                    @endif
-                @endif
-
-                {{-- Perulangan Angka Utama Sekitar Current Page --}}
-                @for($i = $startPage; $i <= $endPage; $i++)
-                    @if($i == $currentPage)
-                        <button type="button" class="w-8 h-8 rounded-xl bg-[#000666] text-white flex items-center justify-center font-bold shadow-sm">
-                            {{ $i }}
-                        </button>
-                    @else
-                        <button type="button" wire:click="gotoPage({{ $i }})" class="w-8 h-8 rounded-xl border border-outline-variant/30 flex items-center justify-center text-secondary/70 bg-surface-container-lowest font-medium transition-all duration-150 hover:bg-[#000666]/[0.06] hover:border-[#000666]/30 hover:text-[#000666] active:scale-95">
-                            {{ $i }}
-                        </button>
-                    @endif
-                @endfor
-
-                <!-- Tampilkan Angka Terakhir Permanen di Ujung Kanan -->
-                @if($endPage < $totalPages)
-                    @if($endPage < $totalPages - 1)
-                        <span class="w-8 h-8 flex items-center justify-center text-secondary/40 font-bold text-xs">...</span>
-                    @endif
-                    <button type="button" wire:click="gotoPage({{ $totalPages }})" class="w-8 h-8 rounded-xl border border-outline-variant/30 flex items-center justify-center text-secondary/70 bg-surface-container-lowest font-medium transition-all duration-150 hover:bg-[#000666]/[0.06] hover:border-[#000666]/30 hover:text-[#000666] active:scale-95">
-                        {{ $totalPages }}
-                    </button>
-                @endif
-                
-                <!-- Tombol Next (>) -->
-                <button type="button" 
-                        wire:click="nextPage"
-                        class="w-8 h-8 rounded-xl border border-outline-variant/30 flex items-center justify-center transition-colors {{ $paginationData['currentPage'] == $paginationData['totalPages'] ? 'text-secondary/40 bg-surface-container/10 cursor-not-allowed' : 'text-secondary/70 hover:bg-surface-container/40' }}"
-                        nameTitle="Previous"
-                        {{ $paginationData['currentPage'] == $paginationData['totalPages'] ? 'disabled' : '' }}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" fill="currentColor"/></svg>
-                </button>
-
-            </div>
-        </div>
+    @if(!$isDashboard)
+        <x-admin.pagination-links :paginationData="$paginationData" />
     @endif
 
     <!-- Confirm Modal -->
     <x-admin.modals.confirm-modal 
         id="approve-event"
         title="Setujui Pengajuan Event"
-        wireAction="approveEvent"
-    />
+        wireAction="approveEvent">
+
+        Apakah Anda yakin ingin menerbitkan event 
+        <strong class="text-primary font-bold">"<span x-text="targetName"></span>"</strong>? 
+        Event ini akan langsung dipublikasikan ke publik.
+    </x-admin.modals.confirm-modal>
 
     <!-- Reject Modal -->
     <x-admin.modals.reject-modal 

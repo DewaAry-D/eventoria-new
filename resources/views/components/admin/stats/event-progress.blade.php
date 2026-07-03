@@ -33,7 +33,7 @@
         </div>
 
         <div class="flex items-center justify-between gap-md group/bar">
-            <span class="text-body-sm sm:text-body-md font-medium text-secondary/80 w-20 sm:w-24 select-none group-hover/bar:text-warning transition-colors">Review</span>
+            <span class="text-body-sm sm:text-body-md font-medium text-secondary/80 w-20 sm:w-24 select-none group-hover/bar:text-warning transition-colors">Pending</span>
             <div class="flex-1 h-2 bg-surface-container rounded-xl overflow-hidden">
                 <div class="h-full bg-warning rounded-xl transition-all duration-500 shadow-2xs" style="width: {{ $pMenunggu }}%"></div>
             </div>

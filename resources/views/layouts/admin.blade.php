@@ -42,7 +42,7 @@
                         class="flex items-center group focus:outline-none shrink-0">
                     
                     <img class="w-9 h-9 rounded-full object-cover ring-2 ring-surface-container group-hover:ring-primary/30 transition-all shrink-0" 
-                            src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->adminKampus?->nama_admin ?? (Auth::user()->name ?? 'Dr Aris Setiawan')) }}&background=000666&color=fff" 
+                            src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->admin_name) }}&background=000666&color=fff" 
                             alt="Profile">
                 </button>
 
@@ -57,13 +57,13 @@
                         style="display: none;">
                     
                     <div class="px-4 py-2 border-b border-outline-variant/10">
-                        <p class="text-body-sm font-bold text-on-surface truncate">
-                            {{ Auth::user()->adminCampus?->nama_admin ?? (Auth::user()->name ?? 'Dr. Aris Setiawan') }}
+                        <p class="text-body-sm font-bold text-on-surface truncate" title="{{ Auth::user()->admin_name }}">
+                            {{ Auth::user()->admin_name }}
                         </p>
-                        <p class="text-[10px] text-on-surface-variant font-medium">Super Admin</p>
+                        <p class="text-[10px] text-on-surface-variant font-medium">{{ Auth::user()->role_label }}</p>
                     </div>
 
-                    <a href="{{ route('profile') }}" wire:navigate 
+                    <a href="{{ route('admin.profil') }}" wire:navigate 
                         class="block px-4 py-2 text-body-md font-medium text-secondary hover:bg-surface-container hover:text-primary transition-colors">
                         Profil Saya
                     </a>

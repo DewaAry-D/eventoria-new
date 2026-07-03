@@ -1,4 +1,4 @@
-<div class="w-full p-md sm:p-lg xl:p-xl space-y-lg sm:space-y-lg">
+<div class="w-full p-md sm:p-lg xl:p-xl space-y-lg select-none">
     
     <!-- Navigasi -->
     <nav class="flex items-center gap-xs text-body-sm font-medium text-secondary/60 tracking-tight select-none">
@@ -10,7 +10,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
         </svg>
 
-        <a href="{{ route('admin.event.master') }}" wire:navigate class="hover:text-primary transition-colors">
+        <a href="{{ route('admin.moderasi.event') }}" wire:navigate class="hover:text-primary transition-colors">
             Moderasi Event
         </a>
         
