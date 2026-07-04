@@ -56,8 +56,28 @@ new #[Layout('layouts.mahasiswa')] class extends Component
                   });
             });
 
-        // 1. Ambil 9 Rekomendasi (Bisa dikembangkan AI kedepannya, sementara ambil terbaru)
-        $rekomendasi = (clone $baseQuery)->latest()->take(9)->get();
+        // 1. Ambil 9 Rekomendasi berdasarkan riwayat ketertarikan kategori event yang diikuti mahasiswa
+        $registeredEventIds = \App\Models\EventRegistration::where('mahasiswa_id', $mahasiswa->id)
+            ->pluck('event_id')
+            ->toArray();
+
+        $interestedCategoryIds = Event::whereIn('id', $registeredEventIds)
+            ->pluck('kategori_id')
+            ->unique()
+            ->filter()
+            ->toArray();
+
+        $recommendationQuery = (clone $baseQuery)->whereNotIn('id', $registeredEventIds);
+
+        if (!empty($interestedCategoryIds)) {
+            $rekomendasi = $recommendationQuery
+                ->orderByRaw("CASE WHEN kategori_id IN (" . implode(',', array_map('intval', $interestedCategoryIds)) . ") THEN 0 ELSE 1 END")
+                ->latest()
+                ->take(9)
+                ->get();
+        } else {
+            $rekomendasi = $recommendationQuery->latest()->take(9)->get();
+        }
 
         // 2. Ambil Semua Event dengan filter Pencarian & Kategori
         $events = (clone $baseQuery)
