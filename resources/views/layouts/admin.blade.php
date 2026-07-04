@@ -18,7 +18,7 @@
         @livewireStyles
     </head>
 
-    <body class="bg-surface text-on-surface antialiased font-sans" 
+    <body class="bg-background text-on-background antialiased font-sans" 
         x-data="{ sidebarOpen: false, showLogoutModal: false }">
 
         <!-- Layout Mobile -->

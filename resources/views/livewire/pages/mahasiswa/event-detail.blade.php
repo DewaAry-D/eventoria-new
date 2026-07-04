@@ -172,7 +172,7 @@ new #[Layout('layouts.mahasiswa')] class extends Component {
             
             {{-- Banner Card --}}
             <div class="relative h-[250px] sm:h-[350px] md:h-[400px] w-full rounded-2xl overflow-hidden shadow-md group">
-                <img src="{{ $event->flyer_url ?? 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80' }}" 
+                <img src="{{ asset('storage/' . $event->flyer_url) }}" 
                      alt="{{ $event->nama_event }}" 
                      class="w-full h-full object-cover">
                 

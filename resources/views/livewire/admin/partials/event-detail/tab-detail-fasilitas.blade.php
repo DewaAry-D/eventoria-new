@@ -1,7 +1,7 @@
 <div class="w-full flex flex-col gap-md lg:gap-lg animate-fade-in select-none">
 
     <!-- 4 Card Utama -->
-    <div class="grid grid-cols-2 gap-sm sm:gap-md w-full">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-sm sm:gap-md w-full">
         @if($isLiveMode)
             <!-- Kuota Total -->
             <div class="p-md bg-surface-container-lowest rounded-2xl shadow-card flex items-center gap-md min-w-0 transition-all duration-300 hover:translate-y-[-2px]">

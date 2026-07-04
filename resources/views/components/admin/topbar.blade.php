@@ -33,7 +33,7 @@
             
             <a href="{{ route('admin.profil') }}" wire:navigate 
                 class="block px-4 py-2 text-body-md font-medium text-secondary hover:bg-surface-container hover:text-primary transition-colors">
-                Profil Saya
+                Profil Admin
             </a>
             
             <div class="border-t border-outline-variant/10 my-1"></div>

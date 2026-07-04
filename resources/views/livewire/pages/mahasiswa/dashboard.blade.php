@@ -30,8 +30,9 @@ new #[Layout('layouts.mahasiswa')] class extends Component
         $q->whereHas('timeLines', function($q2) {
             // Kurung kondisi nama-nama alternatif di sini
             $q2->where(function($sub) {
-                $sub->where('nama_timeline', 'like', '%Pendaftaran%')
+                $sub->where('nama_timeline', 'like', '%pendaftaran%')
                     ->orWhere('nama_timeline', 'like', '%Registrasi%')
+                    ->orWhere('nama_timeline', 'like', '%Extended%')
                     ->orWhere('nama_timeline', 'like', '%Registration%');
             })
             // Filter tanggal ini akan berlaku untuk ketiga kondisi di atas
@@ -182,7 +183,7 @@ new #[Layout('layouts.mahasiswa')] class extends Component
             @forelse($registeredEvents as $reg)
                 <div class="bg-surface-container-lowest shadow-sm rounded-xl p-4 flex flex-col sm:flex-row gap-4 flex-shrink-0 w-80 sm:w-96 group transition-all duration-300 ease-out hover:-translate-y-1.5 hover:shadow-md hover:border-primary hover:border-opacity-35">
                     <div class="overflow-hidden rounded-lg w-full sm:w-32 h-32 flex-shrink-0">
-                        <img src="{{ $reg->event->flyer_url ?? 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80' }}" alt="Flyer" class="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105">
+                        <img src="{{ asset('storage/' . $reg->event->flyer_url) }}" alt="Flyer" class="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105">
                     </div>
                     <div class="flex flex-col flex-1 justify-between">
                         <div>
@@ -274,7 +275,7 @@ new #[Layout('layouts.mahasiswa')] class extends Component
             @forelse($events as $event)
                 <div class="bg-surface-container-lowest shadow-sm rounded-xl overflow-hidden flex flex-col h-full group transition-all duration-300 ease-out hover:-translate-y-1.5 hover:shadow-lg">
                     <div class="relative h-40 bg-surface-container-low overflow-hidden">
-                        <img src="{{ $event->flyer_url ?? 'https://images.unsplash.com/photo-1518770660439-4636190af475?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80' }}" alt="Flyer" class="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105">
+                        <img src="{{ asset('storage/' . $event->flyer_url) }}" alt="Flyer" class="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105">
                         <span class="absolute top-3 right-3 bg-primary text-on-primary px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider">
                             {{ $event->kategori->nama_kategori ?? 'Umum' }}
                         </span>
@@ -361,7 +362,7 @@ new #[Layout('layouts.mahasiswa')] class extends Component
             @forelse($rekomendasi as $event)
                 <div class="bg-surface-container-lowest shadow-sm rounded-xl overflow-hidden flex flex-col group transition-all duration-300 ease-out hover:-translate-y-1.5 hover:shadow-lg flex-shrink-0 w-80 snap-start">
                     <div class="relative h-40 bg-surface-container-low overflow-hidden">
-                        <img src="{{ $event->flyer_url ?? 'https://images.unsplash.com/photo-1518770660439-4636190af475?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80' }}" alt="Flyer" class="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105">
+                        <img src="{{ asset('storage/' . $event->flyer_url) }} " alt="Flyer" class="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105">
                         <span class="absolute top-3 right-3 bg-primary text-on-primary px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider">
                             {{ $event->kategori->nama_kategori ?? 'Umum' }}
                         </span>
