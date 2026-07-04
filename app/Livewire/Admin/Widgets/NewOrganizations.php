@@ -8,6 +8,7 @@ use App\Models\OrganisasiMahasiswa;
 use App\Models\AdminDpm;
 use App\Enums\OrganisasiStatus; // 🟢 Tambahkan enum status jika ada
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 class NewOrganizations extends Component
 {
@@ -26,17 +27,17 @@ class NewOrganizations extends Component
 
     public function render()
     {
-        $adminDpm = AdminDpm::query()->where('user_id', Auth::id())->first();
+        $adminDpm = Cache::remember('admin_dpm_' . Auth::id(), 300, fn() =>
+            AdminDpm::where('user_id', Auth::id())->first()
+        );
 
-        $query = OrganisasiMahasiswa::query();
-        
-        // Ambil organisasi baru yang di setujui
-        $query->where('status', OrganisasiStatus::APPROVED->value); 
+        $query = OrganisasiMahasiswa::query()->where('status', OrganisasiStatus::APPROVED->value); 
 
-        if ($adminDpm && $adminDpm->fakultas_id !== null) {
+        if ($this->fakultasId) {
+            $query->where('fakultas_id', $this->fakultasId);
+        } elseif ($adminDpm && $adminDpm->fakultas_id !== null) {
             $query->where('fakultas_id', $adminDpm->fakultas_id);
-        } 
-        else {
+        } else {
             $query->where('tingkat_organisasi', 'universitas');
         }
 

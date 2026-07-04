@@ -5,7 +5,7 @@
         <div class="flex items-center gap-sm">
             <div class="w-11 h-11 rounded-xl bg-surface-container border border-outline-variant/20 flex items-center justify-center text-primary font-bold overflow-hidden shadow-inner shrink-0">
                 @if($event->organisasi?->logo_url)
-                    <img src="{{ asset('storage/logos/' . $event->organisasi->logo_url) }}" alt="Logo {{ $event->organisasi->nama_organisasi }}" class="w-full h-full object-cover">
+                    <img src="{{ asset('storage/' . $event->organisasi->logo_url) }}" alt="Logo {{ $event->organisasi->nama_organisasi }}" class="w-full h-full object-cover">
                 @else
                     <span class="text-[11px] font-extrabold tracking-tight">
                         {{ strtoupper(substr($event->organisasi->nama_organisasi ?? 'O', 0, 2)) }}

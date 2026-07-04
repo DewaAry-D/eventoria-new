@@ -20,7 +20,7 @@
 
     <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-surface-container-low border border-outline-variant/30 flex items-center justify-center p-sm overflow-hidden shrink-0 relative group shadow-xs">
         @if($org->logo_url)
-            <img src="{{ asset('storage/logos/' . $org->logo_url) }}" 
+            <img src="{{ asset('storage/' . $org->logo_url) }}" 
                     alt="Logo {{ $org->nama_organisasi }}" 
                     class="w-full h-full object-contain transition-all duration-500 group-hover:scale-[1.03] mix-blend-multiply relative z-10">
             

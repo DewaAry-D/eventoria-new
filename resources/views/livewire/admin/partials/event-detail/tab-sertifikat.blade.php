@@ -14,7 +14,7 @@
                 <div class="w-full max-h-[480px] aspect-[16/9] bg-surface-container-low rounded-2xl overflow-hidden relative border border-outline-variant/10 flex flex-col items-center justify-center group shadow-2xs">
                     <div class="relative w-full h-full flex items-center justify-center cursor-zoom-in" @click="if(!imgFailed) showLightbox = true">
                         <img x-show="!imgFailed"
-                                src="{{ asset('storage/sertifikat-templates/' . $event->templateSertifikat->file_template) }}" 
+                                src="{{ asset('storage/' . $event->templateSertifikat->file_template) }}" 
                                 alt="Template Sertifikat {{ $event->nama_event }}" 
                                 x-on:error="imgFailed = true"
                                 class="w-full h-full object-contain transition-all duration-500 group-hover:scale-[1.01] group-hover:brightness-95">
@@ -73,7 +73,7 @@
                 
                         <div class="relative w-full max-w-4xl max-h-[85vh] bg-surface-container rounded-3xl overflow-hidden shadow-2xl border border-white/10 flex items-center justify-center" @click.stop>
                             
-                            <img src="{{ asset('storage/sertifikat-templates/' . $event->templateSertifikat->file_template) }}" 
+                            <img src="{{ asset('storage/' . $event->templateSertifikat->file_template) }}" 
                                     alt="Sertifikat HD" 
                                     class="w-full h-auto max-h-[85vh] object-contain block select-none">
             

@@ -145,17 +145,15 @@ class OrganisasiDetail extends Component
         return array_values(array_filter(array_map('trim', $split)));
     }
     
-    protected function getFriendlyFileSize(?string $filename, string $subFolder): string
+    protected function getFriendlyFileSize(?string $filename): string
     {
         if (empty($filename)) {
             return 'Tidak Ada File';
         }
 
-        $pathLengkap = 'dokumen/' . $subFolder . '/' . $filename;
-
         try {
-            if (Storage::disk('public')->exists($pathLengkap)) {
-                $bytes = Storage::disk('public')->size($pathLengkap);
+            if (Storage::disk('public')->exists($filename)) {
+                $bytes = Storage::disk('public')->size($filename);
                 
                 // Konversi bytes ke Megabytes (MB)
                 $megabytes = round($bytes / 1024 / 1024, 1);
@@ -180,7 +178,7 @@ class OrganisasiDetail extends Component
         $this->showApproveModal = true;
     }
 
-    public function approve(): void
+    public function approve()
     {
         $org = $this->getFreshOrgQuery()->where('status', 'pending')->first();
 
@@ -192,7 +190,7 @@ class OrganisasiDetail extends Component
         $org->update(['status' => OrganisasiStatus::APPROVED->value]);
         
         session()->flash('success', "Berkas organisasi berhasil diverifikasi dan disetujui!");
-        $this->redirect(route('admin.moderasi.organisasi'), navigate: true);
+        return redirect()->route('admin.moderasi.organisasi');
     }
 
     public function confirmReject(): void
@@ -201,7 +199,7 @@ class OrganisasiDetail extends Component
         $this->showRejectModal = true;
     }
 
-    public function reject(): void
+    public function reject()
     {
         $this->validate([
             'pesanPenolakan' => 'required|string|min:5|max:500',
@@ -230,7 +228,7 @@ class OrganisasiDetail extends Component
         ]);
 
         session()->flash('success', "Pendaftaran berkas organisasi telah berhasil ditolak");
-        $this->redirect(route('admin.moderasi.organisasi'), navigate: true);
+        return redirect()->route('admin.moderasi.organisasi');
     }
 
     public function closeModal(): void
@@ -259,8 +257,8 @@ class OrganisasiDetail extends Component
             'listMisi' => $this->parsePoinText($orgData->misi),
             
             'jumlah_dokumen' => $jumlahDokumen,
-            'ad_art_size' => $this->getFriendlyFileSize($orgData->ad_art, 'ad-art'),
-            'sk_size' => $this->getFriendlyFileSize($orgData->sk, 'sk')
+            'ad_art_size' => $this->getFriendlyFileSize($orgData->ad_art),
+            'sk_size' => $this->getFriendlyFileSize($orgData->sk)
         ]);
     }
 }

@@ -103,6 +103,8 @@ new #[Layout('layouts.guest')] class extends Component
                     'role' => 'mahasiswa', 
                 ]);
 
+                $user->assignRole('mahasiswa');
+
                 Mahasiswa::create([
                     'user_id' => $user->id,
                     'nama' => $this->nama_mahasiswa,
@@ -117,6 +119,8 @@ new #[Layout('layouts.guest')] class extends Component
                     'password' => Hash::make($this->password_organisasi),
                     'role' => 'organisasi', 
                 ]);
+
+                $user->assignRole('organisasi');
 
                 $logoPath = $this->logo_url ? $this->logo_url->store('logo', 'public') : null;
                 $adArtPath = $this->ad_art ? $this->ad_art->store('dokumen/ad-art', 'public') : null;

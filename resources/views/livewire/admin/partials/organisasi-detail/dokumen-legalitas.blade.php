@@ -32,7 +32,7 @@
             </div>
 
             @if($org->ad_art)
-                <a href="{{ asset('storage/dokumen/ad-art/' . $org->ad_art) }}" 
+                <a href="{{ asset('storage/' . $org->ad_art) }}" 
                     download="AD_ART_{{ str_replace(' ', '_', $org->nama_organisasi) }}.pdf"
                     class="w-full sm:w-auto inline-flex items-center justify-center gap-xs px-md py-2.5 sm:py-2 bg-primary text-on-primary font-bold text-body-sm rounded-xl border border-primary hover:bg-primary-container hover:border-primary-container transition-all active:scale-95 shadow-sm cursor-pointer select-none shrink-0">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
@@ -67,7 +67,7 @@
             </div>
 
             @if($org->sk)
-                <a href="{{ asset('storage/dokumen/sk/' . $org->sk) }}" 
+                <a href="{{ asset('storage/' . $org->sk) }}" 
                     download="SK_Kepengurusan_{{ str_replace(' ', '_', $org->nama_organisasi) }}.pdf"
                     class="w-full sm:w-auto inline-flex items-center justify-center gap-xs px-md py-2.5 sm:py-2 bg-primary text-on-primary font-bold text-body-sm rounded-xl border border-primary hover:bg-primary-container hover:border-primary-container transition-all active:scale-95 shadow-sm cursor-pointer select-none shrink-0">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">

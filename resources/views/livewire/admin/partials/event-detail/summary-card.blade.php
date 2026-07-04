@@ -8,7 +8,7 @@
                 @click="if(!imgFailed) showLightbox = true">
             
             <img x-show="!imgFailed"
-                src="{{ asset('storage/flyers/' . $event->flyer_url) }}" 
+                src="{{ asset('storage/' . $event->flyer_url) }}" 
                 alt="Flyer {{ $event->nama_event }}" 
                 x-on:error="imgFailed = true"
                 class="w-full h-full object-cover transition-all duration-500 group-hover:scale-105 group-hover:brightness-75">
@@ -60,7 +60,7 @@
                 </button>
     
                 <div class="relative max-w-full max-h-[85vh] md:max-h-[90vh] aspect-[3/4] rounded-2xl overflow-hidden bg-surface-container shadow-2xl border border-white/10" @click.stop>
-                        <img src="{{ asset('storage/flyers/' . $event->flyer_url) }}" alt="Flyer {{ $event->nama_event }} Full" class="w-full h-full object-contain select-none">
+                        <img src="{{ asset('storage/' . $event->flyer_url) }}" alt="Flyer {{ $event->nama_event }} Full" class="w-full h-full object-contain select-none">
                 </div>
             </div>
         </template>
@@ -150,7 +150,7 @@
                     class="flex items-center gap-xs min-w-0 select-none">
                 <div class="w-8 h-8 rounded-full bg-surface-container border border-outline-variant/30 flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
                     @if($event->organisasi?->logo_url)
-                        <img src="{{ asset('storage/logos/' . $event->organisasi->logo_url) }}" 
+                        <img src="{{ asset('storage/' . $event->organisasi->logo_url) }}" 
                                 alt="Logo {{ $event->organisasi->nama_organisasi }}" 
                                 class="w-full h-full object-cover">
                     @else

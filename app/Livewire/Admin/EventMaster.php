@@ -119,7 +119,10 @@ class EventMaster extends Component
     public function approveEvent(int $eventId)
     {
         $adminDpm = AdminDpm::query()->where('user_id', Auth::id())->first();
-        $event = $this->baseEventQuery()->find($eventId);
+        $event = $this->baseEventQuery()
+            ->where('id', $eventId)
+            ->where('status', EventStatus::PENDING_APPROVAL->value)
+            ->first();
 
         if ($event) {
             $event->update([
@@ -155,7 +158,10 @@ class EventMaster extends Component
             'alasanPenolakan.max'      => 'Alasan terlalu panjang, batasi ulasan maksimal 500 karakter saja.',
         ]);
 
-        $event = $this->baseEventQuery()->find($eventId);
+        $event = $this->baseEventQuery()
+            ->where('id', $eventId)
+            ->where('status', EventStatus::PENDING_APPROVAL->value)
+            ->first();
 
         if ($event) {
             $alasanBersih = strip_tags($this->alasanPenolakan);

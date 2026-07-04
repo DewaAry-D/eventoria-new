@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Pages\Admin;
 
+use App\Enums\EventStatus;
 use App\Enums\OrganisasiStatus;
 use App\Models\AdminDpm;
 use App\Models\OrganisasiMahasiswa;
@@ -95,7 +96,7 @@ class ModerasiOrganisasi extends Component
     {
         $org = $this->baseQuery()
             ->where('id', $id)
-            ->where('status', 'pending')
+            ->where('status', EventStatus::PENDING_APPROVAL->value)
             ->first();
 
         if (!$org) {
@@ -137,7 +138,7 @@ class ModerasiOrganisasi extends Component
 
         $org = $this->baseQuery()
             ->where('id', $id)
-            ->where('status', 'pending')
+            ->where('status', EventStatus::PENDING_APPROVAL->value)
             ->first();
 
         if (!$org) {
