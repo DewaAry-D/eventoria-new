@@ -240,36 +240,7 @@ new #[Layout('layouts.mahasiswa')] class extends Component {
                             @endforelse
                         </div>
 
-                        {{-- Termasuk --}}
-                        <div class="border-t border-dashed border-outline-variant pt-4 mt-3">
-                            <span class="text-xs font-bold text-on-surface-variant uppercase tracking-wider block mb-2">Termasuk:</span>
-                            <ul class="text-xs text-on-surface-variant space-y-2.5">
-                                <li class="flex items-center gap-2">
-                                    <svg class="w-4 h-4 text-success flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4" />
-                                    </svg>
-                                    E-Sertifikat Nasional Ber-SKP
-                                </li>
-                                <li class="flex items-center gap-2">
-                                    <svg class="w-4 h-4 text-success flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4" />
-                                    </svg>
-                                    Seminar Kit & Totebag Eksklusif
-                                </li>
-                                <li class="flex items-center gap-2">
-                                    <svg class="w-4 h-4 text-success flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4" />
-                                    </svg>
-                                    Konsumsi Snack Box & Makan Siang
-                                </li>
-                                <li class="flex items-center gap-2">
-                                    <svg class="w-4 h-4 text-success flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4" />
-                                    </svg>
-                                    Akses Materi & Rekaman Simposium
-                                </li>
-                            </ul>
-                        </div>
+
                     </div>
                 </div>
 
