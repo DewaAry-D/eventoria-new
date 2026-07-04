@@ -21,6 +21,14 @@ Route::middleware(['auth', 'role.mahasiswa'])->group(function () {
     Volt::route('/mahasiswa/events/{event:slug}/daftar', 'pages.mahasiswa.event-register')->name('mahasiswa.event-register');
     Volt::route('/mahasiswa/my-events', 'pages.mahasiswa.my-events')->name('mahasiswa.my-events');
     Volt::route('/mahasiswa/schedule', 'pages.mahasiswa.schedule')->name('mahasiswa.schedule');
+    Volt::route('/mahasiswa/profil', 'pages.mahasiswa.profil')->name('mahasiswa.profil');
+    Volt::route('/mahasiswa/sertifikat', 'pages.mahasiswa.sertifikat.index')->name('mahasiswa.sertifikat.index');
+    Volt::route('/mahasiswa/sertifikat/{registration_id}', 'pages.mahasiswa.sertifikat.show')->name('mahasiswa.sertifikat.show');
+    Route::get('/mahasiswa/sertifikat/{registration_id}/download', [App\Http\Controllers\SertifikatController::class, 'download'])->name('mahasiswa.sertifikat.download');
+    Route::get('/mahasiswa/sertifikat/{registration_id}/download-jpg', [App\Http\Controllers\SertifikatController::class, 'downloadJpg'])->name('mahasiswa.sertifikat.download.jpg');
+    Route::get('/mahasiswa/sertifikat/{registration_id}/download-jpg',
+    [App\Http\Controllers\SertifikatController::class, 'downloadJpg']
+    )->name('mahasiswa.sertifikat.download.jpg');
 });
 
 // Grup 2: Organisasi

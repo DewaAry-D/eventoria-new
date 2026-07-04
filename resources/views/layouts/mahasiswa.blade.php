@@ -31,7 +31,7 @@
                         <a href="{{ route('mahasiswa.dashboard') }}" class="inline-flex items-center h-full px-1 pt-1 border-b-2 {{ request()->routeIs('mahasiswa.dashboard') ? 'border-primary text-primary font-bold' : 'border-transparent text-on-surface-variant hover:text-primary hover:border-outline' }} text-sm font-medium transition duration-150">
                             Dashboard
                         </a>
-                        <a href="#" class="inline-flex items-center h-full px-1 pt-1 border-b-2 border-transparent text-on-surface-variant hover:text-primary hover:border-outline text-sm font-medium transition duration-150">
+                        <a href="{{ route('mahasiswa.sertifikat.index') }}" wire:navigate class="inline-flex items-center h-full px-1 pt-1 border-b-2 {{ request()->routeIs('mahasiswa.sertifikat.*') ? 'border-primary text-primary font-bold' : 'border-transparent text-on-surface-variant hover:text-primary hover:border-outline' }} text-sm font-medium transition duration-150">
                             Sertifikat
                         </a>
                         <a href="{{ route('mahasiswa.schedule') }}" wire:navigate class="inline-flex items-center h-full px-1 pt-1 border-b-2 {{ request()->routeIs('mahasiswa.schedule') ? 'border-primary text-primary font-bold' : 'border-transparent text-on-surface-variant hover:text-primary hover:border-outline' }} text-sm font-medium transition duration-150">
@@ -56,7 +56,7 @@
                                     <p class="text-sm font-bold text-on-surface">{{ Auth::user()->mahasiswa->nama ?? 'Mahasiswa' }}</p>
                                     <p class="text-[10px] text-on-surface-variant">{{ Auth::user()->mahasiswa->prodi->nama_prodi ?? 'Prodi' }}</p>
                                 </div>
-                                <a href="{{ route('profile') }}" class="block px-4 py-2 text-sm text-on-surface hover:bg-surface-container-low transition duration-150">Profil Saya</a>
+                                <a href="{{ route('mahasiswa.profil') }}" class="block px-4 py-2 text-sm text-on-surface hover:bg-surface-container-low transition duration-150">Profil Saya</a>
                                 <form method="POST" action="{{ route('logout') }}" onsubmit="return confirm('Apakah Anda yakin ingin keluar?');">
                                     @csrf
                                     <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-error hover:bg-error-container hover:bg-opacity-20 transition duration-150">Keluar</button>
@@ -83,7 +83,7 @@
                     <a href="{{ route('mahasiswa.dashboard') }}" class="block px-3 py-2 rounded-md text-base font-medium {{ request()->routeIs('mahasiswa.dashboard') ? 'bg-primary-fixed text-primary font-bold' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-primary' }}">
                         Dashboard
                     </a>
-                    <a href="#" class="block px-3 py-2 rounded-md text-base font-medium text-on-surface-variant hover:bg-surface-container-low hover:text-primary">
+                    <a href="{{ route('mahasiswa.sertifikat.index') }}" wire:navigate class="block px-3 py-2 rounded-md text-base font-medium {{ request()->routeIs('mahasiswa.sertifikat.*') ? 'bg-primary-fixed text-primary font-bold' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-primary' }}">
                         Sertifikat
                     </a>
                     <a href="{{ route('mahasiswa.schedule') }}" wire:navigate class="block px-3 py-2 rounded-md text-base font-medium {{ request()->routeIs('mahasiswa.schedule') ? 'bg-primary-fixed text-primary font-bold' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-primary' }}">
@@ -92,7 +92,7 @@
                     <a href="{{ route('mahasiswa.my-events') }}" wire:navigate class="block px-3 py-2 rounded-md text-base font-medium {{ request()->routeIs('mahasiswa.my-events') ? 'bg-primary-fixed text-primary font-bold' : 'text-on-surface-variant hover:bg-surface-container-low hover:text-primary' }}">
                         My Event
                     </a>
-                    <a href="{{ route('profile') }}" class="block px-3 py-2 rounded-md text-base font-medium text-on-surface-variant hover:bg-surface-container-low hover:text-primary">
+                    <a href="{{ route('mahasiswa.profil') }}" class="block px-3 py-2 rounded-md text-base font-medium text-on-surface-variant hover:bg-surface-container-low hover:text-primary">
                         Profil Saya
                     </a>
                     <form method="POST" action="{{ route('logout') }}" onsubmit="return confirm('Apakah Anda yakin ingin keluar?');" class="block w-full">
