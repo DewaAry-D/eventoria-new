@@ -17,6 +17,14 @@ Route::view('profile', 'profile')
 // Rute Sementara untuk menghindari error setelah Login/Register
 Route::middleware('auth')->group(function () {
     Volt::route('/dashboard-mahasiswa', 'pages.mahasiswa.dashboard')->name('mahasiswa.dashboard');
+    Volt::route('/mahasiswa/profil', 'pages.mahasiswa.profil')->name('mahasiswa.profil');
+    Volt::route('/mahasiswa/sertifikat', 'pages.mahasiswa.sertifikat.index')->name('mahasiswa.sertifikat.index');
+    Volt::route('/mahasiswa/sertifikat/{registration_id}', 'pages.mahasiswa.sertifikat.show')->name('mahasiswa.sertifikat.show');
+    Route::get('/mahasiswa/sertifikat/{registration_id}/download', [App\Http\Controllers\SertifikatController::class, 'download'])->name('mahasiswa.sertifikat.download');
+    Route::get('/mahasiswa/sertifikat/{registration_id}/download-jpg', [App\Http\Controllers\SertifikatController::class, 'downloadJpg'])->name('mahasiswa.sertifikat.download.jpg');
+    Route::get('/mahasiswa/sertifikat/{registration_id}/download-jpg',
+    [App\Http\Controllers\SertifikatController::class, 'downloadJpg']
+    )->name('mahasiswa.sertifikat.download.jpg');
 
     //organisasi
     Volt::route('/dashboard-organisasi', 'pages.organisasi.dashboard')->name('organisasi.dashboard');

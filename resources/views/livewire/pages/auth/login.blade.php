@@ -25,7 +25,7 @@ new #[Layout('layouts.guest')] class extends Component
 
         // Logika Redirect Berdasarkan Role
         if ($user->hasRole('mahasiswa')) {
-            $this->redirectIntended(default: route('beranda.mahasiswa', absolute: false), navigate: true);
+            $this->redirectIntended(default: route('mahasiswa.dashboard', absolute: false), navigate: true);
         } elseif ($user->hasRole('organisasi')) {
             $this->redirectIntended(default: route('organisasi.dashboard', absolute: false), navigate: true);
         } elseif ($user->hasRole('admin_dpm')) {
