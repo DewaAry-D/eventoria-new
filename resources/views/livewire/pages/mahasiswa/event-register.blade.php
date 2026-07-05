@@ -17,6 +17,8 @@ new #[Layout('layouts.mahasiswa')] class extends Component {
     public array $answers = [];
     public array $files = [];
 
+    public string $namaCetakSertifikat = '';
+
     public function mount(Event $event)
     {
         // Load the event with formFields
@@ -33,6 +35,8 @@ new #[Layout('layouts.mahasiswa')] class extends Component {
                 session()->flash('error', 'Anda sudah terdaftar untuk event ini.');
                 return $this->redirectRoute('mahasiswa.event-detail', $this->event->slug, navigate: true);
             }
+
+            $this->namaCetakSertifikat = $user->mahasiswa->nama;
         }
 
         // If no slot is left
@@ -58,6 +62,10 @@ new #[Layout('layouts.mahasiswa')] class extends Component {
         // Dynamic validation rules & custom error messages
         $rules = [];
         $messages = [];
+
+        $rules['namaCetakSertifikat'] = 'required|string|min:3|max:255';
+        $messages['namaCetakSertifikat.required'] = "Kolom 'Nama Lengkap (Cetak Sertifikat)' wajib diisi.";
+        $messages['namaCetakSertifikat.min'] = "Nama lengkap untuk sertifikat terlalu pendek.";
         
         foreach ($this->event->formFields as $field) {
             $fieldName = $field->nama_field;
@@ -125,7 +133,7 @@ new #[Layout('layouts.mahasiswa')] class extends Component {
                     'event_id' => $this->event->id,
                     'waktu_daftar' => now(),
                     'status_pendaftaran' => RegistrationStatus::PENDING,
-                    'nama_cetak_sertifikat' => $user->mahasiswa->nama,
+                    'nama_cetak_sertifikat' => trim($this->namaCetakSertifikat),
                 ]);
 
                 // Save form responses
@@ -204,141 +212,173 @@ new #[Layout('layouts.mahasiswa')] class extends Component {
         {{-- Form Body --}}
         <form wire:submit.prevent="submit" class="p-6 md:p-8 space-y-6">
             @csrf
-            
-            @if($event->formFields->isEmpty())
-                <div class="text-center p-8 border border-dashed border-outline-variant rounded-xl bg-surface-container-low">
-                    <svg class="mx-auto w-12 h-12 text-outline mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                    <p class="text-sm font-bold text-primary">Formulir Standar</p>
-                    <p class="text-xs text-on-surface-variant mt-1">Event ini tidak memerlukan informasi tambahan khusus. Anda dapat langsung mengirim pendaftaran.</p>
+
+            <div class="space-y-5">
+                <div class="space-y-2 p-4 bg-indigo-50 bg-opacity-40 border border-indigo-100 rounded-xl">
+                    <div class="flex items-center justify-between">
+                        <label class="block text-xs font-bold text-indigo-900 uppercase tracking-wide">
+                            Nama Lengkap (Cetak Sertifikat)
+                            <span class="text-error font-extrabold">*</span>
+                        </label>
+                        <span class="text-[9px] font-bold text-indigo-700 bg-white border border-indigo-200 px-2 py-0.5 rounded uppercase tracking-wider">
+                            Wajib Sistem
+                        </span>
+                    </div>
+                    
+                    <input 
+                        type="text" 
+                        wire:model="namaCetakSertifikat" 
+                        placeholder="Masukkan nama lengkap beserta gelar (jika ada) untuk lembar sertifikat..." 
+                        class="w-full px-4 py-2.5 text-sm bg-white border border-outline rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-on-surface transition shadow-sm placeholder-outline-variant"
+                    >
+                    <p class="text-[10px] text-indigo-950 text-opacity-60 font-medium">
+                        Periksa kembali ejaan nama Anda. Nama ini akan langsung digunakan secara permanen oleh sistem untuk merender teks sertifikat.
+                    </p>
+                    
+                    @error('namaCetakSertifikat')
+                        <span class="block text-[11px] text-error font-semibold mt-1">{{ $message }}</span>
+                    @enderror
                 </div>
-            @else
-                <div class="space-y-5">
-                    @foreach($event->formFields as $field)
-                        @php
-                            $tipe = $field->tipe_field->value ?? $field->tipe_field;
-                            $isRequired = (bool) $field->is_required;
-                            $options = $field->meta_options;
-                        @endphp
-                        
-                        <div class="space-y-2">
-                            <label class="block text-xs font-bold text-primary uppercase tracking-wide">
-                                {{ $field->nama_field }}
-                                @if($isRequired)
-                                    <span class="text-error font-extrabold">*</span>
+
+                {{-- @if($event->formFields->isEmpty())
+                    <div class="border-t border-dashed border-outline-variant/60 my-4"></div>
+
+                    <div class="text-center p-8 border border-dashed border-outline-variant rounded-xl bg-surface-container-low">
+                        <svg class="mx-auto w-12 h-12 text-outline mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <p class="text-sm font-bold text-primary">Formulir Standar</p>
+                        <p class="text-xs text-on-surface-variant mt-1">Event ini tidak memerlukan informasi tambahan khusus. Anda dapat langsung mengirim pendaftaran.</p>
+                    </div>
+                @endif --}}
+
+                @if(!$event->formFields->isEmpty())
+                    <div class="border-t border-dashed border-outline-variant/60 my-4"></div>
+                @endif
+                
+                @foreach($event->formFields as $field)
+                    @php
+                        $tipe = $field->tipe_field->value ?? $field->tipe_field;
+                        $isRequired = (bool) $field->is_required;
+                        $options = $field->meta_options;
+                    @endphp
+                    
+                    <div class="space-y-2">
+                        <label class="block text-xs font-bold text-primary uppercase tracking-wide">
+                            {{ $field->nama_field }}
+                            @if($isRequired)
+                                <span class="text-error font-extrabold">*</span>
+                            @endif
+                        </label>
+
+                        {{-- Text, Number, Email, URL inputs --}}
+                        @if(in_array($tipe, ['text', 'number', 'email', 'url']))
+                            <input 
+                                type="{{ $tipe }}" 
+                                wire:model="answers.{{ $field->id }}" 
+                                placeholder="Masukkan {{ strtolower($field->nama_field) }}..." 
+                                class="w-full px-4 py-2.5 text-sm bg-surface-container-lowest border border-outline rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-on-surface transition shadow-sm placeholder-outline-variant"
+                            >
+                        @endif
+
+                        {{-- Textarea inputs --}}
+                        @if($tipe === 'textarea')
+                            <textarea 
+                                wire:model="answers.{{ $field->id }}" 
+                                rows="4" 
+                                placeholder="Masukkan {{ strtolower($field->nama_field) }}..." 
+                                class="w-full px-4 py-2.5 text-sm bg-surface-container-lowest border border-outline rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-on-surface transition shadow-sm placeholder-outline-variant"
+                            ></textarea>
+                        @endif
+
+                        {{-- Select dropdown --}}
+                        @if($tipe === 'select')
+                            <select 
+                                wire:model="answers.{{ $field->id }}" 
+                                class="w-full px-4 py-2.5 text-sm bg-surface-container-lowest border border-outline rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-on-surface transition shadow-sm"
+                            >
+                                <option value="">Pilih opsi...</option>
+                                @if(!empty($options))
+                                    @foreach($options as $opt)
+                                        <option value="{{ $opt }}">{{ $opt }}</option>
+                                    @endforeach
                                 @endif
-                            </label>
+                            </select>
+                        @endif
 
-                            {{-- Text, Number, Email, URL inputs --}}
-                            @if(in_array($tipe, ['text', 'number', 'email', 'url']))
+                        {{-- Radio options --}}
+                        @if($tipe === 'radio')
+                            <div class="flex flex-col gap-2.5 pt-1">
+                                @if(!empty($options))
+                                    @foreach($options as $opt)
+                                        <label class="inline-flex items-center gap-2 text-sm text-on-surface cursor-pointer select-none">
+                                            <input 
+                                                type="radio" 
+                                                name="radio_{{ $field->id }}" 
+                                                value="{{ $opt }}" 
+                                                wire:model="answers.{{ $field->id }}" 
+                                                class="w-4.5 h-4.5 text-primary border-outline focus:ring-primary focus:ring-offset-0 cursor-pointer animate-none"
+                                            >
+                                            <span>{{ $opt }}</span>
+                                        </label>
+                                    @endforeach
+                                @endif
+                            </div>
+                        @endif
+
+                        {{-- File PDF --}}
+                        @if($tipe === 'file_pdf')
+                            <div class="flex flex-col gap-2">
                                 <input 
-                                    type="{{ $tipe }}" 
-                                    wire:model="answers.{{ $field->id }}" 
-                                    placeholder="Masukkan {{ strtolower($field->nama_field) }}..." 
-                                    class="w-full px-4 py-2.5 text-sm bg-surface-container-lowest border border-outline rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-on-surface transition shadow-sm placeholder-outline-variant"
+                                    type="file" 
+                                    wire:model="files.{{ $field->id }}" 
+                                    accept=".pdf"
+                                    class="block w-full text-xs text-on-surface-variant border border-outline rounded-lg cursor-pointer bg-surface-container-lowest focus:outline-none file:mr-4 file:py-2.5 file:px-4 file:rounded-l-lg file:border-0 file:text-xs file:font-bold file:bg-primary file:text-white hover:file:bg-primary-container transition file:cursor-pointer"
                                 >
-                            @endif
+                                <p class="text-[10px] text-on-surface-variant">Format berkas wajib PDF, ukuran maksimal 2MB.</p>
+                                
+                                {{-- Uploading State --}}
+                                <div wire:loading wire:target="files.{{ $field->id }}" class="text-[10px] text-primary font-bold animate-pulse">
+                                    Mengunggah berkas...
+                                </div>
+                            </div>
+                        @endif
 
-                            {{-- Textarea inputs --}}
-                            @if($tipe === 'textarea')
-                                <textarea 
-                                    wire:model="answers.{{ $field->id }}" 
-                                    rows="4" 
-                                    placeholder="Masukkan {{ strtolower($field->nama_field) }}..." 
-                                    class="w-full px-4 py-2.5 text-sm bg-surface-container-lowest border border-outline rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-on-surface transition shadow-sm placeholder-outline-variant"
-                                ></textarea>
-                            @endif
-
-                            {{-- Select dropdown --}}
-                            @if($tipe === 'select')
-                                <select 
-                                    wire:model="answers.{{ $field->id }}" 
-                                    class="w-full px-4 py-2.5 text-sm bg-surface-container-lowest border border-outline rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-on-surface transition shadow-sm"
+                        {{-- File Image --}}
+                        @if($tipe === 'file_image')
+                            <div class="flex flex-col gap-2">
+                                <input 
+                                    type="file" 
+                                    wire:model="files.{{ $field->id }}" 
+                                    accept="image/*"
+                                    class="block w-full text-xs text-on-surface-variant border border-outline rounded-lg cursor-pointer bg-surface-container-lowest focus:outline-none file:mr-4 file:py-2.5 file:px-4 file:rounded-l-lg file:border-0 file:text-xs file:font-bold file:bg-primary file:text-white hover:file:bg-primary-container transition file:cursor-pointer"
                                 >
-                                    <option value="">Pilih opsi...</option>
-                                    @if(!empty($options))
-                                        @foreach($options as $opt)
-                                            <option value="{{ $opt }}">{{ $opt }}</option>
-                                        @endforeach
-                                    @endif
-                                </select>
-                            @endif
-
-                            {{-- Radio options --}}
-                            @if($tipe === 'radio')
-                                <div class="flex flex-col gap-2.5 pt-1">
-                                    @if(!empty($options))
-                                        @foreach($options as $opt)
-                                            <label class="inline-flex items-center gap-2 text-sm text-on-surface cursor-pointer select-none">
-                                                <input 
-                                                    type="radio" 
-                                                    name="radio_{{ $field->id }}" 
-                                                    value="{{ $opt }}" 
-                                                    wire:model="answers.{{ $field->id }}" 
-                                                    class="w-4.5 h-4.5 text-primary border-outline focus:ring-primary focus:ring-offset-0 cursor-pointer animate-none"
-                                                >
-                                                <span>{{ $opt }}</span>
-                                            </label>
-                                        @endforeach
-                                    @endif
-                                </div>
-                            @endif
-
-                            {{-- File PDF --}}
-                            @if($tipe === 'file_pdf')
-                                <div class="flex flex-col gap-2">
-                                    <input 
-                                        type="file" 
-                                        wire:model="files.{{ $field->id }}" 
-                                        accept=".pdf"
-                                        class="block w-full text-xs text-on-surface-variant border border-outline rounded-lg cursor-pointer bg-surface-container-lowest focus:outline-none file:mr-4 file:py-2.5 file:px-4 file:rounded-l-lg file:border-0 file:text-xs file:font-bold file:bg-primary file:text-white hover:file:bg-primary-container transition file:cursor-pointer"
-                                    >
-                                    <p class="text-[10px] text-on-surface-variant">Format berkas wajib PDF, ukuran maksimal 2MB.</p>
-                                    
-                                    {{-- Uploading State --}}
-                                    <div wire:loading wire:target="files.{{ $field->id }}" class="text-[10px] text-primary font-bold animate-pulse">
-                                        Mengunggah berkas...
+                                <p class="text-[10px] text-on-surface-variant">Format gambar (JPEG, PNG, JPG), ukuran maksimal 2MB.</p>
+                                
+                                {{-- Image Preview --}}
+                                @if(isset($files[$field->id]) && !$errors->has("files.{$field->id}"))
+                                    <div class="mt-2 relative w-28 h-28 rounded-lg overflow-hidden border border-outline-variant bg-surface-container-low shadow-sm">
+                                        <img src="{{ $files[$field->id]->temporaryUrl() }}" class="w-full h-full object-cover">
                                     </div>
+                                @endif
+
+                                {{-- Uploading State --}}
+                                <div wire:loading wire:target="files.{{ $field->id }}" class="text-[10px] text-primary font-bold animate-pulse">
+                                    Mengunggah gambar...
                                 </div>
-                            @endif
+                            </div>
+                        @endif
 
-                            {{-- File Image --}}
-                            @if($tipe === 'file_image')
-                                <div class="flex flex-col gap-2">
-                                    <input 
-                                        type="file" 
-                                        wire:model="files.{{ $field->id }}" 
-                                        accept="image/*"
-                                        class="block w-full text-xs text-on-surface-variant border border-outline rounded-lg cursor-pointer bg-surface-container-lowest focus:outline-none file:mr-4 file:py-2.5 file:px-4 file:rounded-l-lg file:border-0 file:text-xs file:font-bold file:bg-primary file:text-white hover:file:bg-primary-container transition file:cursor-pointer"
-                                    >
-                                    <p class="text-[10px] text-on-surface-variant">Format gambar (JPEG, PNG, JPG), ukuran maksimal 2MB.</p>
-                                    
-                                    {{-- Image Preview --}}
-                                    @if(isset($files[$field->id]) && !$errors->has("files.{$field->id}"))
-                                        <div class="mt-2 relative w-28 h-28 rounded-lg overflow-hidden border border-outline-variant bg-surface-container-low shadow-sm">
-                                            <img src="{{ $files[$field->id]->temporaryUrl() }}" class="w-full h-full object-cover">
-                                        </div>
-                                    @endif
-
-                                    {{-- Uploading State --}}
-                                    <div wire:loading wire:target="files.{{ $field->id }}" class="text-[10px] text-primary font-bold animate-pulse">
-                                        Mengunggah gambar...
-                                    </div>
-                                </div>
-                            @endif
-
-                            {{-- Validation error --}}
-                            @error("answers.{$field->id}")
-                                <span class="block text-[11px] text-error font-semibold mt-1">{{ $message }}</span>
-                            @enderror
-                            @error("files.{$field->id}")
-                                <span class="block text-[11px] text-error font-semibold mt-1">{{ $message }}</span>
-                            @enderror
-                        </div>
-                    @endforeach
-                </div>
-            @endif
+                        {{-- Validation error --}}
+                        @error("answers.{$field->id}")
+                            <span class="block text-[11px] text-error font-semibold mt-1">{{ $message }}</span>
+                        @enderror
+                        @error("files.{$field->id}")
+                            <span class="block text-[11px] text-error font-semibold mt-1">{{ $message }}</span>
+                        @enderror
+                    </div>
+                @endforeach
+            </div>
 
             <hr class="border-outline-variant">
 
