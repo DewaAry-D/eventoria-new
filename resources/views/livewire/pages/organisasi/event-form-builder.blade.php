@@ -27,6 +27,9 @@ new #[Layout('layouts.organisasi')] class extends Component
 
         if ($existingFields->count() > 0) {
             foreach ($existingFields as $field) {
+                if ($field->nama_field === 'Nama Lengkap (Untuk Sertifikat)') {
+                    continue; 
+                }
                 $this->fields[] = [
                     'nama_field' => $field->nama_field,
                     'tipe_field' => $field->tipe_field,
@@ -64,6 +67,13 @@ new #[Layout('layouts.organisasi')] class extends Component
 
         DB::transaction(function () {
             $this->event->formFields()->delete();
+
+            $this->event->formFields()->create([
+                'nama_field' => 'Nama Lengkap (Untuk Sertifikat)',
+                'tipe_field' => FieldType::TEXT->value, // Menyimpan teks 'text'
+                'is_required' => true, // Wajib diisi
+                'opsi' => null,
+            ]);
 
             foreach ($this->fields as $field) {
                 $this->event->formFields()->create([
