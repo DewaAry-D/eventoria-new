@@ -12,7 +12,7 @@
         </span>
     </div>
 
-    <div class="w-full bg-surface-container-low p-md sm:p-lg rounded-2xl border border-outline-variant/10 flex flex-col gap-md max-h-[500px] overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-outline-variant/40 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-outline-variant/70">
+    <div class="w-full bg-surface-container-high p-md sm:p-lg rounded-2xl border border-outline-variant/10 flex flex-col gap-md max-h-[500px] overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-outline-variant/40 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-outline-variant/70">
         
         <!-- Form untuk nama sertif -->
         <div class="w-full flex flex-col gap-sm pr-xs border-b border-outline-variant/20 pb-md mb-xs">
