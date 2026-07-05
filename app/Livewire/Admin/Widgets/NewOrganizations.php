@@ -28,7 +28,7 @@ class NewOrganizations extends Component
     public function render()
     {
         $adminDpm = Cache::remember('admin_dpm_' . Auth::id(), 300, fn() =>
-            AdminDpm::where('user_id', Auth::id())->first()
+            AdminDpm::query()->where('user_id', Auth::id())->first()
         );
 
         $query = OrganisasiMahasiswa::query()->where('status', OrganisasiStatus::APPROVED->value); 

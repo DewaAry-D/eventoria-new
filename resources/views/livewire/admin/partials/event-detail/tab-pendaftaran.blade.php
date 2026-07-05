@@ -14,6 +14,30 @@
 
     <div class="w-full bg-surface-container-low p-md sm:p-lg rounded-2xl border border-outline-variant/10 flex flex-col gap-md max-h-[500px] overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-outline-variant/40 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-outline-variant/70">
         
+        <!-- Form untuk nama sertif -->
+        <div class="w-full flex flex-col gap-sm pr-xs border-b border-outline-variant/20 pb-md mb-xs">
+            <div class="flex items-center justify-between">
+                <label class="text-body-sm font-extrabold text-on-surface flex items-center gap-xs">
+                    <span>Nama Lengkap (Cetak Sertifikat)</span>
+                    <span class="text-error text-title-xs" title="Wajib Diisi">*</span>
+                </label>
+                <!-- Badge Penanda Wajib Sistem -->
+                <span class="text-[10px] font-extrabold text-indigo-700 bg-indigo-50 border border-indigo-200/50 px-2.5 py-0.5 rounded-md uppercase tracking-wider select-none">
+                    Wajib Sistem
+                </span>
+            </div>
+
+            <div class="w-full text-on-surface">
+                <input type="text" 
+                        disabled 
+                        placeholder="Nama lengkap yang akan dicetak pada lembar sertifikat..." 
+                        class="w-full text-body-md px-md py-2.5 bg-surface-container-lowest border border-outline-variant/30 rounded-xl text-on-surface/40 placeholder-secondary/30 font-medium cursor-not-allowed">
+            </div>
+            <p class="text-[11px] text-secondary/50 font-semibold mt-0.5">
+                Sistem otomatis meminta nama ini dan menyimpannya langsung ke kolom registrasi database.
+            </p>
+        </div>
+
         @forelse($event->formFields as $field)
             @php
                 // Decode opsi meta (pilihan select/radio/checkbox)
