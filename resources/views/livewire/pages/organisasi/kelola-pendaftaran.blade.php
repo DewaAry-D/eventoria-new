@@ -8,6 +8,7 @@ use Illuminate\Support\Str;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
 use Livewire\WithFileUploads;
+use App\Enums\RegistrationStatus;
 
 new #[Layout('layouts.organisasi')] class extends Component
 {
@@ -46,8 +47,8 @@ new #[Layout('layouts.organisasi')] class extends Component
     public function terima($id)
     {
         $reg = EventRegistration::find($id);
-        if ($reg && $reg->status_pendaftaran === 'pending') {
-            $reg->update(['status_pendaftaran' => 'approved']);
+        if ($reg && $reg->status_pendaftaran === RegistrationStatus::PENDING) {
+            $reg->update(['status_pendaftaran' => RegistrationStatus::APPROVED]);
             $this->loadPendaftar();
             session()->flash('success', 'Pendaftar berhasil disetujui.');
         }
@@ -69,9 +70,9 @@ new #[Layout('layouts.organisasi')] class extends Component
         ]);
 
         $reg = EventRegistration::find($this->rejectId);
-        if ($reg && $reg->status_pendaftaran === 'pending') {
+        if ($reg && $reg->status_pendaftaran === RegistrationStatus::PENDING) {
             $reg->update([
-                'status_pendaftaran' => 'rejected',
+                'status_pendaftaran' => RegistrationStatus::REJECTED,
                 'catatan_penolakan' => $this->catatan_penolakan
             ]);
 
@@ -84,8 +85,8 @@ new #[Layout('layouts.organisasi')] class extends Component
     public function selesaikan($id)
     {
         $reg = EventRegistration::find($id);
-        if ($reg && $reg->status_pendaftaran === 'approved') {
-            $reg->update(['status_pendaftaran' => 'completed']);
+        if ($reg && $reg->status_pendaftaran === RegistrationStatus::APPROVED) {
+            $reg->update(['status_pendaftaran' => RegistrationStatus::COMPLETED]);
             $this->loadPendaftar();
             session()->flash('success', 'Status pendaftar diubah menjadi Selesai (Completed).');
         }
@@ -95,7 +96,7 @@ new #[Layout('layouts.organisasi')] class extends Component
     {
         $approvedRegistrations = EventRegistration::with('mahasiswa')
             ->where('event_id', $this->event->id)
-            ->where('status_pendaftaran', 'approved')
+            ->where('status_pendaftaran', RegistrationStatus::APPROVED)
             ->get();
 
         $csvData = "ID_Pendaftaran,NIM,Nama,Ubah_Jadi_Selesai(Isi dengan angka 1)\n";
@@ -138,8 +139,8 @@ new #[Layout('layouts.organisasi')] class extends Component
                     if ($is_completed == '1' || strtolower($is_completed) == 'y' || strtolower($is_completed) == 'yes') {
                         $reg = EventRegistration::find($id_pendaftaran);
 
-                        if ($reg && $reg->event_id == $this->event->id && $reg->status_pendaftaran === 'approved') {
-                            $reg->update(['status_pendaftaran' => 'completed']);
+                        if ($reg && $reg->event_id == $this->event->id && $reg->status_pendaftaran === RegistrationStatus::APPROVED) {
+                            $reg->update(['status_pendaftaran' => RegistrationStatus::COMPLETED]);
                             $updatedCount++;
                         }
                     }
@@ -214,30 +215,34 @@ new #[Layout('layouts.organisasi')] class extends Component
                                 {{ $peserta->mahasiswa->nama ?? '-' }}
                             </td>
                             <td class="px-6 py-4">
-                                @if($peserta->status_pendaftaran === 'pending')
+                                @if($peserta->status_pendaftaran === RegistrationStatus::PENDING)
                                     <span class="px-2.5 py-1 text-[10px] font-bold text-warning bg-warning/10 rounded-full uppercase">Pending</span>
-                                @elseif($peserta->status_pendaftaran === 'approved')
+                                @elseif($peserta->status_pendaftaran === RegistrationStatus::APPROVED)
                                     <span class="px-2.5 py-1 text-[10px] font-bold text-success bg-success/10 rounded-full uppercase">Disetujui</span>
-                                @elseif($peserta->status_pendaftaran === 'completed')
+                                @elseif($peserta->status_pendaftaran === RegistrationStatus::COMPLETED)
                                     <span class="px-2.5 py-1 text-[10px] font-bold text-primary bg-primary/10 border border-primary/20 rounded-full uppercase">Completed</span>
-                                @elseif($peserta->status_pendaftaran === 'rejected')
+                                @elseif($peserta->status_pendaftaran === RegistrationStatus::REJECTED)
                                     <span class="px-2.5 py-1 text-[10px] font-bold text-on-error-container bg-error-container rounded-full uppercase">Ditolak</span>
                                 @endif
                             </td>
                             <td class="px-6 py-4 text-center">
                                 <div class="flex items-center justify-center gap-2">
-                                    @if($peserta->status_pendaftaran === 'pending')
-                                        <button wire:click="terima({{ $peserta->id }})" title="Setujui" class="p-1.5 text-success hover:bg-success/10 rounded-lg transition border border-transparent hover:border-success/30">
+                                    @if($peserta->status_pendaftaran === RegistrationStatus::PENDING)
+                                        <button type="button" wire:click="terima({{ $peserta->id }})" title="Setujui" class="p-1.5 text-success hover:bg-success/10 rounded-lg transition border border-transparent hover:border-success/30">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                                         </button>
-                                        <button wire:click="konfirmasiTolak({{ $peserta->id }})" title="Tolak" class="p-1.5 text-error hover:bg-error-container/40 rounded-lg transition border border-transparent hover:border-error/30">
+                                        <button type="button" wire:click="konfirmasiTolak({{ $peserta->id }})" title="Tolak" class="p-1.5 text-error hover:bg-error-container/40 rounded-lg transition border border-transparent hover:border-error/30">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                                         </button>
-                                    @elseif($peserta->status_pendaftaran === 'approved')
-                                        <button wire:click="selesaikan({{ $peserta->id }})" title="Tandai Selesai" class="p-1.5 text-primary hover:bg-primary/10 rounded-lg transition border border-transparent hover:border-primary/20 flex items-center gap-1 text-xs font-bold">
+                                    @elseif($peserta->status_pendaftaran === RegistrationStatus::APPROVED)
+                                        <button type="button" wire:click="selesaikan({{ $peserta->id }})" title="Tandai Selesai" class="p-1.5 text-primary hover:bg-primary/10 rounded-lg transition border border-transparent hover:border-primary/20 flex items-center gap-1 text-xs font-bold">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
                                             Selesai
                                         </button>
+                                    @elseif($peserta->status_pendaftaran === RegistrationStatus::REJECTED) 
+                                        <span class="text-xs text-error font-semibold">Ditolak</span>
+                                    @elseif($peserta->status_pendaftaran === RegistrationStatus::COMPLETED) 
+                                        <span class="text-xs text-success font-semibold">Selesai</span>
                                     @else
                                         <span class="text-xs text-on-surface-variant/60 italic">Dikunci</span>
                                     @endif

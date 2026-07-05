@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
+use App\Enums\FieldType;
+use Illuminate\Validation\Rule;
 
 new #[Layout('layouts.organisasi')] class extends Component
 {
@@ -55,7 +57,7 @@ new #[Layout('layouts.organisasi')] class extends Component
     {
         $this->validate([
             'fields.*.nama_field' => 'required|string|max:255',
-            'fields.*.tipe_field' => 'required|string|in:text,textarea,number,email,select,radio,file_pdf,file_image',
+            'fields.*.tipe_field' => ['required', Rule::enum(FieldType::class)], 
         ], [
             'fields.*.nama_field.required' => 'Label pertanyaan tidak boleh kosong.',
         ]);
@@ -144,16 +146,9 @@ new #[Layout('layouts.organisasi')] class extends Component
                                 <div>
                                     <x-input-label value="Jenis Input" required />
                                     <select wire:model.live="fields.{{ $index }}.tipe_field" class="block w-full mt-1 text-sm border-outline-variant rounded-md shadow-sm focus:ring-primary focus:border-primary">
-                                        <option value="text">Teks Pendek</option>
-                                        <option value="textarea">Paragraf</option>
-                                        <option value="number">Angka</option>
-                                        <option value="email">Email</option>
-                                        <option value="url">URL / Tautan (Cth: Portofolio/Github)</option>
-                                        <option value="select">Dropdown</option>
-                                        <option value="radio">Pilihan Ganda (Radio)</option>
-
-                                        <option value="file_pdf">Upload Dokumen (Hanya PDF)</option>
-                                        <option value="file_image">Upload Gambar (JPG/PNG)</option>
+                                        @foreach(\App\Enums\FieldType::cases() as $type)
+                                            <option value="{{ $type->value }}">{{ $type->label() }}</option>
+                                        @endforeach
                                     </select>
                                 </div>
                             </div>
