@@ -30,7 +30,7 @@ Route::middleware('auth')->group(function () {
     Volt::route('/organisasi/events/{event}/sertifikat-builder', 'pages.organisasi.sertifikat-builder')->name('organisasi.events.sertifikat-builder');
     Volt::route('/organisasi/profil', 'pages.organisasi.profil')->name('organisasi.profil');
     Volt::route('/events/{event}/pendaftar', 'pages.organisasi.kelola-pendaftaran')->name('organisasi.events.pendaftar');
-  
+    Volt::route('/organisasi/events/{event}/peserta/{peserta}/jawaban', 'pages.organisasi.event-jawaban')->name('organisasi.events.jawaban');
 
     //admin
     // Volt::route('/dashboard-admin', 'pages.admin.dashboard')->name('admin.dashboard');
@@ -43,8 +43,6 @@ Route::middleware('auth')->group(function () {
     // Rute detail event admin
     Route::get('/admin/moderasi-event/detail/{event}', EventDetail::class)->name('admin.event.detail');
 });
-
-
 
 // Rute Logout Standar
 Route::post('/logout', function (\Illuminate\Http\Request $request) {
