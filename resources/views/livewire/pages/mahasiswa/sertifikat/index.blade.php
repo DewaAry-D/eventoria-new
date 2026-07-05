@@ -130,28 +130,21 @@ new #[Layout('layouts.mahasiswa')] class extends Component
                             {{ $reg->event->nama_event }}
                         </h3>
 
-                        <div class="grid grid-cols-2 gap-3 mt-4">
-                            {{-- Lihat: menuju halaman pratinjau detail --}}
-                            <a href="{{ route('mahasiswa.sertifikat.show', $reg->id) }}"
-                               class="text-center px-4 py-2 border border-gray-300 text-indigo-900 font-medium text-sm rounded-lg hover:bg-gray-50 transition">
-                                Lihat
-                            </a>
-
-                            {{-- Download PDF langsung dari halaman index --}}
+                        <div class="mt-4">
                             @if ($reg->event->templateSertifikat?->file_template)
                                 <a href="{{ route('mahasiswa.sertifikat.download', $reg->id) }}"
-                                   class="text-center px-4 py-2 bg-indigo-900 text-white font-medium text-sm rounded-lg hover:bg-indigo-800 transition flex justify-center items-center gap-1.5">
+                                target="_blank"
+                                class="w-full text-center px-4 py-2 bg-indigo-900 text-white font-medium text-sm rounded-lg hover:bg-indigo-800 transition flex justify-center items-center gap-1.5">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                                            d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
                                     </svg>
-                                    Download
+                                    Download Sertifikat
                                 </a>
                             @else
                                 <button disabled
-                                        title="Panitia belum menyiapkan template"
-                                        class="text-center px-4 py-2 bg-gray-200 text-gray-400 font-medium text-sm rounded-lg cursor-not-allowed flex justify-center items-center gap-1.5">
-                                    Download
+                                        class="w-full text-center px-4 py-2 bg-gray-200 text-gray-400 font-medium text-sm rounded-lg cursor-not-allowed">
+                                    Belum Tersedia
                                 </button>
                             @endif
                         </div>

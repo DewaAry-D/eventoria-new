@@ -10,11 +10,6 @@ use Illuminate\Support\Facades\Auth;
 
 class SertifikatController extends Controller
 {
-    // ---------------------------------------------------------------
-    // HELPER PRIVATE: validasi akses sertifikat
-    // Dipanggil oleh download() dan downloadJpg() agar tidak duplikasi
-    // logika yang sama di dua tempat (prinsip DRY - Don't Repeat Yourself)
-    // ---------------------------------------------------------------
     private function getValidatedRegistration(int $registration_id): EventRegistration
     {
         $registration = EventRegistration::with([
@@ -79,33 +74,6 @@ class SertifikatController extends Controller
             . str_replace(' ', '-', $registration->nama_cetak_sertifikat ?? $registration->mahasiswa->nama)
             . '.pdf';
 
-        return $pdf->download($namaFile);
-    }
-
-    // ---------------------------------------------------------------
-    // Download JPG
-    // Mengirim file gambar template asli yang sudah diupload panitia.
-    // Ini adalah file yang tersimpan di server (public/storage/sertifikat-templates/),
-    // bukan file yang bisa dimanipulasi mahasiswa dari browser.
-    // ---------------------------------------------------------------
-    public function downloadJpg(Request $request, int $registration_id)
-    {
-        $registration = $this->getValidatedRegistration($registration_id);
-        $template     = $registration->event->templateSertifikat;
-
-        $templatePath = public_path('storage/' . $template->file_template);
-
-        if (! file_exists($templatePath)) {
-            abort(404, 'File template tidak ditemukan di server.');
-        }
-
-        $namaFile = 'Sertifikat-'
-            . str_replace(' ', '-', $registration->event->nama_event) . '-'
-            . str_replace(' ', '-', $registration->nama_cetak_sertifikat ?? $registration->mahasiswa->nama)
-            . '.jpg';
-
-        return response()->download($templatePath, $namaFile, [
-            'Content-Type' => 'image/jpeg',
-        ]);
+        return $pdf->stream($namaFile);
     }
 }

@@ -12,7 +12,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="font-sans antialiased bg-background text-on-background">
+<body class="font-sans antialiased bg-background text-on-background" x-data="{ showLogoutModal: false }">
+<x-admin.modals.logout-modal target="mahasiswa" />
     <div class="min-h-screen bg-background">
         {{-- Top Navigation Bar --}}
         <nav x-data="{ mobileMenuOpen: false }" class="bg-surface-container-lowest border-b border-outline-variant sticky top-0 z-50">
@@ -57,10 +58,11 @@
                                     <p class="text-[10px] text-on-surface-variant">{{ Auth::user()->mahasiswa->prodi->nama_prodi ?? 'Prodi' }}</p>
                                 </div>
                                 <a href="{{ route('mahasiswa.profil') }}" wire:navigate class="block px-4 py-2 text-sm text-on-surface hover:bg-surface-container-low transition duration-150">Profil Saya</a>
-                                <form method="POST" action="{{ route('logout') }}" onsubmit="return confirm('Apakah Anda yakin ingin keluar?');">
-                                    @csrf
-                                    <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-error hover:bg-error-container hover:bg-opacity-20 transition duration-150">Keluar</button>
-                                </form>
+                                <button type="button"
+                                        @click="showLogoutModal = true; open = false"
+                                        class="block w-full text-left px-4 py-2 text-sm text-error hover:bg-error-container hover:bg-opacity-20 transition duration-150">
+                                    Keluar
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -95,11 +97,11 @@
                     <a href="{{ route('mahasiswa.profil') }}" wire:navigate class="block px-3 py-2 rounded-md text-base font-medium text-on-surface-variant hover:bg-surface-container-low hover:text-primary">
                         Profil Saya
                     </a>
-                    <form method="POST" action="{{ route('logout') }}" onsubmit="return confirm('Apakah Anda yakin ingin keluar?');" class="block w-full">
-                        @csrf
-                        <button type="submit" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-error hover:bg-error-container hover:bg-opacity-20">
-                            Keluar
-                        </button>
+                    <button type="button"
+                            @click="showLogoutModal = true; mobileMenuOpen = false"
+                            class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-error hover:bg-error-container hover:bg-opacity-20">
+                        Keluar
+                    </button>
                     </form>
                 </div>
             </div>
