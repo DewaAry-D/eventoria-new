@@ -197,24 +197,25 @@ new #[Layout('layouts.organisasi')] class extends Component
 
         <div class="overflow-x-auto">
             <table class="w-full text-sm text-left text-on-surface-variant">
-                <thead class="text-xs text-on-surface-variant uppercase bg-surface-container border-b border-outline-variant">
+                <thead class="text-center text-xs text-on-surface-variant uppercase bg-surface-container border-b border-outline-variant">
                     <tr>
                         <th class="px-6 py-4">NIM</th>
                         <th class="px-6 py-4">Nama Mahasiswa</th>
                         <th class="px-6 py-4">Status</th>
+                        <th class="px-6 py-4">View</th>
                         <th class="px-6 py-4 text-center">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($pendaftar as $peserta)
-                        <tr class="bg-surface-container-lowest border-b border-outline-variant/30 hover:bg-surface-container-low transition">
+                        <tr class="text-center bg-surface-container-lowest border-b border-outline-variant/30 hover:bg-surface-container-low transition">
                             <td class="px-6 py-4 font-medium text-on-surface">
                                 {{ $peserta->mahasiswa->nim ?? '-' }}
                             </td>
                             <td class="px-6 py-4">
                                 {{ $peserta->mahasiswa->nama ?? '-' }}
                             </td>
-                            <td class="px-6 py-4">
+                            <td class="px-5 py-4">
                                 @if($peserta->status_pendaftaran === RegistrationStatus::PENDING)
                                     <span class="px-2.5 py-1 text-[10px] font-bold text-warning bg-warning/10 rounded-full uppercase">Pending</span>
                                 @elseif($peserta->status_pendaftaran === RegistrationStatus::APPROVED)
@@ -224,6 +225,9 @@ new #[Layout('layouts.organisasi')] class extends Component
                                 @elseif($peserta->status_pendaftaran === RegistrationStatus::REJECTED)
                                     <span class="px-2.5 py-1 text-[10px] font-bold text-on-error-container bg-error-container rounded-full uppercase">Ditolak</span>
                                 @endif
+                            </td>
+                            <td class="px-6 py-4">
+                                <a href="{{ route('organisasi.events.jawaban', ['event' => $event->id, 'peserta' => $peserta->id]) }}" wire:navigate class="px-3 py-1 text-xs font-bold text-on-primary bg-primary hover:bg-primary/90 rounded-lg transition">Lihat Detail</a>
                             </td>
                             <td class="px-6 py-4 text-center">
                                 <div class="flex items-center justify-center gap-2">

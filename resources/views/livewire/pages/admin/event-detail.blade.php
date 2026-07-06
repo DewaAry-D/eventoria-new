@@ -23,6 +23,27 @@
         </span>
     </nav>
 
+    @if(($event->status->value ?? $event->status) === 'revision' && $event->catatan_revisi)
+        <div class="w-full p-md bg-error/5 border border-error/15 rounded-2xl flex gap-md items-start animate-fade-in">
+            <!-- Icon Indicator -->
+            <div class="p-xs bg-error/10 text-error rounded-xl shrink-0 mt-0.5">
+                <svg class="w-5 h-5 stroke-[2.2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                </svg>
+            </div>
+            
+            <div class="space-y-sm flex-1 min-w-0">
+                <h5 class="text-body-sm font-extrabold text-error uppercase tracking-wider">
+                    Catatan Instruksi Revisi
+                </h5>
+                
+                <p class="text-body-md font-semibold text-on-surface/80 bg-surface-container-lowest/50 p-lg rounded-xl border border-outline-variant/10 leading-relaxed text-left">
+                    {{ trim($event->catatan_revisi) }}
+                </p>
+            </div>
+        </div>
+    @endif
+
     <!-- Summary Card -->
     <div class="w-full">
         @include('livewire.admin.partials.event-detail.summary-card')
