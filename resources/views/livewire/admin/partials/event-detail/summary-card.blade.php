@@ -92,7 +92,7 @@
                         </svg>
                     </div>
                     <div class="flex flex-col min-w-0 flex-1">
-                        <span class="text-[10px] sm:text-[11px] text-on-surface-variant/50 tracking-wider font-bold leading-none mb-1 select-none">Tanggal Pendaftaran</span>
+                        <span class="text-[10px] sm:text-[11px] text-on-surface-variant/50 tracking-wider font-bold leading-none mb-1 select-none">Tanggal Mulai Pendaftaran</span>
                         <p class="text-body-sm sm:text-body-md font-bold sm:font-bold text-on-surface leading-tight truncate" title="{{ $tanggalPelaksanaan }}">
                             {{ $tanggalPelaksanaan }}
                         </p>

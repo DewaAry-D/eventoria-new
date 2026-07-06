@@ -49,10 +49,22 @@ class EventDetail extends Component
     public function getEmbedUrl($url)
     {
         if (!$url) return null;
-        if (str_contains($url, 'output=embed') || str_contains($url, '/embed')) return $url;
+
+        $isMapsUrl = str_contains($url, 'google.com/maps') || 
+                        str_contains($url, 'maps.google') || 
+                        str_contains($url, 'maps.app.goo.gl') || 
+                        str_contains($url, 'goo.gl/maps');
+        
+        if (!$isMapsUrl) {
+            return null;
+        }
+
+        if (str_contains($url, 'output=embed') || str_contains($url, '/embed')) {
+            return $url;
+        }
 
         if (str_contains($url, 'maps.app.goo.gl') || str_contains($url, 'goo.gl/maps')) {
-            return Cache::remember('map_url_' . md5($url), 86400, function () use ($url) {
+            $url = Cache::remember('map_url_' . md5($url), 86400, function() use ($url) {
                 $ch = curl_init();
                 curl_setopt($ch, CURLOPT_URL, $url);
                 curl_setopt($ch, CURLOPT_HEADER, true);
@@ -61,7 +73,7 @@ class EventDetail extends Component
                 curl_setopt($ch, CURLOPT_TIMEOUT, 3);
                 $response = curl_exec($ch);
                 curl_close($ch);
-
+                
                 if (preg_match('/^Location:\s+(.*)$/mi', $response, $matches)) {
                     return trim($matches[1]);
                 }
@@ -69,12 +81,14 @@ class EventDetail extends Component
             });
         }
 
-        if (preg_match('/\/maps\/search\/([^\/?#]+)/', $url, $matches)) {
-            return "https://maps.google.com/maps?q=" . urlencode(urldecode($matches[1])) . "&t=&z=15&ie=UTF8&iwloc=&output=embed";
-        }
         if (preg_match('/\/maps\/place\/([^\/@?#]+)/', $url, $matches)) {
-            return "https://maps.google.com/maps?q=" . urlencode(urldecode($matches[1])) . "&t=&z=15&ie=UTF8&iwloc=&output=embed";
+            return "https://maps.google.com/maps?q=" . $matches[1] . "&t=&z=15&ie=UTF8&iwloc=&output=embed";
         }
+
+        if (preg_match('/\/maps\/search\/([^\/?#]+)/', $url, $matches)) {
+            return "https://maps.google.com/maps?q=" . $matches[1] . "&t=&z=15&ie=UTF8&iwloc=&output=embed";
+        }
+
         if (preg_match('/@(-?\d+\.\d+),(-?\d+\.\d+)/', $url, $matches)) {
             return "https://maps.google.com/maps?q={$matches[1]},{$matches[2]}&t=&z=15&ie=UTF8&iwloc=&output=embed";
         }
@@ -89,7 +103,6 @@ class EventDetail extends Component
 
         return "https://maps.google.com/maps?q=" . urlencode($url) . "&t=&z=15&ie=UTF8&iwloc=&output=embed";
     }
-
     public function approveEvent(int $eventId)
     {
         $adminDpm = AdminDpm::query()->where('user_id', Auth::id())->first();

@@ -7,6 +7,7 @@ use App\Models\EventRegistration;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class SertifikatController extends Controller
 {
@@ -69,10 +70,13 @@ class SertifikatController extends Controller
             'warnaFont'     => $template->warna_font ?? '#1e1b4b',
         ])->setPaper('A4', 'landscape');
 
-        $namaFile = 'Sertifikat-'
-            . str_replace(' ', '-', $registration->event->nama_event) . '-'
-            . str_replace(' ', '-', $registration->nama_cetak_sertifikat ?? $registration->mahasiswa->nama)
-            . '.pdf';
+        $namaEventClean = str_replace(' ', '-', $registration->event->nama_event);
+        $namaMhsClean   = str_replace(' ', '-', $registration->nama_cetak_sertifikat ?? $registration->mahasiswa->nama);
+
+        $namaEventClean = str_replace(['/', '\\'], '-', $namaEventClean);
+        $namaMhsClean   = str_replace(['/', '\\'], '-', $namaMhsClean);
+
+        $namaFile = 'Sertifikat-' . $namaEventClean . '-' . $namaMhsClean . '.pdf';
 
         return $pdf->stream($namaFile);
     }

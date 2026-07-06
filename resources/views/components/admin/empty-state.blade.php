@@ -2,7 +2,8 @@
     'title' => 'Belum Ada Data',
     'description' => 'Data yang kamu cari atau ajukan saat ini belum tersedia di sistem.',
     'inTable' => false, // Set TRUE jika ditaruh di dalam tag <tbody> tabel
-    'colspan' => 1      // Jumlah kolom tabel (wajib diisi jika inTable="true")
+    'colspan' => 1,      // Jumlah kolom tabel (wajib diisi jika inTable="true")
+    'bg' => 'bg-surface-container-lowest'
 ])
 
 @if($inTable)
@@ -32,7 +33,7 @@
         </td>
     </tr>
 @else
-    <div class="flex flex-col items-center justify-center text-center p-lg select-none min-h-[11rem] bg-surface-container-lowest rounded-3xl border border-outline-variant/30 shadow-card animate-fade-in w-full">
+    <div class="flex flex-col items-center justify-center text-center p-lg select-none min-h-[11rem] {{ $bg }} rounded-3xl border border-outline-variant/30 shadow-card animate-fade-in w-full">
         
         <div class="w-12 h-12 rounded-xl bg-surface-container flex items-center justify-center text-secondary/40 mb-sm transition-transform duration-500 hover:scale-105 hover:rotate-6 shrink-0">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">

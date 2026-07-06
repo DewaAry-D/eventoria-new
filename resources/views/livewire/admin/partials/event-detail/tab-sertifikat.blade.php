@@ -101,6 +101,7 @@
                 <x-admin.empty-state 
                     title="Template Sertifikat Kosong" 
                     description="Pihak panitia ormawa pelaksana belum mengunggah berkas template desain sertifikat utama untuk ajang ini." 
+                    bg="bg-surface-container-low"
                 />
             </div>
         @endif

@@ -19,8 +19,8 @@ class DummyCertificateSeeder extends Seeder
     public function run(): void
     {
         // 1. Ambil Mahasiswa dan Organisasi dari seeder sebelumnya
-        $userMahasiswa = User::where('email', 'mahasiswa@student.univ.ac.id')->first();
-        $userOrganisasi = User::where('email', 'sic@univ.ac.id')->first();
+        $userMahasiswa = User::query()->where('email', 'mahasiswa@student.univ.ac.id')->first();
+        $userOrganisasi = User::query()->where('email', 'sic@univ.ac.id')->first();
 
         if (!$userMahasiswa || !$userOrganisasi) {
             $this->command->error('Silakan jalankan UserSeeder terlebih dahulu.');

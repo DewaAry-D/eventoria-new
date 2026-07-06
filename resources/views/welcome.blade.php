@@ -145,7 +145,7 @@ $footer_links = [
             @forelse($events as $event)
             <article class="group bg-surface-container-lowest border-[1.5px] border-outline-variant rounded-md overflow-hidden hover:shadow-card hover:-translate-y-1 transition-all">
                 <div class="relative h-[200px] overflow-hidden">
-                    <img src="{{ $event->flyer_url ?? 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600&q=80' }}" alt="{{ $event->nama_event }}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                    <img src="{{ asset('storage/' . $event->flyer_url) ?? 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600&q=80' }}" alt="{{ $event->nama_event }}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                 </div>
                 <div class="p-5">
                     <h3 class="text-title-lg text-primary mb-2.5 leading-snug line-clamp-2">{{ $event->nama_event }}</h3>

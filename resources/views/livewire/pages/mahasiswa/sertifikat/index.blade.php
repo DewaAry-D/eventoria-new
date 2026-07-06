@@ -86,23 +86,31 @@ new #[Layout('layouts.mahasiswa')] class extends Component
             @foreach ($sertifikats as $reg)
                 <div class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition">
 
-                    {{-- Preview thumbnail template --}}
-                    <div class="relative h-48 bg-gray-100 border-b border-gray-200">
-                        @if ($reg->event->templateSertifikat?->file_template)
-                            <img src="{{ Storage::url($reg->event->templateSertifikat->file_template) }}"
-                                 class="w-full h-full object-cover"
-                                 alt="Template Sertifikat {{ $reg->event->nama_event }}">
+                    {{-- Preview thumbnail --}}
+                    <div class="relative h-56 bg-gray-100 border-b border-gray-200 overflow-hidden rounded-t-2xl flex items-center justify-center group">
+                        @if ($reg->event->flyer_url)
+                            <img src="{{ asset('storage/' . $reg->event->flyer_url) }}"
+                                    class="absolute inset-0 w-full h-full object-cover blur-2xl opacity-30 scale-110 pointer-events-none select-none"
+                                    alt="Background Blur">
+
+                            <div class="absolute inset-0 bg-gradient-to-b from-black/5 via-transparent to-black/10"></div>
+
+                            <img src="{{ asset('storage/' . $reg->event->flyer_url) }}"
+                                    class="relative h-full object-contain select-none pointer-events-none z-10 drop-shadow-md group-hover:scale-[1.02] transition-transform duration-300"
+                                    alt="Flyer {{ $reg->event->nama_event }}"
+                                    loading="lazy">
                         @else
-                            <div class="w-full h-full flex flex-col items-center justify-center text-gray-400">
-                                <svg class="w-10 h-10 mb-2 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                          d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            <div class="w-full h-full flex flex-col items-center justify-center text-gray-400 bg-gray-50">
+                                <svg class="w-10 h-10 mb-2 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                                 </svg>
-                                <span class="text-xs">Template belum tersedia</span>
+                                <span class="text-xs font-medium">Gambar belum tersedia</span>
                             </div>
                         @endif
-
-                        <div class="absolute top-3 right-3">
+                    
+                        {{-- Badge Status Tersedia / Menunggu --}}
+                        <div class="absolute top-3 right-3 z-20">
                             @if ($reg->event->templateSertifikat?->file_template)
                                 <span class="bg-green-100 text-green-800 text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wide shadow-sm">
                                     TERSEDIA
