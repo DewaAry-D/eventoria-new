@@ -13,8 +13,6 @@ new #[Layout('layouts.organisasi')] class extends Component
     public string $search = '';
     public string $statusFilter = 'semua';
 
-    
-
     // Reset paginasi saat melakukan pencarian atau filter
     public function updatingSearch() { $this->resetPage(); }
     public function updatingStatusFilter() { $this->resetPage(); }
@@ -46,7 +44,6 @@ new #[Layout('layouts.organisasi')] class extends Component
 
     public function with(): array
     {
-        // $orgId = Auth::user()->load('organisasi')->organisasi->id;
         $organisasi = Auth::user()->load('organisasi')->organisasi;
 
         $events = Event::with(['kategori'])
@@ -64,46 +61,47 @@ new #[Layout('layouts.organisasi')] class extends Component
     }
 }; ?>
 
-<div>
+<div x-data="{ showAjukanModal: false, selectedEventId: null }">
+    
     <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
         <div>
             <h1 class="text-2xl font-bold text-gray-900">Manajemen Event</h1>
-            <p class="text-gray-500 text-sm">Kelola seluruh kegiatan, pantau status birokrasi, dan atur pendaftar.</p>
+            <p class="text-sm text-gray-500">Kelola seluruh kegiatan, pantau status birokrasi, dan atur pendaftar.</p>
         </div>
         @if($organisasi->status->value === 'approved')
-                <a href="{{ route('organisasi.events.create') }}" wire:navigate class="px-4 py-2 bg-primary text-white font-medium rounded-lg hover:bg-primary/90 transition shadow-sm text-sm inline-flex items-center gap-2">
-                    + Buat Event Baru
-                </a>
+            <a href="{{ route('organisasi.events.create') }}" wire:navigate class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white transition rounded-lg shadow-sm bg-primary hover:bg-primary/90">
+                + Buat Event Baru
+            </a>
         @else
-                <button disabled class="px-4 py-2 bg-primary text-white font-medium rounded-lg shadow-sm text-sm opacity-50 cursor-not-allowed inline-flex items-center gap-2">
-                    + Buat Event Baru
-                </button>
+            <button disabled class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white rounded-lg shadow-sm opacity-50 cursor-not-allowed bg-primary">
+                + Buat Event Baru
+            </button>
         @endif
     </div>
 
     @if (session()->has('success'))
-        <div class="mb-4 p-4 text-sm text-green-800 rounded-lg bg-green-50 flex items-center shadow-sm">
-            <svg class="w-5 h-5 inline mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+        <div class="flex items-center p-4 mb-4 text-sm text-green-800 rounded-lg shadow-sm bg-green-50">
+            <svg class="inline w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
             {{ session('success') }}
         </div>
     @endif
 
     @if (session()->has('error'))
-        <div class="mb-4 p-4 text-sm text-red-800 rounded-lg bg-red-50 flex items-center shadow-sm">
-            <svg class="w-5 h-5 inline mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+        <div class="flex items-center p-4 mb-4 text-sm text-red-800 rounded-lg shadow-sm bg-red-50">
+            <svg class="inline w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
             {{ session('error') }}
         </div>
     @endif
 
-    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 flex flex-col md:flex-row gap-4 justify-between items-center mb-6">
+    <div class="flex flex-col items-center justify-between gap-4 p-4 mb-6 bg-white border border-gray-200 shadow-sm rounded-xl md:flex-row">
         <div class="relative w-full md:w-96">
             <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                 <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
             </div>
-            <input wire:model.live.debounce.500ms="search" type="search" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 p-2.5" placeholder="Cari nama event...">
+            <input wire:model.live.debounce.500ms="search" type="search" class="block w-full p-2.5 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Cari nama event...">
         </div>
         
-        <select wire:model.live="statusFilter" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block w-full md:w-48 p-2.5">
+        <select wire:model.live="statusFilter" class="block w-full md:w-48 p-2.5 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-indigo-500 focus:border-indigo-500">
             <option value="semua">Semua Status</option>
             <option value="draft">Draft</option>
             <option value="pending_approval">Menunggu ACC</option>
@@ -113,10 +111,10 @@ new #[Layout('layouts.organisasi')] class extends Component
         </select>
     </div>
 
-    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+    <div class="overflow-hidden bg-white border border-gray-200 shadow-sm rounded-xl">
         <div class="overflow-x-auto">
             <table class="w-full text-sm text-left text-gray-500">
-                <thead class="text-xs text-gray-700 uppercase bg-gray-50 border-b border-gray-200">
+                <thead class="text-xs text-gray-700 uppercase border-b border-gray-200 bg-gray-50">
                     <tr>
                         <th scope="col" class="px-6 py-4">Nama Event</th>
                         <th scope="col" class="px-6 py-4 text-center">Status</th>
@@ -127,10 +125,10 @@ new #[Layout('layouts.organisasi')] class extends Component
                 </thead>
                 <tbody class="divide-y divide-gray-200">
                     @forelse($events as $event)
-                        <tr class="hover:bg-gray-50 transition">
+                        <tr class="transition hover:bg-gray-50">
                             <td class="px-6 py-4">
                                 <div class="font-semibold text-gray-900">{{ $event->nama_event }}</div>
-                                <div class="text-xs text-gray-500 mt-1 flex items-center gap-2">
+                                <div class="flex items-center gap-2 mt-1 text-xs text-gray-500">
                                     <span class="bg-gray-100 text-gray-600 px-2 py-0.5 rounded">{{ $event->kategori->nama_kategori ?? 'Umum' }}</span>
                                     <span>•</span>
                                     <span>Form: {{ $event->form_fields_count }} Pertanyaan</span>
@@ -142,7 +140,7 @@ new #[Layout('layouts.organisasi')] class extends Component
                                 @elseif($event->status->value === 'pending_approval')
                                     <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-1 rounded-full border border-yellow-300">Review DPM</span>
                                 @elseif($event->status->value === 'revision')
-                                    <div class="flex flex-col gap-1 items-start">
+                                    <div class="flex flex-col items-start gap-1">
                                         <span class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-1 rounded-full border border-red-300">Revisi</span>
                                         <a class="text-xs text-red-600 cursor-pointer hover:underline" title="{{ $event->catatan_revisi }}" href="#">Lihat Catatan</a>
                                     </div>
@@ -153,7 +151,7 @@ new #[Layout('layouts.organisasi')] class extends Component
                                 @endif
                             </td>
                             <td class="px-6 py-4 text-center">
-                                <span class="uppercase text-xs font-bold tracking-wider text-gray-500">{{ $event->tingkat_event }}</span>
+                                <span class="text-xs font-bold tracking-wider text-gray-500 uppercase">{{ $event->tingkat_event }}</span>
                             </td>
                             <td class="px-6 py-4 text-center">
                                 <span class="font-medium text-gray-900">{{ $event->registrations_count }}</span>
@@ -165,11 +163,13 @@ new #[Layout('layouts.organisasi')] class extends Component
                                     
                                     @if(in_array($event->status->value, ['draft', 'revision']))
                                         <button 
-                                            wire:click="ajukanEvent({{ $event->id }})"
-                                            wire:confirm="Yakin ingin mengajukan event ini ke DPM sekarang? Pastikan proposal dan form sudah sesuai SOP."
+                                            type="button"
+                                            @click="selectedEventId = {{ $event->id }}; showAjukanModal = true"
                                             title="Ajukan Event ke DPM"
                                             class="p-1.5 hover:bg-blue-50 hover:text-blue-800 rounded-md transition focus:outline-none focus:ring-2 focus:ring-blue-200">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                                            </svg>
                                         </button>
                                     @endif
 
@@ -201,7 +201,7 @@ new #[Layout('layouts.organisasi')] class extends Component
                     @empty
                         <tr>
                             <td colspan="5" class="px-6 py-10 text-center text-gray-500">
-                                <svg class="mx-auto h-12 w-12 text-gray-300 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                                <svg class="w-12 h-12 mx-auto mb-3 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
                                 <p class="text-lg font-medium text-gray-900">Belum ada event</p>
                                 <p class="text-sm">Klik "Buat Event Baru" untuk memulai.</p>
                             </td>
@@ -215,4 +215,51 @@ new #[Layout('layouts.organisasi')] class extends Component
             {{ $events->links() }}
         </div>
     </div>
-</div>
+
+    <template x-teleport="body">
+        <div x-show="showAjukanModal"
+             x-cloak
+             class="fixed inset-0 z-[150] flex items-center justify-center p-4 select-none"
+             style="display: none;"
+             @keydown.escape.window="showAjukanModal = false">
+
+            <div x-show="showAjukanModal"
+                 x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                 x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+                 @click="showAjukanModal = false"
+                 class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm"></div>
+
+            <div x-show="showAjukanModal"
+                 x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95 translate-y-4 sm:translate-y-0" x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                 x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 scale-100 translate-y-0" x-transition:leave-end="opacity-0 scale-95 translate-y-4 sm:translate-y-0"
+                 class="relative bg-white max-w-sm w-full p-6 sm:p-8 rounded-2xl shadow-2xl border border-gray-100 z-10 text-center">
+
+                <div class="flex items-center justify-center w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 text-primary">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                    </svg>
+                </div>
+
+                <h3 class="mb-2 text-xl font-bold tracking-tight text-gray-900">Ajukan Event ke DPM?</h3>
+                <p class="max-w-xs mx-auto mb-6 text-sm font-medium leading-relaxed text-gray-500">
+                    Apakah Anda yakin ingin mengajukan event ini untuk direview? Pastikan Anda sudah menyusun <span class="font-bold text-gray-700">Form Pendaftaran</span> dengan lengkap.
+                </p>
+
+                <div class="flex items-center justify-center gap-3">
+                    <button type="button"
+                            @click="showAjukanModal = false"
+                            class="flex-1 px-4 py-2.5 text-sm font-bold text-gray-600 hover:bg-gray-100 rounded-full transition-colors active:scale-95">
+                        Batal
+                    </button>
+                    
+                    <button type="button"
+                            @click="$wire.ajukanEvent(selectedEventId); showAjukanModal = false"
+                            class="flex-1 px-4 py-2.5 text-sm font-bold text-white bg-primary hover:bg-primary/90 rounded-full shadow-md hover:shadow transition-all active:scale-95">
+                        Ya, Ajukan
+                    </button>
+                </div>
+            </div>
+        </div>
+    </template>
+
+</div> 

@@ -131,7 +131,8 @@ new #[Layout('layouts.organisasi')] class extends Component
             'tingkat_event' => 'required|in:prodi,fakultas,universitas',
             'deskripsi' => 'required|string',
             'kuota' => 'required|integer|min:1',
-            'flyer' => 'nullable|image|max:5120',
+            'flyer' => 'required|image|max:5120',
+            'nama_lokasi' => 'required|string|max:255',
 
             'timelines.*.nama_timeline' => 'required|string|max:255',
             'timelines.*.tanggal_mulai' => 'required|date',
@@ -291,8 +292,9 @@ new #[Layout('layouts.organisasi')] class extends Component
                     <h2 class="text-lg font-bold text-on-surface mb-4 border-b border-outline-variant pb-2">Lokasi & Tautan</h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <x-input-label value="Nama Lokasi / Gedung" />
+                            <x-input-label value="Nama Lokasi / Gedung" required/>
                             <x-text-input wire:model="nama_lokasi" class="block w-full mt-1" type="text" />
+                            <x-input-error :messages="$errors->get('nama_lokasi')" class="mt-2" />
                         </div>
                         <div>
                             <x-input-label value="Link Google Maps (Opsional)" />
