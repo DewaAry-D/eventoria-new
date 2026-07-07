@@ -7,7 +7,7 @@
         Sorotan Aktivitas
     </div>
 
-    <a href="/admin/laporan-stat-event" wire:navigate 
+    <a href="{{ route('admin.moderasi.event') }}" wire:navigate 
         class="flex items-center justify-between p-md bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/10 hover:bg-surface-container/20 transition-all group active:scale-[0.99]">
         <div class="flex items-center gap-md min-w-0">
             <span class="w-2.5 h-2.5 rounded-full bg-red-600 flex-shrink-0 shadow-sm"></span>

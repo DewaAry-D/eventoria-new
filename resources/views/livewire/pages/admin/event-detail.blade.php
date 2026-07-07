@@ -92,7 +92,7 @@
         </div>
 
         <div class="lg:col-span-12 w-full min-w-0 pt-md border-t border-outline-variant/20">
-            @include('livewire.admin.partials.event-detail.sidebar-right')
+            @include('livewire.admin.partials.event-detail.organisasi-info')
         </div>
 
     </div>
