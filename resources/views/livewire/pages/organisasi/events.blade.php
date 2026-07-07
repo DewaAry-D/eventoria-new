@@ -119,7 +119,7 @@ new #[Layout('layouts.organisasi')] class extends Component
                 <thead class="text-xs text-gray-700 uppercase bg-gray-50 border-b border-gray-200">
                     <tr>
                         <th scope="col" class="px-6 py-4">Nama Event</th>
-                        <th scope="col" class="px-6 py-4">Status</th>
+                        <th scope="col" class="px-6 py-4 text-center">Status</th>
                         <th scope="col" class="px-6 py-4 text-center">Tingkat</th>
                         <th scope="col" class="px-6 py-4 text-center">Pendaftar / Kuota</th>
                         <th scope="col" class="px-6 py-4 text-right">Aksi</th>
@@ -136,7 +136,7 @@ new #[Layout('layouts.organisasi')] class extends Component
                                     <span>Form: {{ $event->form_fields_count }} Pertanyaan</span>
                                 </div>
                             </td>
-                            <td class="px-6 py-4">
+                            <td class="px-6 py-4 text-center">
                                 @if($event->status->value === 'draft')
                                     <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2.5 py-1 rounded-full border border-gray-300">Draft</span>
                                 @elseif($event->status->value === 'pending_approval')
@@ -147,7 +147,7 @@ new #[Layout('layouts.organisasi')] class extends Component
                                         <a class="text-xs text-red-600 cursor-pointer hover:underline" title="{{ $event->catatan_revisi }}" href="#">Lihat Catatan</a>
                                     </div>
                                 @elseif($event->status->value === 'published')
-                                    <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-1 rounded-full border border-green-300">Live</span>
+                                    <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-1 rounded-full border border-green-300">Dipublikasi</span>
                                 @else
                                     <span class="bg-indigo-100 text-indigo-800 text-xs font-medium px-2.5 py-1 rounded-full border border-indigo-300">Selesai</span>
                                 @endif

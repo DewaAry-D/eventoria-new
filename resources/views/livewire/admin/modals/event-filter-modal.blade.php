@@ -27,7 +27,7 @@
                 <!-- Filter Kategori -->
                 <div class="flex flex-col gap-xs">
                     <label class="text-xs font-bold text-secondary/60 uppercase tracking-wide">Kategori Event</label>
-                    <select wire:model.live="kategoriId" class="w-full text-body-md px-sm py-2 bg-surface-container/40 border border-outline-variant/30 rounded-xl focus:outline-none focus:border-primary/30 text-primary font-medium">
+                    <select wire:model.live="kategoriId" class="w-full text-body-md px-sm py-2 bg-surface-container/40 border border-outline-variant/30 rounded-xl focus:outline-none focus:border-primary/30 text-primary font-semibold cursor-pointer">
                         <option value="">Semua Kategori</option>
                         @foreach($listKategori as $kat)
                             <option value="{{ $kat->id }}">{{ $kat->nama_kategori }}</option>
@@ -38,7 +38,7 @@
                 <!-- Filter Status -->
                 <div class="flex flex-col gap-xs">
                     <label class="text-xs font-bold text-secondary/60 uppercase tracking-wide">Status Kelayakan</label>
-                    <select wire:model.live="status" class="w-full text-body-md px-sm py-2 bg-surface-container/40 border border-outline-variant/30 rounded-xl focus:outline-none focus:border-primary/30 text-primary font-medium">
+                    <select wire:model.live="status" class="w-full text-body-md px-sm py-2 bg-surface-container/40 border border-outline-variant/30 rounded-xl focus:outline-none focus:border-primary/30 text-primary font-semibold cursor-pointer">
                         <option value="">Semua Status</option>
                         <option value="completed">Selesai (Kegiatan Selesai)</option>
                         <option value="published">Terbit (Telah Disetujui / Aktif)</option>
@@ -50,7 +50,7 @@
                 <!-- Filter Periode Waktu -->
                 <div class="flex flex-col gap-xs">
                     <label class="text-xs font-bold text-secondary/60 uppercase tracking-wide">Periode Pengajuan</label>
-                    <select wire:model.live="periode" class="w-full text-body-md px-sm py-2 bg-surface-container/40 border border-outline-variant/30 rounded-xl focus:outline-none focus:border-primary/30 text-primary font-medium">
+                    <select wire:model.live="periode" class="w-full text-body-md px-sm py-2 bg-surface-container/40 border border-outline-variant/30 rounded-xl focus:outline-none focus:border-primary/30 text-primary font-semibold cursor-pointer">
                         <option value="">Semua Waktu</option>
                         <option value="today">Hari Ini</option>
                         <option value="this_week">Minggu Ini</option>
@@ -62,7 +62,7 @@
                 @if(!$isFakultasScope)
                     <div class="flex flex-col gap-xs">
                         <label class="text-xs font-bold text-secondary/60 uppercase tracking-wide">Lingkup Wilayah / Fakultas</label>
-                        <select wire:model.live="fakultasId" class="w-full text-body-md px-sm py-2 bg-surface-container/40 border border-outline-variant/30 rounded-xl focus:outline-none focus:border-primary/30 text-primary font-medium">
+                        <select wire:model.live="fakultasId" class="w-full text-body-md px-sm py-2 bg-surface-container/40 border border-outline-variant/30 rounded-xl focus:outline-none focus:border-primary/30 text-primary font-semibold cursor-pointer">
                             <option value="">Semua Fakultas / Universitas</option>
                             @foreach($listFakultas as $fak)
                                 <option value="{{ $fak->id }}">{{ $fak->nama_fakultas }}</option>
@@ -74,7 +74,7 @@
                 <!-- Filter Organisasi Penyelenggara -->
                 <div class="flex flex-col gap-xs">
                     <label class="text-xs font-bold text-secondary/60 uppercase tracking-wide">Organisasi Penyelenggara</label>
-                    <select wire:model.live="organisasiId" class="w-full text-body-md px-sm py-2 bg-surface-container/40 border border-outline-variant/30 rounded-xl focus:outline-none focus:border-primary/30 text-primary font-medium">
+                    <select wire:model.live="organisasiId" class="w-full text-body-md px-sm py-2 bg-surface-container/40 border border-outline-variant/30 rounded-xl focus:outline-none focus:border-primary/30 text-primary font-semibold cursor-pointer">
                         <option value="">Semua Organisasi</option>
                         @foreach($listOrganisasi as $org)
                             <option value="{{ $org->id }}">{{ $org->nama_organisasi }}</option>

@@ -12,6 +12,7 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
             MasterDataSeeder::class,
             UserSeeder::class,
+            EventDataSeeder::class,
         ]);
     }
 }

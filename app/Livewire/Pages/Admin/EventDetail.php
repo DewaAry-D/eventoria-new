@@ -27,6 +27,19 @@ class EventDetail extends Component
         $this->eventId = $event->id;
     }
 
+    protected function baseEventQuery()
+    {
+        $adminDpm = AdminDpm::query()->where('user_id', Auth::id())->first();
+
+        return Event::whereHas('organisasi', function ($q) use ($adminDpm) {
+            if ($adminDpm && $adminDpm->fakultas_id !== null) {
+                $q->where('fakultas_id', $adminDpm->fakultas_id);
+            } else {
+                $q->where('tingkat_organisasi', 'universitas');
+            }
+        });
+    }
+
     public function getCleanMapsUrlProperty()
     {
         $url = $this->event->lokasi_url; 
@@ -36,10 +49,22 @@ class EventDetail extends Component
     public function getEmbedUrl($url)
     {
         if (!$url) return null;
-        if (str_contains($url, 'output=embed') || str_contains($url, '/embed')) return $url;
+
+        $isMapsUrl = str_contains($url, 'google.com/maps') || 
+                        str_contains($url, 'maps.google') || 
+                        str_contains($url, 'maps.app.goo.gl') || 
+                        str_contains($url, 'goo.gl/maps');
+        
+        if (!$isMapsUrl) {
+            return null;
+        }
+
+        if (str_contains($url, 'output=embed') || str_contains($url, '/embed')) {
+            return $url;
+        }
 
         if (str_contains($url, 'maps.app.goo.gl') || str_contains($url, 'goo.gl/maps')) {
-            return Cache::remember('map_url_' . md5($url), 86400, function () use ($url) {
+            $url = Cache::remember('map_url_' . md5($url), 86400, function() use ($url) {
                 $ch = curl_init();
                 curl_setopt($ch, CURLOPT_URL, $url);
                 curl_setopt($ch, CURLOPT_HEADER, true);
@@ -48,7 +73,7 @@ class EventDetail extends Component
                 curl_setopt($ch, CURLOPT_TIMEOUT, 3);
                 $response = curl_exec($ch);
                 curl_close($ch);
-
+                
                 if (preg_match('/^Location:\s+(.*)$/mi', $response, $matches)) {
                     return trim($matches[1]);
                 }
@@ -56,12 +81,14 @@ class EventDetail extends Component
             });
         }
 
-        if (preg_match('/\/maps\/search\/([^\/?#]+)/', $url, $matches)) {
-            return "https://maps.google.com/maps?q=" . urlencode(urldecode($matches[1])) . "&t=&z=15&ie=UTF8&iwloc=&output=embed";
-        }
         if (preg_match('/\/maps\/place\/([^\/@?#]+)/', $url, $matches)) {
-            return "https://maps.google.com/maps?q=" . urlencode(urldecode($matches[1])) . "&t=&z=15&ie=UTF8&iwloc=&output=embed";
+            return "https://maps.google.com/maps?q=" . $matches[1] . "&t=&z=15&ie=UTF8&iwloc=&output=embed";
         }
+
+        if (preg_match('/\/maps\/search\/([^\/?#]+)/', $url, $matches)) {
+            return "https://maps.google.com/maps?q=" . $matches[1] . "&t=&z=15&ie=UTF8&iwloc=&output=embed";
+        }
+
         if (preg_match('/@(-?\d+\.\d+),(-?\d+\.\d+)/', $url, $matches)) {
             return "https://maps.google.com/maps?q={$matches[1]},{$matches[2]}&t=&z=15&ie=UTF8&iwloc=&output=embed";
         }
@@ -76,7 +103,6 @@ class EventDetail extends Component
 
         return "https://maps.google.com/maps?q=" . urlencode($url) . "&t=&z=15&ie=UTF8&iwloc=&output=embed";
     }
-
     public function approveEvent(int $eventId)
     {
         $adminDpm = AdminDpm::query()->where('user_id', Auth::id())->first();
@@ -89,10 +115,9 @@ class EventDetail extends Component
                 'catatan_revisi' => null,
             ]);
 
-            // Refresh Global
-            $this->dispatch('trigger-global-refresh');
             session()->flash('success', "Event '{$event->nama_event}' berhasil disetujui!");
-            $this->closeModal();
+            
+            return redirect()->route('admin.moderasi.event');
         } else {
             session()->flash('error', "Aksi ilegal terdeteksi. Data tidak ditemukan di wilayah Anda.");
         }
@@ -127,19 +152,34 @@ class EventDetail extends Component
 
             $this->reset('alasanPenolakan');
 
-            // Refresh Global & Tutup Modal Konfirmasi
-            $this->dispatch('trigger-global-refresh');
             session()->flash('success', "Event '{$event->nama_event}' telah dikembalikan ke ormawa untuk direvisi.");
-            $this->closeModal();
+            
+            return redirect()->route('admin.moderasi.event');
         } else {
             session()->flash('error', "Aksi ilegal terdeteksi. Data tidak ditemukan di wilayah otoritas Anda.");
         }
+    }
+
+    public function closeModal()
+    {
+        $this->alasanPenolakan = '';
+        $this->resetErrorBag();
+        $this->dispatch('modal-closed');
+    }
+
+    #[ \Livewire\Attributes\On('trigger-global-refresh') ]
+    public function refreshComponent()
+    {
+        // Ini akan memaksa Livewire memanggil ulang fungsi render() dan mengambil data terbaru
+        $this->resetErrorBag();
+        $this->alasanPenolakan = '';
     }
     
     #[Layout('layouts.admin', ['active' => 'moderasi-event'])]
     public function render()
     {
-        $eventData = Event::with([
+        // Mengunci render data hanya jika event berada di wilayahnya
+        $eventData = $this->baseEventQuery()->with([
             'kategori', 
             'organisasi.fakultas',
             'timeLines' => function($query) {
@@ -202,6 +242,25 @@ class EventDetail extends Component
         $pendaftarAktif = max(0, $kuotaTotal - $sisaKuota);
         $persenTerisi = $kuotaTotal > 0 ? round(($pendaftarAktif / $kuotaTotal) * 100) : 0;
 
+        $cpUtama = $eventData->narahubung?->first();
+        $waNumber = '';
+
+        if ($cpUtama && !empty($cpUtama->nomor)) {
+            // Bersihkan dari spasi, strip (-), plus (+), dan karakter non-angka lainnya
+            $nomorAngka = preg_replace('/[^0-9]/', '', $cpUtama->nomor);
+
+            // Jika input berawalan '0812...' -> ubah jadi '62812...'
+            if (str_starts_with($nomorAngka, '0')) {
+                $nomorAngka = '62' . substr($nomorAngka, 1);
+            }
+            // Jika input langsung angka '812...' -> tambahkan '62812...'
+            elseif (str_starts_with($nomorAngka, '8')) {
+                $nomorAngka = '62' . $nomorAngka;
+            }
+
+            $waNumber = $nomorAngka;
+        }
+
         $listBankJson = collect($eventData->tujuanTransfer)->map(function($b) {
             return [
                 'nama'      => $b->nama_bank,
@@ -222,7 +281,8 @@ class EventDetail extends Component
             'sisaKuota'          => $sisaKuota,
             'pendaftarAktif'     => $pendaftarAktif,
             'persenTerisi'       => $persenTerisi,
-            'listBankJson'       => $listBankJson
+            'listBankJson'       => $listBankJson,
+            'waNumber'           => $waNumber
         ]);
     }
 }

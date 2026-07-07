@@ -11,7 +11,7 @@ use App\Enums\EventStatus;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
-class EventManagement extends Component
+class ModerasiEvent extends Component
 {
     public ?int $fakultasId = null;
     public array $statCards = [];
@@ -73,6 +73,6 @@ class EventManagement extends Component
     #[Layout('layouts.admin', ['active' => 'moderasi-event'])]
     public function render()
     {
-        return view('livewire.pages.admin.event-management');
+        return view('livewire.pages.admin.moderasi-event');
     }
 }

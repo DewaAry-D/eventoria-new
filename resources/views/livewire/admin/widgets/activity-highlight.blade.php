@@ -23,10 +23,10 @@
         </span>
     </a>
 
-    <a href="/admin/moderasi-organisasi" wire:navigate 
+    <a href="{{ route('admin.moderasi.organisasi') }}" wire:navigate 
         class="flex items-center justify-between p-md bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/10 hover:bg-surface-container/20 transition-all group active:scale-[0.99]">
         <div class="flex items-center gap-md min-w-0">
-            <span class="w-2.5 h-2.5 rounded-full bg-[#000666] flex-shrink-0 shadow-sm"></span>
+            <span class="w-2.5 h-2.5 rounded-full bg-primary flex-shrink-0 shadow-sm"></span>
             <div class="flex flex-col min-w-0">
                 <span class="text-body-md font-bold text-primary tracking-tight">Organisasi Teraktif</span>
                 <span class="text-caption text-on-surface-variant font-medium mt-0.5 truncate leading-relaxed">

@@ -9,6 +9,7 @@ use App\Models\AdminDpm;
 use App\Enums\EventStatus;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class ActivityHighlight extends Component
@@ -28,27 +29,26 @@ class ActivityHighlight extends Component
 
     public function render()
     {
-        $adminDpm = AdminDpm::query()->where('user_id', Auth::id())->first();
+        $adminDpm = Cache::remember('admin_dpm_' . Auth::id(), 300, fn() =>
+            AdminDpm::query()->where('user_id', Auth::id())->first()
+        );
 
         $baseEventQuery = Event::whereHas('organisasi', function ($q) use ($adminDpm) {
-            if ($adminDpm && $adminDpm->fakultas_id !== null) {
+            if ($this->fakultasId) {
+                $q->where('fakultas_id', $this->fakultasId);
+            } elseif ($adminDpm && $adminDpm->fakultas_id !== null) {
                 $q->where('fakultas_id', $adminDpm->fakultas_id);
-            }
-            else {
+            } else {
                 $q->where('tingkat_organisasi', 'universitas');
             }
-        });
+        })->where('status', '!=', EventStatus::DRAFT->value);
 
-        $baseEventQuery->where('status', '!=', EventStatus::DRAFT->value);
-
-        // Kategori Terpopuler
         $popularCategory = (clone $baseEventQuery)
             ->whereIn('status', [EventStatus::PUBLISHED->value, EventStatus::COMPLETED->value])
-            ->whereMonth('created_at', Carbon::now()->month)
-            ->select('kategori_id', DB::raw('count(*) as total'))
+            ->select('kategori_id', DB::raw('SUM(GREATEST(0, COALESCE(kuota, 0) - COALESCE(sisa_kuota, 0))) as total_pendaftar'))
             ->groupBy('kategori_id')
             ->with('kategori')
-            ->orderByDesc('total')
+            ->orderByDesc('total_pendaftar')
             ->first();
 
         // Organisasi Teraktif

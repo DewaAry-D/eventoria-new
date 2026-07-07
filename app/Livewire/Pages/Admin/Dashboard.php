@@ -125,8 +125,8 @@ class Dashboard extends Component
                 $event->sisa_kuota ?? 0,
                 '"' . str_replace('"', '""', $event->narasumber ?? '-') . '"',
                 '"' . str_replace('"', '""', $event->nama_lokasi ?? '-') . '"',
-                $event->lokasi_url ?? '-',
-                $event->link_event ?? '-',
+                '"' . ($event->lokasi_url ?? '-') . '"',
+                '"' . ($event->link_event ?? '-') . '"',
                 $event->created_at->format('Y-m-d H:i')
             ];
 

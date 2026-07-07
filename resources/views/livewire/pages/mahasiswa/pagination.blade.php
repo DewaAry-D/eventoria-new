@@ -1,52 +1,53 @@
 @if ($paginator->hasPages())
-    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 py-3 bg-surface-container-lowest border border-outline-variant/30 rounded-xl px-4 shadow-sm select-none w-full">
-        
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 py-3 bg-surface-container-lowest border border-outline-variant rounded-xl px-4 shadow-sm">
+        {{-- Progress text --}}
         <div>
-            <p class="text-body-sm font-medium text-secondary/60">
+            <p class="text-sm text-on-surface-variant">
                 Menampilkan 
-                <span class="font-bold text-primary">{{ $paginator->firstItem() }}</span> 
+                <span class="font-semibold text-primary">{{ $paginator->firstItem() }}</span> 
                 sampai 
-                <span class="font-bold text-primary">{{ $paginator->lastItem() }}</span> 
+                <span class="font-semibold text-primary">{{ $paginator->lastItem() }}</span> 
                 dari 
-                <span class="font-bold text-primary">{{ $paginator->total() }}</span> 
-                pengajuan
+                <span class="font-semibold text-primary">{{ $paginator->total() }}</span> 
+                event
             </p>
         </div>
 
-        <!-- Pagination Control -->
-        <div class="inline-flex items-center gap-xs text-body-sm">
-            
-            <!-- Button Previous -->
+        {{-- Pagination Buttons --}}
+        <div class="flex items-center gap-2">
+            {{-- Previous Page Link --}}
             @if ($paginator->onFirstPage())
-                <span class="w-8 h-8 rounded-xl border border-outline-variant/30 flex items-center justify-center text-secondary/40 bg-surface-container/10 cursor-not-allowed">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                <span class="p-2 rounded-lg border border-outline-variant bg-surface-container-low text-outline cursor-not-allowed">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                     </svg>
                 </span>
             @else
-                <button type="button" wire:click="previousPage('{{ $paginator->getPageName() }}')" 
-                        class="w-8 h-8 rounded-xl border border-outline-variant/30 flex items-center justify-center text-secondary/70 bg-surface-container-lowest font-medium transition-all hover:bg-[#000666]/[0.06] hover:border-[#000666]/30 hover:text-[#000666] active:scale-95 focus:outline-none shadow-sm">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                <button wire:click="previousPage('{{ $paginator->getPageName() }}')" 
+                        class="p-2 rounded-lg border border-outline-variant bg-surface-container-lowest text-primary hover:bg-surface-container-low hover:border-primary transition shadow-sm focus:outline-none">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                     </svg>
                 </button>
             @endif
 
+            {{-- Pagination Elements --}}
             @foreach ($elements as $element)
+                {{-- "Three Dots" Separator --}}
                 @if (is_string($element))
-                    <span class="w-8 h-8 flex items-center justify-center text-secondary/40 font-bold select-none">{{ $element }}</span>
+                    <span class="px-3 py-1.5 text-outline font-semibold">{{ $element }}</span>
                 @endif
 
-                <!-- Array Koleksi Halaman Terdekat -->
+                {{-- Array Of Links --}}
                 @if (is_array($element))
                     @foreach ($element as $page => $url)
                         @if ($page == $paginator->currentPage())
-                            <span class="w-8 h-8 rounded-xl bg-[#000666] text-white flex items-center justify-center font-bold shadow-sm">
+                            <span class="px-4 py-2 rounded-lg bg-primary border border-primary text-on-primary font-bold shadow-sm">
                                 {{ $page }}
                             </span>
                         @else
-                            <button type="button" wire:click="gotoPage({{ $page }}, '{{ $paginator->getPageName() }}')" 
-                                    class="w-8 h-8 rounded-xl border border-outline-variant/30 flex items-center justify-center text-secondary/70 bg-surface-container-lowest font-medium transition-all duration-150 hover:bg-[#000666]/[0.06] hover:border-[#000666]/30 hover:text-[#000666] active:scale-95 focus:outline-none">
+                            <button wire:click="gotoPage({{ $page }}, '{{ $paginator->getPageName() }}')" 
+                                    class="px-4 py-2 rounded-lg border border-outline-variant bg-surface-container-lowest text-primary font-semibold hover:bg-surface-container-low hover:text-primary transition shadow-sm focus:outline-none">
                                 {{ $page }}
                             </button>
                         @endif
@@ -54,18 +55,18 @@
                 @endif
             @endforeach
 
-            <!-- Button Next -->
+            {{-- Next Page Link --}}
             @if ($paginator->hasMorePages())
-                <button type="button" wire:click="nextPage('{{ $paginator->getPageName() }}')" 
-                        class="w-8 h-8 rounded-xl border border-outline-variant/30 flex items-center justify-center text-secondary/70 bg-surface-container-lowest font-medium transition-all hover:bg-[#000666]/[0.06] hover:border-[#000666]/30 hover:text-[#000666] active:scale-95 focus:outline-none shadow-sm">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                <button wire:click="nextPage('{{ $paginator->getPageName() }}')" 
+                        class="p-2 rounded-lg border border-outline-variant bg-surface-container-lowest text-primary hover:bg-surface-container-low hover:border-primary transition shadow-sm focus:outline-none">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                     </svg>
                 </button>
             @else
-                <span class="w-8 h-8 rounded-xl border border-outline-variant/30 flex items-center justify-center text-secondary/40 bg-surface-container/10 cursor-not-allowed">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                <span class="p-2 rounded-lg border border-outline-variant bg-surface-container-low text-outline cursor-not-allowed">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                     </svg>
                 </span>
             @endif

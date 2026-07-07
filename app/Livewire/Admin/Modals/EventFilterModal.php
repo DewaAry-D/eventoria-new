@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Admin\Modals;
 
+use App\Enums\OrganisasiStatus;
 use Livewire\Component;
 use Livewire\Attributes\On;
 use App\Models\Fakultas;
@@ -76,10 +77,10 @@ class EventFilterModal extends Component
 
         if ($this->fakultasId) {
             // Jika dalam lingkup fakultas, hanya tampilkan ormawa milik fakultas tersebut
-            $organisasiQuery->where('fakultas_id', $this->fakultasId);
+            $organisasiQuery->where('fakultas_id', $this->fakultasId)->where('status', OrganisasiStatus::APPROVED->value);
         } else {
             // Jika dalam lingkup universitas, batasi hanya menampilkan ormawa tingkat universitas saja
-            $organisasiQuery->where('tingkat_organisasi', 'universitas');
+            $organisasiQuery->where('tingkat_organisasi', 'universitas')->where('status', OrganisasiStatus::APPROVED->value);
         }
 
         return view('livewire.admin.modals.event-filter-modal', [

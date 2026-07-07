@@ -18,7 +18,7 @@
         @livewireStyles
     </head>
 
-    <body class="bg-surface text-on-surface antialiased font-sans" 
+    <body class="bg-background text-on-background antialiased font-sans" 
         x-data="{ sidebarOpen: false, showLogoutModal: false }">
 
         <!-- Layout Mobile -->
@@ -42,7 +42,7 @@
                         class="flex items-center group focus:outline-none shrink-0">
                     
                     <img class="w-9 h-9 rounded-full object-cover ring-2 ring-surface-container group-hover:ring-primary/30 transition-all shrink-0" 
-                            src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->adminKampus?->nama_admin ?? (Auth::user()->name ?? 'Dr Aris Setiawan')) }}&background=000666&color=fff" 
+                            src="https://ui-avatars.com/api/?name={{ urlencode(Auth::user()->admin_name) }}&background=000666&color=fff" 
                             alt="Profile">
                 </button>
 
@@ -57,13 +57,13 @@
                         style="display: none;">
                     
                     <div class="px-4 py-2 border-b border-outline-variant/10">
-                        <p class="text-body-sm font-bold text-on-surface truncate">
-                            {{ Auth::user()->adminCampus?->nama_admin ?? (Auth::user()->name ?? 'Dr. Aris Setiawan') }}
+                        <p class="text-body-sm font-bold text-on-surface truncate" title="{{ Auth::user()->admin_name }}">
+                            {{ Auth::user()->admin_name }}
                         </p>
-                        <p class="text-[10px] text-on-surface-variant font-medium">Super Admin</p>
+                        <p class="text-[10px] text-on-surface-variant font-medium">{{ Auth::user()->role_label }}</p>
                     </div>
 
-                    <a href="{{ route('profile') }}" wire:navigate 
+                    <a href="{{ route('admin.profil') }}" wire:navigate 
                         class="block px-4 py-2 text-body-md font-medium text-secondary hover:bg-surface-container hover:text-primary transition-colors">
                         Profil Saya
                     </a>
@@ -100,12 +100,8 @@
                     {{ $slot }}
                 </main>
 
-                <footer class="max-w-container mx-auto w-full px-md lg:px-lg py-md border-t border-outline-variant/20 flex flex-col sm:flex-row items-center justify-between gap-xs text-caption font-bold text-secondary/50 select-none">
+                <footer class="max-w-container mx-auto w-full px-md lg:px-lg py-md border-t border-outline-variant/20 flex flex-col sm:flex-row items-center justify-center gap-xs text-caption font-bold text-secondary/50 select-none">
                     <p>{{ date('Y') }} &copy; Eventoria Management System</p>
-                    <div class="flex gap-md">
-                        <a href="#" class="hover:text-primary transition-colors">Syarat & Ketentuan</a>
-                        <a href="#" class="hover:text-primary transition-colors">Kebijakan Privasi</a>
-                    </div>
                 </footer>
             </div>
         </div>

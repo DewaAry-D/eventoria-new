@@ -1,12 +1,13 @@
 @props([
     'id' => 'reject-event',
     'title' => 'Tolak Pendaftaran?',
-    'description' => 'Berikan alasan penolakan agar organisasi dapat melakukan perbaikan.',
+    'description' => 'Berikan alasan penolakan agar dapat melakukan perbaikan.',
+    'wireModel' => 'alasanPenolakan',
     'wireAction'
 ])
 
 <div x-data="{ open: false, eventId: null }"
-    @open-modal-{{ $id }}.window="open = true; eventId = $event.detail.id; $wire.set('alasanPenolakan', '')"
+    @open-modal-{{ $id }}.window="open = true; eventId = $event.detail.id; $wire.set('{{ $wireModel }}', '')"
     @modal-closed.window="open = false"
     @keydown.escape.window="if (open) open = false"
     :class="open ? 'pointer-events-auto' : 'pointer-events-none'"
@@ -50,13 +51,13 @@
             </label>
             
             <textarea
-                wire:model="alasanPenolakan"
+                wire:model="{{ $wireModel }}"
                 placeholder="Tulis alasan di sini..."
                 rows="4"
-                class="w-full text-body-md p-sm bg-surface-container/20 border rounded-2xl focus:outline-none text-primary placeholder-secondary/40 font-medium resize-none transition-all @error('alasanPenolakan') border-error focus:border-error @else border-outline-variant/50 focus:border-primary/30 @enderror">
+                class="w-full text-body-md p-sm bg-surface-container/20 border rounded-2xl focus:outline-none text-primary placeholder-secondary/40 font-medium resize-none transition-all @error('{{ $wireModel }}') border-error focus:border-error @else border-outline-variant/50 focus:border-primary/30 @enderror">
             </textarea>
 
-            @error('alasanPenolakan')
+            @error($wireModel)
                 <span class="text-caption font-semibold text-error mt-xs block">
                     {{ $message }}
                 </span>

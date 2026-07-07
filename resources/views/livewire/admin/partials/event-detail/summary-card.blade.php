@@ -8,7 +8,7 @@
                 @click="if(!imgFailed) showLightbox = true">
             
             <img x-show="!imgFailed"
-                src="{{ asset('storage/flyer/' . $event->flyer_url) }}" 
+                src="{{ asset('storage/' . $event->flyer_url) }}" 
                 alt="Flyer {{ $event->nama_event }}" 
                 x-on:error="imgFailed = true"
                 class="w-full h-full object-cover transition-all duration-500 group-hover:scale-105 group-hover:brightness-75">
@@ -60,7 +60,7 @@
                 </button>
     
                 <div class="relative max-w-full max-h-[85vh] md:max-h-[90vh] aspect-[3/4] rounded-2xl overflow-hidden bg-surface-container shadow-2xl border border-white/10" @click.stop>
-                        <img src="{{ asset('storage/flyer/' . $event->flyer_url) }}" alt="Flyer {{ $event->nama_event }} Full" class="w-full h-full object-contain select-none">
+                        <img src="{{ asset('storage/' . $event->flyer_url) }}" alt="Flyer {{ $event->nama_event }} Full" class="w-full h-full object-contain select-none">
                 </div>
             </div>
         </template>
@@ -92,7 +92,7 @@
                         </svg>
                     </div>
                     <div class="flex flex-col min-w-0 flex-1">
-                        <span class="text-[10px] sm:text-[11px] text-on-surface-variant/50 tracking-wider font-bold leading-none mb-1 select-none">Tanggal Acara</span>
+                        <span class="text-[10px] sm:text-[11px] text-on-surface-variant/50 tracking-wider font-bold leading-none mb-1 select-none">Tanggal Mulai Pendaftaran</span>
                         <p class="text-body-sm sm:text-body-md font-bold sm:font-bold text-on-surface leading-tight truncate" title="{{ $tanggalPelaksanaan }}">
                             {{ $tanggalPelaksanaan }}
                         </p>
@@ -146,10 +146,11 @@
 
         <!-- Footer Card Layout -->
         <div class="border-t border-outline-variant/20 pt-md mt-sm flex flex-col sm:flex-row sm:items-center justify-between gap-md w-full">
-            <div class="flex items-center gap-xs min-w-0 select-none">
+            <a href="{{ route('admin.organisasi.detail', $event->organisasi->id) }}" wire:navigate
+                    class="flex items-center gap-xs min-w-0 select-none">
                 <div class="w-8 h-8 rounded-full bg-surface-container border border-outline-variant/30 flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
                     @if($event->organisasi?->logo_url)
-                        <img src="{{ asset('storage/logo/' . $event->organisasi->logo_url) }}" 
+                        <img src="{{ asset('storage/' . $event->organisasi->logo_url) }}" 
                                 alt="Logo {{ $event->organisasi->nama_organisasi }}" 
                                 class="w-full h-full object-cover">
                     @else
@@ -158,11 +159,11 @@
                         </span>
                     @endif
                 </div>
-        
+
                 <span class="text-body-sm font-bold text-secondary hover:text-primary transition-colors cursor-pointer truncate pl-1 max-w-[200px] sm:max-w-[240px]" title="{{ $event->organisasi->nama_organisasi ?? 'Organisasi Mahasiswa' }}">
                     {{ $event->organisasi->nama_organisasi ?? 'Organisasi Mahasiswa' }}
                 </span>
-            </div>
+            </a>
 
             @php
                 $currentStatus = is_object($event->status) ? $event->status->value : $event->status;

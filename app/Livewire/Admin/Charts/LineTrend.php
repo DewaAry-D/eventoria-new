@@ -28,19 +28,17 @@ class LineTrend extends Component
 
     private function baseEventQuery()
     {
-        // Ambil data profil Admin DPM yang sedang login
         $adminDpm = AdminDpm::query()->where('user_id', Auth::id())->first();
 
-        $query = Event::whereHas('organisasi', function ($q) use ($adminDpm) {
-            if ($adminDpm && $adminDpm->fakultas_id !== null) {
+        return Event::whereHas('organisasi', function ($q) use ($adminDpm) {
+            if ($this->fakultasId) {
+                $q->where('fakultas_id', $this->fakultasId);
+            } elseif ($adminDpm && $adminDpm->fakultas_id !== null) {
                 $q->where('fakultas_id', $adminDpm->fakultas_id);
-            } 
-            else {
+            } else {
                 $q->where('tingkat_organisasi', 'universitas');
             }
-        });
-
-        return $query->where('status', '!=', EventStatus::DRAFT->value);
+        })->where('status', '!=', EventStatus::DRAFT->value);
     }
 
     private function getLineChartConfig()

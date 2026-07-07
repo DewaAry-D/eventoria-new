@@ -1,418 +1,320 @@
-<?php
+<div class="w-full p-md sm:p-lg xl:p-xl space-y-lg sm:space-y-xl select-none">
 
-use App\Models\OrganisasiMahasiswa;
-use App\Models\AdminDpm;
-use Livewire\Attributes\Layout;
-use Livewire\Volt\Component;
-use Livewire\WithPagination;
+    <x-admin.header-info title="Manajemen Pengajuan Organisasi">
+        <x-slot name="action">
+            <button type="button" 
+                wire:click="$dispatch('trigger-global-refresh')"
+                wire:loading.attr="disabled"
+                class="inline-flex items-center justify-center gap-sm px-md sm:px-lg py-2.5 sm:py-md bg-primary text-white font-bold sm:font-bold rounded-lg shadow-sm hover:bg-primary/90 disabled:opacity-50 transition-colors text-xs sm:text-body-md group cursor-pointer">
+                
+                <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white transform group-hover:rotate-45 transition-transform duration-300" 
+                    wire:loading.class="animate-spin"
+                    fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+                </svg>
+                <span>Refresh</span>
+            </button>
+        </x-slot>
+        <p class="text-xs sm:text-body-md text-on-surface-variant/80 font-medium leading-relaxed mt-1">
+            Tinjau dan verifikasi berkas legalitas akun organisasi mahasiswa secara berkala.
+        </p>
+    </x-admin.header-info>
 
-new #[Layout('layouts.admin')] class extends Component
-{
-    use WithPagination;
+    <!-- Card Information -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-sm sm:gap-md lg:gap-lg w-full">
+        <x-admin.cards.stat-card-action title="Menunggu Persetujuan" value="{{ $stats['pending'] }}" unit="Organisasi" footerLabel="Perlu Verifikasi" footerType="warning" iconType="warning">
+            <x-slot:icon><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></x-slot:icon>
+        </x-admin.cards.stat-card-action>
 
-    // State untuk Pencarian & Filter
-    public $search = '';
-    public $filterStatus = '';
-    public $filterTingkat = '';
+        <x-admin.cards.stat-card-action title="Organisasi Aktif" value="{{ $stats['approved'] }}" unit="Terdaftar" footerLabel="Beroperasi Normal" footerType="success" iconType="success">
+            <x-slot:icon><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z"/></svg></x-slot:icon>
+        </x-admin.cards.stat-card-action>
 
-    // State Modal Konfirmasi Aksi
-    public $showApproveModal = false;
-    public $showRejectModal = false;
-    public $selectedOrgId = null;
-    public $selectedOrgName = '';
-    public $pesanPenolakan = '';
-
-    // Reset pagination ketika nilai pencarian/filter berubah
-    public function updatingSearch() { $this->resetPage(); }
-    public function updatingFilterStatus() { $this->resetPage(); }
-    public function updatingFilterTingkat() { $this->resetPage(); }
-
-    public function resetFilter()
-    {
-        $this->filterStatus = '';
-        $this->filterTingkat = '';
-        $this->search = '';
-        $this->resetPage();
-    }
-
-    public function with(): array
-    {
-        // Hitung Statistik (Tetap hitung semua data terlepas dari filter)
-        $stats = [
-            'pending' => OrganisasiMahasiswa::where('status', 'pending')->count(),
-            'approved' => OrganisasiMahasiswa::where('status', 'approved')->count(),
-            'rejected' => OrganisasiMahasiswa::where('status', 'rejected')->count(),
-        ];
-
-        // Ambil Data Organisasi beserta Filter
-        $organisasiQuery = OrganisasiMahasiswa::with('user')
-            ->when($this->search, function ($query) {
-                // Bungkus pencarian dalam closure agar tidak bertabrakan dengan filter status
-                $query->where(function($subQuery) {
-                    $subQuery->where('nama_organisasi', 'like', '%' . $this->search . '%')
-                             ->orWhereHas('user', function ($q) {
-                                 $q->where('email', 'like', '%' . $this->search . '%');
-                             });
-                });
-            })
-            ->when($this->filterStatus, function ($query) {
-                $query->where('status', $this->filterStatus);
-            })
-            ->when($this->filterTingkat, function ($query) {
-                $query->where('tingkat_organisasi', $this->filterTingkat);
-            })
-            ->latest();
-
-        return [
-            'stats' => $stats,
-            'daftar_organisasi' => $organisasiQuery->paginate(10),
-        ];
-    }
-
-    // --- FUNGSI SETUJUI ---
-    public function confirmApprove($id, $name)
-    {
-        $this->selectedOrgId = $id;
-        $this->selectedOrgName = $name;
-        $this->showApproveModal = true;
-    }
-
-    public function approve()
-    {
-        if ($this->selectedOrgId) {
-            $org = OrganisasiMahasiswa::find($this->selectedOrgId);
-            $statusVal = $org->status instanceof \UnitEnum ? $org->status->value : $org->status;
-
-            if ($org && $statusVal === 'pending') {
-                $org->update(['status' => 'approved']);
-                session()->flash('success', "Organisasi '{$this->selectedOrgName}' berhasil disetujui.");
-            }
-        }
-        $this->closeModal();
-    }
-
-    // --- FUNGSI TOLAK ---
-    public function confirmReject($id, $name)
-    {
-        $this->selectedOrgId = $id;
-        $this->selectedOrgName = $name;
-        $this->pesanPenolakan = '';
-        $this->showRejectModal = true;
-    }
-
-    public function reject()
-    {
-        $this->validate([
-            'pesanPenolakan' => 'required|string|min:5'
-        ], [
-            'pesanPenolakan.required' => 'Alasan penolakan wajib diisi agar organisasi dapat memperbaikinya.',
-            'pesanPenolakan.min' => 'Alasan penolakan terlalu singkat.'
-        ]);
-
-        if ($this->selectedOrgId) {
-            $org = OrganisasiMahasiswa::find($this->selectedOrgId);
-            $statusVal = $org->status instanceof \UnitEnum ? $org->status->value : $org->status;
-
-            if ($org && $statusVal === 'pending') {
-                $org->update([
-                    'status' => 'rejected',
-                    'pesan_penolakan' => $this->pesanPenolakan
-                ]);
-                session()->flash('success', "Pengajuan organisasi '{$this->selectedOrgName}' berhasil ditolak.");
-            }
-        }
-        $this->closeModal();
-    }
-
-    // --- FUNGSI UTILITAS ---
-    public function closeModal()
-    {
-        $this->showApproveModal = false;
-        $this->showRejectModal = false;
-        $this->selectedOrgId = null;
-        $this->selectedOrgName = '';
-        $this->pesanPenolakan = '';
-        $this->resetErrorBag();
-    }
-}; ?>
-
-<div class="p-8">
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-        <div>
-            <h1 class="text-2xl font-bold text-[#000666]">Manajemen Pengajuan Organisasi</h1>
-            <p class="text-gray-500 text-sm mt-1">Tinjau dan verifikasi pengajuan organisasi mahasiswa secara berkala.</p>
-        </div>
-        <button wire:click="$refresh" class="px-5 py-2.5 text-sm font-semibold text-white bg-[#000666] hover:bg-indigo-900 rounded-xl flex items-center gap-2 transition shadow-sm">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-            Refresh
-        </button>
+        <x-admin.cards.stat-card-action title="Organisasi Ditolak" value="{{ $stats['rejected'] }}" unit="Total" footerLabel="Gagal Verifikasi" footerType="error" iconType="error">
+            <x-slot:icon><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></x-slot:icon>
+        </x-admin.cards.stat-card-action>
     </div>
 
-    @if (session()->has('success'))
-        <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 3000)" class="mb-6 p-4 text-sm text-green-800 rounded-xl bg-green-50 flex items-center border border-green-100 shadow-sm transition-all">
-            <svg class="w-5 h-5 inline mr-2 shrink-0 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
-            {{ session('success') }}
-        </div>
-    @endif
-
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative overflow-hidden">
-            <div class="absolute top-4 right-4 w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"/></svg>
-            </div>
-            <p class="text-sm font-semibold text-gray-500 mb-1">Menunggu Persetujuan</p>
-            <div class="flex items-baseline gap-2 mb-4">
-                <span class="text-4xl font-extrabold text-gray-900">{{ $stats['pending'] }}</span>
-                <span class="text-sm font-medium text-gray-500">Organisasi</span>
-            </div>
-            <span class="inline-block px-3 py-1 bg-[#000666] text-white text-[10px] font-bold uppercase tracking-wider rounded-full">
-                Perlu Verifikasi
-            </span>
-        </div>
-
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative overflow-hidden">
-            <div class="absolute top-4 right-4 w-8 h-8 bg-green-100 text-green-600 rounded-full flex items-center justify-center">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-            </div>
-            <p class="text-sm font-semibold text-gray-500 mb-1">Organisasi Aktif</p>
-            <div class="flex items-baseline gap-2 mb-4">
-                <span class="text-4xl font-extrabold text-gray-900">{{ $stats['approved'] }}</span>
-                <span class="text-sm font-medium text-gray-500">Terdaftar</span>
-            </div>
-            <span class="inline-block px-3 py-1 bg-green-50 text-green-700 text-[10px] font-bold uppercase tracking-wider rounded-full border border-green-100">
-                Beroperasi Normal
-            </span>
-        </div>
-
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative overflow-hidden">
-            <div class="absolute top-4 right-4 w-8 h-8 bg-red-100 text-red-600 rounded-full flex items-center justify-center">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-            </div>
-            <p class="text-sm font-semibold text-gray-500 mb-1">Organisasi Ditolak</p>
-            <div class="flex items-baseline gap-2 mb-4">
-                <span class="text-4xl font-extrabold text-gray-900">{{ $stats['rejected'] }}</span>
-                <span class="text-sm font-medium text-gray-500">Total</span>
-            </div>
-            <span class="inline-block px-3 py-1 bg-red-50 text-red-700 text-[10px] font-bold uppercase tracking-wider rounded-full border border-red-100">
-                Gagal Verifikasi
-            </span>
-        </div>
-    </div>
-
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-visible relative">
+    <!-- Flash Alert -->
+    <x-admin.modals.toast-alert />
+    
+    <div class="bg-surface-container-lowest p-md sm:p-lg rounded-2xl border border-outline-variant/30 shadow-sm w-full">
         
-        <div class="p-6 border-b border-gray-100 flex flex-col md:flex-row justify-between items-center gap-4">
-            <h2 class="text-lg font-bold text-[#000666]">Daftar Pengajuan & Organisasi</h2>
-            
-            <div class="flex items-center gap-3 w-full md:w-auto">
-                <div class="relative w-full md:w-72">
-                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                    </div>
-                    <input type="text" wire:model.live="search" class="block w-full pl-10 pr-3 py-2.5 text-sm border border-gray-200 rounded-xl bg-gray-50 focus:ring-[#000666] focus:border-[#000666] focus:bg-white transition" placeholder="Cari organisasi atau email...">
+        <div class="flex items-center justify-between gap-md mb-lg select-none w-full">
+            <div>
+                <h4 class="text-title-sm sm:text-title-md font-bold text-primary tracking-tight">
+                    Daftar Pendaftaran Organisasi
+                </h4>
+            </div>
+
+            <div class="items-center gap-sm w-full sm:w-auto hidden sm:flex">
+                <div class="relative flex-1 sm:w-64" x-data="{ search: @entangle('search').live }">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-sm text-secondary/50">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="currentColor"/>
+                        </svg>
+                    </span>
+                    
+                    <input type="text" 
+                            wire:model.live.debounce.300ms="search" 
+                            placeholder="Cari organisasi atau email..." 
+                            class="w-full text-body-md pl-9 pr-8 py-1.5 bg-surface-container/40 border border-outline-variant/30 rounded-xl focus:outline-none focus:border-primary/30 text-primary placeholder-secondary/40 font-medium">
+                
+                    <button type="button" 
+                            x-show="search.length > 0"
+                            @click="@this.set('search', ''); $dispatch('trigger-global-refresh')"
+                            x-transition
+                            class="absolute inset-y-0 right-0 flex items-center pr-sm text-secondary/40 hover:text-error transition-colors cursor-pointer"
+                            title="Bersihkan pencarian"
+                            x-cloak>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
                 </div>
 
-                <div x-data="{ openFilter: false }" class="relative inline-block text-left w-full md:w-auto">
-                    <button @click="openFilter = !openFilter" type="button" class="w-full md:w-auto px-4 py-2.5 border rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition {{ ($filterStatus !== '' || $filterTingkat !== '') ? 'bg-indigo-50 border-indigo-200 text-indigo-700' : 'border-gray-200 text-gray-600 hover:bg-gray-50' }}">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
-                        Filter
-                        @if($filterStatus !== '' || $filterTingkat !== '')
-                            <span class="w-2 h-2 rounded-full bg-red-500 ml-1"></span>
-                        @endif
-                    </button>
+                <button type="button" 
+                        @click="$dispatch('open-modal-filter-organisasi')"
+                        class="inline-flex items-center justify-center gap-xs px-md py-2 border border-outline-variant/30 bg-surface-container-lowest hover:bg-surface-container/30 text-primary rounded-xl transition-all font-bold text-body-md active:scale-95 shadow-sm cursor-pointer">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+                    <span>Filter</span>
+                </button>
+            </div>
 
-                    <div x-show="openFilter"
-                         x-transition:enter="transition ease-out duration-200"
-                         x-transition:enter-start="opacity-0 scale-95"
-                         x-transition:enter-end="opacity-100 scale-100"
-                         x-transition:leave="transition ease-in duration-75"
-                         x-transition:leave-start="opacity-100 scale-100"
-                         x-transition:leave-end="opacity-0 scale-95"
-                         @click.away="openFilter = false"
-                         class="absolute right-0 z-[60] mt-2 w-72 origin-top-right rounded-2xl bg-white shadow-xl border border-gray-100 ring-1 ring-black ring-opacity-5 p-5"
-                         style="display: none;">
+            <button type="button" 
+                    @click="$dispatch('open-modal-filter-organisasi')"
+                    class="inline-flex sm:hidden items-center justify-center w-8 h-8 border border-outline-variant/30 bg-surface-container-lowest hover:bg-surface-container/30 text-primary rounded-xl transition-all active:scale-95 shadow-sm shrink-0 cursor-pointer"
+                    title="Buka Filter">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+            </button>
+        </div>
 
-                        <div class="mb-4">
-                            <h3 class="text-sm font-bold text-gray-900 mb-4 border-b pb-2">Opsi Penyaringan Data</h3>
+        <div class="flex items-center gap-sm w-full mb-lg sm:hidden">
+            <div class="relative flex-1 sm:w-64" x-data="{ search: @entangle('search').live }">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-sm text-secondary/50">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="currentColor"/>
+                    </svg>
+                </span>
+                
+                <input type="text" 
+                        wire:model.live.debounce.300ms="search" 
+                        placeholder="Cari organisasi atau email..." 
+                        class="w-full text-body-md pl-9 pr-8 py-1.5 bg-surface-container/40 border border-outline-variant/30 rounded-xl focus:outline-none focus:border-primary/30 text-primary placeholder-secondary/40 font-medium">
+            
+                <button type="button" 
+                        x-show="search.length > 0"
+                        @click="@this.set('search', ''); $dispatch('trigger-global-refresh')"
+                        x-transition
+                        class="absolute inset-y-0 right-0 flex items-center pr-sm text-secondary/40 hover:text-error transition-colors cursor-pointer"
+                        title="Bersihkan pencarian"
+                        x-cloak>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
 
-                            <div class="space-y-4">
-                                <div>
-                                    <label class="block text-xs font-bold text-gray-500 mb-1.5 uppercase tracking-wider">Status Pengajuan</label>
-                                    <select wire:model.live="filterStatus" class="block w-full text-sm border-gray-200 rounded-lg bg-gray-50 focus:ring-[#000666] focus:border-[#000666]">
-                                        <option value="">Semua Status</option>
-                                        <option value="pending">Menunggu (Pending)</option>
-                                        <option value="approved">Aktif (Approved)</option>
-                                        <option value="rejected">Ditolak (Rejected)</option>
-                                    </select>
-                                </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-md lg:hidden w-full">
+            @forelse($daftar_organisasi as $org)
+                @php
+                    $currentStatus = is_object($org->status) ? $org->status->value : $org->status;
+                    $statusConfig = match($currentStatus) {
+                        'pending'  => ['color' => 'bg-amber-500/[0.08] text-amber-700 border-amber-500/20', 'label' => 'Pending', 'pulse' => true],
+                        'approved' => ['color' => 'bg-emerald-500/[0.08] text-emerald-700 border-emerald-500/20', 'label' => 'Aktif', 'pulse' => false],
+                        'rejected' => ['color' => 'bg-red-500/[0.08] text-red-700 border-red-500/20', 'label' => 'Ditolak', 'pulse' => false],
+                    };
+                @endphp
+                <div wire:key="org-card-{{ $org->id }}" class="border border-outline-variant/20 rounded-2xl p-md bg-surface-container-lowest shadow-sm flex flex-col justify-between gap-md h-full transition-all duration-200 hover:shadow-md">
+                    <div class="flex flex-col gap-sm">
+                        <div class="flex items-center justify-between gap-xs">
+                            <span class="px-sm py-0.5 bg-primary/[0.06] text-primary/80 font-extrabold text-[10px] rounded-md border border-primary/10 uppercase tracking-wide">
+                                {{ $org->tingkat_organisasi }}
+                            </span>
+                            <span class="inline-flex items-center gap-xs px-sm py-0.5 font-bold text-[11px] rounded-full border {{ $statusConfig['color'] }}">
+                                @if($statusConfig['pulse']) <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span> @endif
+                                {{ $statusConfig['label'] }}
+                            </span>
+                        </div>
 
-                                @if(AdminDpm::where('user_id', auth()->id())->value('fakultas_id'))
-                                    <div>
-                                        <label class="block text-xs font-bold text-gray-500 mb-1.5 uppercase tracking-wider">Tingkat Organisasi</label>
-                                        <select wire:model.live="filterTingkat" class="block w-full text-sm border-gray-200 rounded-lg bg-gray-50 focus:ring-[#000666] focus:border-[#000666]">
-                                            <option value="">Semua Tingkat</option>
-                                            <option value="fakultas">Tingkat Fakultas</option>
-                                            <option value="prodi">Tingkat Program Studi</option>
-                                        </select>
-                                    </div>
+                        <div class="flex items-center gap-md mt-sm">
+                            <div class="w-11 h-11 rounded-xl border border-outline-variant/30 bg-surface-container overflow-hidden shadow-2xs flex items-center justify-center font-black text-xs text-primary shrink-0">
+                                @if($org->logo_url)
+                                    <img src="{{ asset('storage/' . $org->logo_url) }}" class="w-full h-full object-cover">
+                                @else
+                                    {{ strtoupper(substr($org->nama_organisasi, 0, 2)) }}
                                 @endif
                             </div>
+                            <div class="min-w-0 flex flex-col gap-0.5">
+                                <h5 class="text-body-lg font-bold text-primary tracking-tight leading-snug truncate">{{ $org->nama_organisasi }}</h5>
+                                <span class="text-caption text-secondary/60 font-sans font-medium truncate">{{ $org->user?->email ?? '-' }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col gap-sm border-t border-outline-variant/10 pt-sm mt-xs">
+                        <div class="flex items-center gap-xs text-caption text-secondary/50 font-medium font-sans">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="text-secondary/40"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                            <span>Diajukan: {{ $org->created_at ? \Carbon\Carbon::parse($org->created_at)->translatedFormat('d M Y') : '-' }}</span>
                         </div>
 
-                        <div class="flex items-center justify-between pt-3 border-t border-gray-100">
-                            <button wire:click="resetFilter" type="button" class="text-xs font-bold text-red-600 hover:text-red-800 transition">
-                                Bersihkan
-                            </button>
-                            <button @click="openFilter = false" type="button" class="px-5 py-2 text-xs font-bold text-white bg-[#000666] rounded-lg hover:bg-indigo-900 transition shadow-sm">
-                                Terapkan
-                            </button>
+                        <div class="flex items-center justify-end gap-sm mt-xs">
+                            @if($currentStatus === 'pending')
+                                <button type="button" 
+                                        @click="$dispatch('open-modal-approve-organisasi', { id: {{ $org->id }}, name: '{{ addslashes($org->nama_organisasi) }}' })"
+                                        class="flex-1 py-1.5 rounded-xl border border-emerald-500/30 text-emerald-600 hover:bg-emerald-500/5 font-bold text-xs transition-all active:scale-95 cursor-pointer">
+                                    Setujui
+                                </button>
+                                <button type="button" 
+                                        @click="$dispatch('open-modal-reject-organisasi', { id: {{ $org->id }}, name: '{{ addslashes($org->nama_organisasi) }}' })"
+                                        class="flex-1 py-1.5 rounded-xl border border-red-500/30 text-red-600 hover:bg-red-500/5 font-bold text-xs transition-all active:scale-95 cursor-pointer">
+                                    Tolak
+                                </button>
+                            @endif
+                            <a href="{{ route('admin.organisasi.detail', $org->id) }}" wire:navigate
+                                class="flex-1 py-1.5 rounded-xl bg-[#000666] text-white font-bold text-xs flex items-center justify-center transition-all active:scale-95 text-center cursor-pointer">
+                                Detail
+                            </a>
                         </div>
                     </div>
                 </div>
-
-            </div>
+            @empty
+                <div class="col-span-full">
+                    <x-admin.empty-state title="Tidak Ada Pengajuan" description="Seluruh antrean pengajuan verifikasi berkas organisasi kosong." />
+                </div>
+            @endforelse
         </div>
 
-        @if($filterStatus || $filterTingkat || $search)
-            <div class="bg-indigo-50/50 px-6 py-2 border-b border-gray-100 flex items-center justify-between text-xs text-indigo-700">
-                <span>Data ditampilkan berdasarkan penyaringan khusus.</span>
-                <button wire:click="resetFilter" class="font-bold hover:underline">Hapus Semua Filter</button>
-            </div>
-        @endif
-
-        <div class="overflow-x-auto">
-            <table class="w-full text-sm text-left text-gray-500">
-                <thead class="text-xs text-gray-500 uppercase bg-gray-50/50 border-b border-gray-100">
-                    <tr>
-                        <th class="px-6 py-4 font-bold tracking-wider">Logo</th>
-                        <th class="px-6 py-4 font-bold tracking-wider">Nama Organisasi</th>
-                        <th class="px-6 py-4 font-bold tracking-wider">Tingkat</th>
-                        <th class="px-6 py-4 font-bold tracking-wider">Pendaftaran</th>
-                        <th class="px-6 py-4 font-bold tracking-wider">Status</th>
-                        <th class="px-6 py-4 font-bold tracking-wider text-center">Aksi</th>
+        <!-- Screen >= lg -->
+        <div class="hidden lg:block w-full overflow-hidden rounded-xl border border-outline-variant/10">
+            <table class="w-full text-left border-collapse table-fixed bg-surface-container-lowest">
+                <thead>
+                    <tr class="border-b border-outline-variant/30 text-caption text-secondary/50 font-bold uppercase tracking-wider select-none bg-surface-container-lowest">
+                        <th class="py-md pl-md font-bold text-left w-[7%]">Logo</th>
+                        <th class="py-md font-bold text-left w-[24%]">Nama Organisasi</th>
+                        <th class="py-md font-bold px-md text-left w-[22%]">Email Akun</th>
+                        <th class="py-md font-bold px-md text-center w-[12%]">Tgl Daftar</th>
+                        <th class="py-md font-bold px-md text-center w-[10%]">Tingkat</th>
+                        <th class="py-md font-bold px-md text-center w-[11%]">Status</th>
+                        <th class="py-md font-bold text-right pr-md w-[14%]">Aksi</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-100">
+                <tbody class="divide-y divide-outline-variant/10 text-body-md text-on-surface font-medium">
                     @forelse($daftar_organisasi as $org)
                         @php
-                            $statusVal = $org->status instanceof \UnitEnum ? $org->status->value : $org->status;
-                            $tingkatVal = $org->tingkat_organisasi instanceof \UnitEnum ? $org->tingkat_organisasi->value : $org->tingkat_organisasi;
+                            $currentStatus = is_object($org->status) ? $org->status->value : $org->status;
+                            $tdStatusColor = match($currentStatus) {
+                                'approved' => 'text-success bg-success/10 border-success/10',
+                                'rejected' => 'text-error bg-error/10 border-error/10',
+                                'pending'  => 'text-warning bg-warning/10 border-warning/10',
+                            };
                         @endphp
-                        <tr class="bg-white hover:bg-gray-50/50 transition">
-                            <td class="px-6 py-4">
-                                <div class="w-10 h-10 rounded-lg bg-gray-100 border border-gray-200 flex items-center justify-center overflow-hidden shrink-0">
+                        <tr wire:key="org-row-{{ $org->id }}" class="transition-colors duration-150 bg-transparent even:bg-surface-container/30 hover:bg-primary/[0.01]">
+                            
+                            <td class="py-lg pl-md text-left align-middle">
+                                <div class="w-9 h-9 rounded-xl border border-outline-variant/30 bg-surface-container overflow-hidden shadow-2xs flex items-center justify-center font-black text-[11px] text-primary">
                                     @if($org->logo_url)
                                         <img src="{{ asset('storage/' . $org->logo_url) }}" class="w-full h-full object-cover">
                                     @else
-                                        <span class="text-[#000666] font-bold text-sm">{{ substr($org->nama_organisasi, 0, 1) }}</span>
+                                        {{ strtoupper(substr($org->nama_organisasi, 0, 2)) }}
                                     @endif
                                 </div>
                             </td>
-                            <td class="px-6 py-4">
-                                <p class="font-bold text-[#000666]">{{ $org->nama_organisasi }}</p>
-                                <p class="text-xs text-gray-500 mt-0.5">{{ $org->user->email ?? '-' }}</p>
+        
+                            <td class="py-lg text-left align-middle pr-md">
+                                <div class="w-full block font-bold text-primary tracking-tight leading-relaxed break-words whitespace-normal" title="{{ $org->nama_organisasi }}">
+                                    {{ $org->nama_organisasi }}
+                                </div>
                             </td>
-                            <td class="px-6 py-4">
-                                <span class="px-2.5 py-1 text-[10px] font-bold text-gray-600 bg-gray-100 border border-gray-200 rounded-md uppercase">
-                                    {{ $tingkatVal ?? '-' }}
-                                </span>
+        
+                            <td class="py-lg px-md text-left align-middle text-secondary/80 font-sans pr-md">
+                                <div class="w-full block break-words whitespace-normal leading-normal font-normal">
+                                    {{ $org->user?->email ?? '-' }}
+                                </div>
                             </td>
-                            <td class="px-6 py-4 text-gray-600 font-medium">
-                                {{ $org->created_at->translatedFormat('d M Y') }}
+        
+                            <td class="py-lg px-md text-center align-middle text-secondary/70 font-sans whitespace-nowrap">
+                                {{ $org->created_at ? $org->created_at->format('d M Y') : '-' }}
                             </td>
-                            <td class="px-6 py-4">
-                                @if($statusVal === 'pending')
-                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-yellow-50 text-yellow-700 border border-yellow-100">
-                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                        Menunggu
+        
+                            <td class="py-lg px-md text-center align-middle select-none">
+                                <div class="inline-flex justify-center w-full">
+                                    <span class="inline-flex px-2.5 py-0.5 bg-surface-container text-primary uppercase text-[10px] rounded-xl border border-outline-variant/30 font-extrabold tracking-wide shadow-2xs whitespace-nowrap">
+                                        {{ $org->tingkat_organisasi }}
                                     </span>
-                                @elseif($statusVal === 'approved')
-                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-green-50 text-green-700 border border-green-100">
-                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                                        Aktif
-                                    </span>
-                                @elseif($statusVal === 'rejected')
-                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-red-50 text-red-700 border border-red-100">
-                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                                        Ditolak
-                                    </span>
-                                @endif
+                                </div>
                             </td>
-                            <td class="px-6 py-4 text-center">
-                                <div class="flex items-center justify-center gap-2">
-                                    @if($statusVal === 'pending')
-                                        <button wire:click="confirmApprove({{ $org->id }}, '{{ addslashes($org->nama_organisasi) }}')" class="p-1.5 text-green-600 hover:bg-green-100 rounded-lg transition border border-transparent hover:border-green-200" title="Setujui">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+        
+                            <td class="py-lg px-md text-center align-middle select-none">
+                                <div class="inline-flex justify-center w-full">
+                                    <div class="px-2.5 py-1 rounded-xl border text-[11px] font-bold tracking-wide inline-flex items-center gap-xs shadow-2xs whitespace-nowrap {{ $tdStatusColor }}">
+                                        @if($currentStatus === 'approved')
+                                            <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                        @elseif($currentStatus === 'rejected')
+                                            <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/></svg>
+                                        @else
+                                            <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                        @endif
+                                        <span>{{ $currentStatus === 'pending' ? 'Pending' : ($currentStatus === 'approved' ? 'Terbit' : 'Revisi') }}</span>
+                                    </div>
+                                </div>
+                            </td>
+        
+                            <td class="py-lg pr-md text-right align-middle">
+                                <div class="inline-flex items-center justify-end gap-xs w-full">
+                                    @if($currentStatus === 'pending')
+                                        <button type="button" 
+                                                @click="$dispatch('open-modal-approve-organisasi', { id: {{ $org->id }}, name: '{{ addslashes($org->nama_organisasi) }}' })"
+                                                class="w-7 h-7 rounded-lg text-emerald-600 hover:bg-emerald-500/10 flex items-center justify-center transition-all active:scale-95 cursor-pointer shrink-0" title="Setujui Akun">
+                                            <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8.6 14.6L15.65 7.55L14.25 6.15L8.6 11.8L5.75 8.95L4.35 10.35L8.6 14.6ZM10 20C8.61667 20 7.31667 19.7375 6.1 19.2125C4.88333 18.6875 3.825 17.975 2.925 17.075C2.025 16.175 1.3125 15.1167 0.7875 13.9C0.2625 12.6833 0 11.3833 0 10C0 8.61667 0.2625 7.31667 0.7875 6.1C1.3125 4.88333 2.025 3.825 2.925 2.925C3.825 2.025 4.88333 1.3125 6.1 0.7875C7.31667 0.2625 8.61667 0 10 0C11.3833 0 12.6833 0.2625 13.9 0.7875C15.1167 1.3125 16.175 2.025 17.075 2.925C17.975 3.825 18.6875 4.88333 19.2125 6.1C19.7375 7.31667 20 8.61667 20 10C20 11.3833 19.7375 12.6833 19.2125 13.9C18.6875 15.1167 17.975 16.175 17.075 17.075C16.175 17.975 15.1167 18.6875 13.9 19.2125C12.6833 19.7375 11.3833 20 10 20ZM10 18C12.2333 18 14.125 17.225 15.675 15.675C17.225 14.125 18 12.2333 18 10C18 7.76667 17.225 5.875 15.675 4.325C14.125 2.775 12.2333 2 10 2C7.76667 2 5.875 2.775 4.325 4.325C2.775 5.875 2 7.76667 2 10C2 12.2333 2.775 14.125 4.325 15.675C5.875 17.225 7.76667 18 10 18Z" fill="currentColor"/></svg>
                                         </button>
-                                        
-                                        <button wire:click="confirmReject({{ $org->id }}, '{{ addslashes($org->nama_organisasi) }}')" class="p-1.5 text-red-600 hover:bg-red-100 rounded-lg transition border border-transparent hover:border-red-200" title="Tolak">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                        <div class="w-[1px] h-3.5 bg-outline-variant/30 self-center shrink-0"></div>
+                                        <button type="button" 
+                                                @click="$dispatch('open-modal-reject-organisasi', { id: {{ $org->id }}, name: '{{ addslashes($org->nama_organisasi) }}' })"
+                                                class="w-7 h-7 rounded-lg text-red-600 hover:bg-red-500/10 flex items-center justify-center transition-all active:scale-95 cursor-pointer shrink-0" title="Tolak Berkas">
+                                            <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6.4 15L10 11.4L13.6 15L15 13.6L11.4 10L15 6.4L13.6 5L10 8.6L6.4 5L5 6.4L8.6 10L5 13.6L6.4 15ZM10 20C8.61667 20 7.31667 19.7375 6.1 19.2125C4.88333 18.6875 3.825 17.975 2.925 17.075C2.025 16.175 1.3125 15.1167 0.7875 13.9C0.2625 12.6833 0 11.3833 0 10C0 8.61667 0.2625 7.31667 0.7875 6.1C1.3125 4.88333 2.025 3.825 2.925 2.925C3.825 2.025 4.88333 1.3125 6.1 0.7875C7.31667 0.2625 8.61667 0 10 0C11.3833 0 12.6833 0.2625 13.9 0.7875C15.1167 1.3125 16.175 2.025 17.075 2.925C17.975 3.825 18.6875 4.88333 19.2125 6.1C19.7375 7.31667 20 8.61667 20 10C20 11.3833 19.7375 12.6833 19.2125 13.9C18.6875 15.1167 17.975 16.175 17.075 17.075C16.175 17.975 15.1167 18.6875 13.9 19.2125C12.6833 19.7375 11.3833 20 10 20ZM10 18C12.2333 18 14.125 17.225 15.675 15.675C17.225 14.125 18 12.2333 18 10C18 7.76667 17.225 5.875 15.675 4.325C14.125 2.775 12.2333 2 10 2C7.76667 2 5.875 2.775 4.325 4.325C2.775 5.875 2 7.76667 2 10C2 12.2333 2.775 14.125 4.325 15.675C5.875 17.225 7.76667 18 10 18Z" fill="currentColor"/></svg>
                                         </button>
+                                        <div class="w-[1px] h-3.5 bg-outline-variant/30 self-center shrink-0"></div>
                                     @endif
-
-                                    <a href="{{ route('admin.moderasi-organisasi.detail', $org->id) }}" wire:navigate class="inline-block p-1.5 text-gray-400 hover:text-[#000666] hover:bg-indigo-50 rounded-lg transition" title="Lihat Detail">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                    <a href="{{ route('admin.organisasi.detail', $org->id) }}" wire:navigate 
+                                        class="w-8 h-8 rounded-xl text-[#000666] bg-[#000666]/[0.06] hover:bg-[#000666] hover:text-white flex items-center justify-center transition-all active:scale-95 cursor-pointer shrink-0" title="Lihat Detail Organisasi">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" fill="currentColor"/></svg>
                                     </a>
                                 </div>
                             </td>
+        
                         </tr>
                     @empty
-                        <tr>
-                            <td colspan="6" class="px-6 py-12 text-center">
-                                <div class="flex flex-col items-center justify-center">
-                                    <svg class="w-12 h-12 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-                                    <p class="text-gray-500 font-medium">Tidak ada data organisasi yang sesuai kriteria pencarian/filter.</p>
-                                </div>
-                            </td>
-                        </tr>
+                        <x-admin.empty-state :inTable="true" colspan="7" title="Belum Ada Pengajuan" description="Tidak ada antrean registrasi organisasi mahasiswa baru saat ini." />
                     @endforelse
                 </tbody>
             </table>
         </div>
 
-        <div class="p-4 border-t border-gray-100 bg-gray-50/30">
-            {{ $daftar_organisasi->links() }}
+        <!-- Pagination -->
+        <div class="mt-lg">
+            <x-admin.pagination-links :paginationData="$paginationData" />
         </div>
     </div>
 
-    @if($showApproveModal)
-        <div class="fixed inset-0 z-[100] flex items-center justify-center bg-gray-900/60 backdrop-blur-sm px-4">
-            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 text-center transform transition-all">
-                <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-                </div>
-                <h3 class="text-xl font-bold text-gray-900 mb-2">Setujui Pengajuan?</h3>
-                <p class="text-sm text-gray-500 mb-8 leading-relaxed">
-                    Apakah Anda yakin ingin menyetujui pendaftaran <span class="font-bold text-gray-800">{{ $selectedOrgName }}</span>? Organisasi ini akan segera aktif di platform.
-                </p>
-                <div class="flex items-center justify-center gap-3">
-                    <button wire:click="closeModal" class="flex-1 py-2.5 px-4 bg-white text-gray-700 font-semibold rounded-xl border border-gray-200 hover:bg-gray-50 transition">Batal</button>
-                    <button wire:click="approve" class="flex-1 py-2.5 px-4 bg-[#16A34A] hover:bg-green-700 text-white font-semibold rounded-xl transition shadow-sm">Ya, Setujui</button>
-                </div>
-            </div>
-        </div>
-    @endif
+    <x-admin.modals.confirm-modal 
+        id="approve-organisasi"
+        title="Setujui Verifikasi Organisasi"
+        wireAction="approve">
 
-    @if($showRejectModal)
-        <div class="fixed inset-0 z-[100] flex items-center justify-center bg-gray-900/60 backdrop-blur-sm px-4">
-            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 transform transition-all">
-                <div class="text-center mb-6">
-                    <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-2">Tolak Pengajuan?</h3>
-                    <p class="text-sm text-gray-500 leading-relaxed px-4">Berikan alasan penolakan agar organisasi <span class="font-bold text-gray-800">{{ $selectedOrgName }}</span> dapat melakukan perbaikan.</p>
-                </div>
-                <div class="mb-6">
-                    <label class="block text-xs font-bold text-gray-900 mb-2">Alasan Penolakan</label>
-                    <textarea wire:model="pesanPenolakan" rows="4" class="w-full bg-[#FAFAFA] border border-gray-200 rounded-xl text-sm p-3 focus:ring-red-500 focus:border-red-500 placeholder-gray-400" placeholder="Tulis alasan di sini..."></textarea>
-                    <x-input-error :messages="$errors->get('pesanPenolakan')" class="mt-1" />
-                </div>
-                <div class="flex items-center justify-center gap-3">
-                    <button wire:click="closeModal" class="flex-1 py-2.5 px-4 bg-white text-gray-700 font-semibold rounded-xl border border-gray-200 hover:bg-gray-50 transition">Batal</button>
-                    <button wire:click="reject" class="flex-1 py-2.5 px-4 bg-[#DC2626] hover:bg-red-700 text-white font-semibold rounded-xl transition shadow-sm">Kirim Penolakan</button>
-                </div>
-            </div>
-        </div>
-    @endif
+        Apakah Anda yakin ingin menyetujui pendaftaran berkas 
+        <strong class="text-primary font-bold">"<span x-text="targetName"></span>"</strong>? 
+        Organisasi ini akan berstatus aktif di dalam sistem.
+    </x-admin.modals.confirm-modal>
+
+    <x-admin.modals.reject-modal 
+        id="reject-organisasi"
+        title="Tolak Registrasi Organisasi?"
+        description="Berikan alasan penolakan berkas legalitas agar organisasi dapat memperbaiki datanya."
+        wireModel="pesanPenolakan"
+        wireAction="reject"
+    />
+
+    @include('livewire.admin.modals.filter-organisasi-modal')
 </div>

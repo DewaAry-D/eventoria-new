@@ -8,6 +8,7 @@ use Livewire\Attributes\On;
 use App\Models\Event;
 use App\Models\AdminDpm;
 use App\Enums\EventStatus;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 
 class EventMaster extends Component
@@ -36,14 +37,23 @@ class EventMaster extends Component
     #[ \Livewire\Attributes\On('filterEvents') ]
     public function handleFilters($filters)
     {
+        $adminDpm = AdminDpm::query()->where('user_id', Auth::id())->first();
+        
         $this->filterPeriode = $filters['periode'];
         $this->filterStatus = $filters['status'];
-        $this->fakultasId = $filters['fakultasId'];
         $this->filterKategoriId = $filters['kategoriId'];
         $this->filterOrganisasiId = $filters['organisasiId'];
         
+        // Hanya admin Universitas (fakultas_id == null) yang boleh mengganti filter fakultas
+        if ($adminDpm && $adminDpm->fakultas_id === null) {
+            $this->fakultasId = $filters['fakultasId'];
+        } else {
+            $this->fakultasId = $adminDpm?->fakultas_id;
+        }
+        
         $this->resetPage();
     }
+
     public function updatingSearch()
     {
         $this->resetPage();
@@ -62,6 +72,8 @@ class EventMaster extends Component
 
         // Query awal berdasarkan birokrasi DPM
         $query = Event::whereHas('organisasi', function ($q) use ($adminDpm) {
+            $q->where('status', 'approved'); // Mencegah ormawa pending/rejected memunculkan event
+
             if ($this->fakultasId) {
                 $q->where('fakultas_id', $this->fakultasId);
             } elseif ($adminDpm && $adminDpm->fakultas_id !== null) {
@@ -92,12 +104,12 @@ class EventMaster extends Component
         // logika Filter Periode Waktu jika dipilih
         if ($this->filterPeriode) {
             if ($this->filterPeriode === 'today') {
-                $query->whereDate('created_at', \Carbon\Carbon::today());
+                $query->whereDate('created_at', Carbon::today());
             } elseif ($this->filterPeriode === 'this_week') {
-                $query->whereBetween('created_at', [\Carbon\Carbon::now()->startOfWeek(), \Carbon\Carbon::now()->endOfWeek()]);
+                $query->whereBetween('created_at', [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
             } elseif ($this->filterPeriode === 'this_month') {
-                $query->whereMonth('created_at', \Carbon\Carbon::now()->month)
-                        ->whereYear('created_at', \Carbon\Carbon::now()->year);
+                $query->whereMonth('created_at', Carbon::now()->month)
+                        ->whereYear('created_at', Carbon::now()->year);
             }
         }
 
@@ -107,37 +119,49 @@ class EventMaster extends Component
     public function approveEvent(int $eventId)
     {
         $adminDpm = AdminDpm::query()->where('user_id', Auth::id())->first();
-        $event = $this->baseEventQuery()->find($eventId);
+        $event = $this->baseEventQuery()
+            ->where('id', $eventId)
+            ->where('status', EventStatus::PENDING_APPROVAL->value)
+            ->first();
 
         if ($event) {
             $event->update([
-                'status'       => EventStatus::PUBLISHED->value,
-                'admin_acc_id' => $adminDpm?->id,
+                'status'         => EventStatus::PUBLISHED->value,
+                'admin_acc_id'   => $adminDpm?->id,
                 'catatan_revisi' => null,
             ]);
 
-            // Refresh Global
-            $this->dispatch('trigger-global-refresh');
-            session()->flash('success', "Event '{$event->nama_event}' berhasil disetujui!");
             $this->closeModal();
+
+            $this->dispatch('show-toast',
+                message: "Event '{$event->nama_event}' berhasil disetujui!",
+                type: 'success'
+            );
+            $this->dispatch('refresh-after-toast');
+
         } else {
-            session()->flash('error', "Aksi ilegal terdeteksi. Data tidak ditemukan di wilayah Anda.");
+            $this->dispatch('show-toast',
+                message: 'Aksi ilegal terdeteksi. Data tidak ditemukan di wilayah Anda.',
+                type: 'error'
+            );
         }
     }
 
     public function rejectEvent(int $eventId)
     {
-        // 1. Validasi Input sesuai aturan string
         $this->validate([
             'alasanPenolakan' => 'required|string|min:5|max:500'
         ], [
             'alasanPenolakan.required' => 'Alasan wajib diisi agar panitia mengetahui kekurangannya.',
             'alasanPenolakan.string'   => 'Format ulasan alasan penolakan tidak valid.',
             'alasanPenolakan.min'      => 'Alasan terlalu singkat, berikan ulasan yang jelas minimal 5 karakter.',
-            'alasanPenolakan.max'      => 'Alasan terlalu panjang, batasi ulasan maksimal 500 karakter saja.'
+            'alasanPenolakan.max'      => 'Alasan terlalu panjang, batasi ulasan maksimal 500 karakter saja.',
         ]);
 
-        $event = $this->baseEventQuery()->find($eventId);
+        $event = $this->baseEventQuery()
+            ->where('id', $eventId)
+            ->where('status', EventStatus::PENDING_APPROVAL->value)
+            ->first();
 
         if ($event) {
             $alasanBersih = strip_tags($this->alasanPenolakan);
@@ -153,13 +177,19 @@ class EventMaster extends Component
             ]);
 
             $this->reset('alasanPenolakan');
-
-            // Refresh Global & Tutup Modal Konfirmasi
-            $this->dispatch('trigger-global-refresh');
-            session()->flash('success', "Event '{$event->nama_event}' telah dikembalikan ke ormawa untuk direvisi.");
             $this->closeModal();
+
+            $this->dispatch('show-toast',
+                message: "Event '{$event->nama_event}' dikembalikan untuk direvisi.",
+                type: 'success'
+            );
+            $this->dispatch('refresh-after-toast');
+
         } else {
-            session()->flash('error', "Aksi ilegal terdeteksi. Data tidak ditemukan di wilayah otoritas Anda.");
+            $this->dispatch('show-toast',
+                message: 'Aksi ilegal terdeteksi. Data tidak ditemukan di wilayah Anda.',
+                type: 'error'
+            );
         }
     }
 

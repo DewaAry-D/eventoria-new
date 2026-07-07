@@ -75,7 +75,7 @@ $footer_links = [
 <section class="bg-surface-container-low py-16 md:py-20 text-center">
     <div class="max-w-container mx-auto px-6 w-full">
         <span class="inline-block text-xs font-bold tracking-[1.5px] uppercase text-primary-container mb-5">Platform Event Kampus #1</span>
-        <h1 class="text-headline-lg-mobile md:text-headline-lg font-black text-primary max-w-[700px] mx-auto mb-5 tracking-tight">Temukan Event Campus Terbaik dengan Mudah</h1>
+        <h1 class="text-headline-lg-mobile md:text-headline-lg font-black md:font-black text-primary max-w-[700px] mx-auto mb-5 tracking-tight">Temukan Event Campus Terbaik dengan Mudah</h1>
         <p class="max-w-[520px] mx-auto text-on-surface-variant text-body-lg mb-9">Platform manajemen event modern untuk mahasiswa dan organisasi kampus. Kelola, cari, dan ikuti berbagai kegiatan akademik serta kreatif dalam satu tempat.</p>
 
         <div class="flex flex-wrap justify-center gap-3.5 mb-10">
@@ -145,7 +145,7 @@ $footer_links = [
             @forelse($events as $event)
             <article class="group bg-surface-container-lowest border-[1.5px] border-outline-variant rounded-md overflow-hidden hover:shadow-card hover:-translate-y-1 transition-all">
                 <div class="relative h-[200px] overflow-hidden">
-                    <img src="{{ $event->flyer_url ?? 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600&q=80' }}" alt="{{ $event->nama_event }}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                    <img src="{{ asset('storage/' . $event->flyer_url) ?? 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600&q=80' }}" alt="{{ $event->nama_event }}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                 </div>
                 <div class="p-5">
                     <h3 class="text-title-lg text-primary mb-2.5 leading-snug line-clamp-2">{{ $event->nama_event }}</h3>

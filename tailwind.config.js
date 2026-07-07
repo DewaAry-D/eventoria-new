@@ -8,14 +8,14 @@ export default {
         "./storage/framework/views/*.php",
         "./resources/views/**/*.blade.php",
     ],
-    
+
     theme: {
         extend: {
             colors: {
                 // Surface
-                surface: "#fbf8ff",
+                surface: "#f9fafb",
                 "surface-dim": "#dbd9e1",
-                "surface-bright": "#fbf8ff",
+                "surface-bright": "#f9fafb",
                 "surface-container-lowest": "#ffffff",
                 "surface-container-low": "#f5f2fb",
                 "surface-container": "#efecf5",
@@ -75,7 +75,6 @@ export default {
                 "on-background": "#1b1b21",
                 "surface-variant": "#e4e1ea",
             },
-
             fontFamily: {
                 sans: ["Inter", ...defaultTheme.fontFamily.sans],
             },

@@ -1,7 +1,7 @@
 <div class="w-full flex flex-col gap-md lg:gap-lg animate-fade-in select-none">
 
-    <!-- Blok 1: 4 Card Utama -->
-    <div class="grid grid-cols-2 gap-sm sm:gap-md w-full">
+    <!-- 4 Card Utama -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-sm sm:gap-md w-full">
         @if($isLiveMode)
             <!-- Kuota Total -->
             <div class="p-md bg-surface-container-lowest rounded-2xl shadow-card flex items-center gap-md min-w-0 transition-all duration-300 hover:translate-y-[-2px]">
@@ -122,6 +122,15 @@
         @endif
     </div>
 
+    <div class="w-full bg-surface-container-lowest p-md sm:p-lg rounded-3xl border border-outline-variant/30 shadow-card flex flex-col gap-sm">
+        <div class="space-y-2">
+            <h4 class="text-title-md font-bold text-primary tracking-tight">Deskripsi Event</h4>
+            <div class="text-body-md text-on-surface-variant font-medium leading-relaxed max-w-[98%] select-text">
+                <p class="whitespace-pre-line">{{ $event->deskripsi }}</p>
+            </div>
+        </div>
+    </div>
+
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-md sm:gap-lg w-full items-stretch">
     
         <div class="w-full bg-surface-container-lowest p-md sm:p-lg rounded-3xl shadow-card flex flex-col gap-md min-h-[240px]">
@@ -201,7 +210,7 @@
                         </div>
                     @else
                         <span class="px-sm py-1 bg-primary/5 text-primary border border-primary/10 text-caption font-extrabold rounded-lg tracking-wide uppercase">
-                            {{ $bankPertama->nama_bank ?? 'Rekening Bank' }}
+                            {{ $bankPertama->nama_bank ?? 'Bank' }}
                         </span>
                     @endif
                 </div>
@@ -250,8 +259,8 @@
                         <span class="text-body-md font-bold text-on-surface block truncate mt-1.5 leading-none">{{ $cpUtama?->nama ?? 'Panitia Pelaksana' }}</span>
                     </div>
                 </div>
-                @if($cpUtama?->nomor)
-                    <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $cpUtama->nomor) }}" target="_blank" 
+                @if(!empty($waNumber))
+                    <a href="https://wa.me/{{ $waNumber }}" target="_blank" 
                         class="w-10 h-10 bg-success text-white hover:bg-success/90 rounded-xl flex items-center justify-center transition-all shrink-0 select-none shadow-2xs hover:scale-105"
                         title="Hubungi WhatsApp">
                         <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

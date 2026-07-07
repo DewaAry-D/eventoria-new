@@ -184,7 +184,7 @@ export function eventLineChart(config) {
                                 drawBorder: false,
                             },
                             ticks: {
-                                stepSize: 5,
+                                precision: 0,
                                 color: "rgba(0, 6, 102, 0.5)",
                                 font: {
                                     family: "Inter, sans-serif",

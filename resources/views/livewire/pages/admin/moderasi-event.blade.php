@@ -1,4 +1,4 @@
-<div class="w-full p-md sm:p-lg xl:p-xl space-y-lg sm:space-y-xl">
+<div class="w-full p-md sm:p-lg xl:p-xl space-y-lg sm:space-y-xl select-none">
 
     <x-admin.header-info title="Manajemen Pengajuan Event">
     
@@ -78,7 +78,6 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
             </x-slot>
         </x-admin.cards.stat-card-action>
-
     </div>
 
     <div class="w-full">

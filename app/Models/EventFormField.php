@@ -18,7 +18,7 @@ class EventFormField extends Model
     protected function casts(): array
     {
         return [
-            'tipe_fields' => FieldType::class,
+            'tipe_field' => FieldType::class,
             'is_required' => 'boolean',
             // AsArrayObject memungkinkan Anda berinteraksi dengan JSON seolah itu adalah array PHP murni
             'meta_options' => AsArrayObject::class, 

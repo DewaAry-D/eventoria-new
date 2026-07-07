@@ -16,7 +16,7 @@
             </div>
         </div>
 
-        <nav class="space-y-xs">
+        <nav class="space-y-sm">
             <!-- Halaman Dashboard -->
             <a href="{{ route('admin.dashboard') }}" wire:navigate
                 class="flex items-center gap-md px-md py-sm rounded-xl transition-all group
@@ -28,7 +28,7 @@
             </a>
 
             <!-- Halaman Moderasi Organisasi -->
-            <a href="{{ route('admin.moderasi-organisasi') }}" 
+            <a href="{{ route('admin.moderasi.organisasi') }}" wire:navigate
                 class="flex items-center gap-md px-md py-sm rounded-xl transition-all group
                 {{ $active === 'moderasi-organisasi' ? 'bg-secondary-container text-primary shadow-sm' : 'text-secondary hover:bg-surface-container hover:text-on-surface' }}">
                 <svg width="15" height="19" class="{{ $active === 'moderasi-organisasi' ? 'text-primary' : 'text-secondary/70 group-hover:text-on-surface' }}" viewBox="0 0 15 19" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -38,7 +38,7 @@
             </a>
 
             <!-- Halaman Moderasi Event -->
-            <a href="{{ route('admin.event.master') }}" wire:navigate
+            <a href="{{ route('admin.moderasi.event') }}" wire:navigate
                 class="flex items-center gap-md px-md py-sm rounded-xl transition-all group
                 {{ $active === 'moderasi-event' ? 'bg-secondary-container text-primary shadow-sm' : 'text-secondary hover:bg-surface-container hover:text-on-surface' }}">
                 <svg width="17" height="19" class="{{ $active === 'moderasi-event' ? 'text-primary' : 'text-secondary/70 group-hover:text-on-surface' }}" viewBox="0 0 17 19" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -51,7 +51,7 @@
     
     <div class="border-t border-outline-variant/20 pt-md space-y-xs">
         <!-- Halaman Pengaturan -->
-        <a href="#" wire:navigate
+        <a href="{{ route('admin.profil') }}" wire:navigate
             class="flex items-center gap-md px-md py-sm rounded-xl transition-all group
             {{ $active === 'pengaturan' ? 'bg-secondary-container text-primary shadow-sm' : 'text-secondary hover:bg-surface-container hover:text-on-surface' }}">
             <svg width="21" height="20" class="{{ $active === 'pengaturan' ? 'text-primary' : 'text-secondary/70 group-hover:text-on-surface' }}" viewBox="0 0 21 20" fill="none" xmlns="http://www.w3.org/2000/svg">
