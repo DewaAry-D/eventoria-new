@@ -4,6 +4,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
+use App\Http\Middleware\EnsureRole;
 use App\Http\Middleware\EnsureMahasiswa;
 use App\Http\Middleware\EnsureAdminDpm;
 use App\Http\Middleware\EnsureOrganisasi;
@@ -16,9 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
-            'role.mahasiswa'  => EnsureMahasiswa::class,
-            'role.organisasi' => EnsureOrganisasi::class,
-            'role.admin'      => EnsureAdminDpm::class,
+            'role'=> EnsureRole::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

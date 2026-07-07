@@ -1,8 +1,5 @@
 <?php
-// Eventoria - Campus Event Management Platform
-// Mengambil data riil dari Database menggunakan Eloquent
 
-// 1. Ambil data count untuk Statistik (dengan fallback angka dummy jika database masih kosong saat dev)
 $dbEventCount = \App\Models\Event::where('status', 'published')->count();
 $dbOrgCount = \App\Models\OrganisasiMahasiswa::where('status', 'approved')->count();
 $dbMhsCount = \App\Models\Mahasiswa::count();

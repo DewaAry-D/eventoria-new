@@ -15,7 +15,7 @@ Route::view('profile', 'profile')
     ->name('profile');
 
 // Grup 1: Mahasiswa
-Route::middleware(['auth', 'role.mahasiswa'])->group(function () {
+Route::middleware(['auth', 'role:mahasiswa'])->group(function () {
     Volt::route('/dashboard-mahasiswa', 'pages.mahasiswa.dashboard')->name('mahasiswa.dashboard');
     Volt::route('/mahasiswa/events/{event:slug}', 'pages.mahasiswa.event-detail')->name('mahasiswa.event-detail');
     Volt::route('/mahasiswa/events/{event:slug}/daftar', 'pages.mahasiswa.event-register')->name('mahasiswa.event-register');
@@ -32,7 +32,7 @@ Route::middleware(['auth', 'role.mahasiswa'])->group(function () {
 });
 
 // Grup 2: Organisasi
-Route::middleware(['auth', 'role.organisasi'])->group(function () {
+Route::middleware(['auth', 'role:organisasi'])->group(function () {
     Volt::route('/dashboard-organisasi', 'pages.organisasi.dashboard')->name('organisasi.dashboard');
     Volt::route('/organisasi/events', 'pages.organisasi.events')->name('organisasi.events');
     Volt::route('/organisasi/events/create', 'pages.organisasi.event-create')->name('organisasi.events.create');
@@ -45,7 +45,7 @@ Route::middleware(['auth', 'role.organisasi'])->group(function () {
 });
 
 // Grup 3: Admin DPM
-Route::middleware(['auth', 'role.admin'])->group(function () {
+Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/profil', AdminProfil::class)->name('admin.profil');
     Route::get('/admin/dashboard', Dashboard::class)->name('admin.dashboard');
     Route::get('/admin/moderasi-event', ModerasiEvent::class)->name('admin.moderasi.event');
