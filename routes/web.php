@@ -45,7 +45,7 @@ Route::middleware(['auth', 'role:organisasi'])->group(function () {
 });
 
 // Grup 3: Admin DPM
-Route::middleware(['auth', 'role:admin'])->group(function () {
+Route::middleware(['auth', 'role:admin_dpm'])->group(function () {
     Route::get('/admin/profil', AdminProfil::class)->name('admin.profil');
     Route::get('/admin/dashboard', Dashboard::class)->name('admin.dashboard');
     Route::get('/admin/moderasi-event', ModerasiEvent::class)->name('admin.moderasi.event');
