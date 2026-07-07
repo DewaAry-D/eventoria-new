@@ -131,7 +131,7 @@ new #[Layout('layouts.organisasi')] class extends Component
             'tingkat_event' => 'required|in:prodi,fakultas,universitas',
             'deskripsi' => 'required|string',
             'kuota' => 'required|integer|min:1',
-            'flyer' => 'nullable|image|max:2048',
+            'flyer' => 'nullable|image|max:5120',
 
             'timelines.*.nama_timeline' => 'required|string|max:255',
             'timelines.*.tanggal_mulai' => 'required|date',
