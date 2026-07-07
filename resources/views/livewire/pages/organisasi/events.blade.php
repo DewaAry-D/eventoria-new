@@ -144,7 +144,7 @@ new #[Layout('layouts.organisasi')] class extends Component
                                 @elseif($event->status->value === 'revision')
                                     <div class="flex flex-col gap-1 items-start">
                                         <span class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-1 rounded-full border border-red-300">Revisi</span>
-                                        <span class="text-xs text-red-600 cursor-pointer hover:underline" title="{{ $event->catatan_revisi }}">Lihat Catatan</span>
+                                        <a class="text-xs text-red-600 cursor-pointer hover:underline" title="{{ $event->catatan_revisi }}" href="#">Lihat Catatan</a>
                                     </div>
                                 @elseif($event->status->value === 'published')
                                     <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-1 rounded-full border border-green-300">Live</span>
