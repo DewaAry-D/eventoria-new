@@ -42,6 +42,31 @@ new #[Layout('layouts.organisasi')] class extends Component
         session()->flash('success', 'Event "' . $event->nama_event . '" berhasil diajukan ke DPM untuk direview.');
     }
 
+    // Fungsi Menyelesaikan Event
+    public function selesaikanEvent($eventId)
+    {
+        $orgId = Auth::user()->load('organisasi')->organisasi->id;
+        $event = Event::where('organisasi_id', $orgId)->find($eventId);
+
+        if (!$event) {
+            session()->flash('error', 'Event tidak ditemukan.');
+            return;
+        }
+
+        // Validasi: Hanya event berstatus published yang bisa diselesaikan
+        if ($event->status->value !== 'published') {
+            session()->flash('error', 'Hanya event yang sedang dipublikasi yang dapat diselesaikan.');
+            return;
+        }
+
+        // Ubah status menjadi completed
+        $event->update([
+            'status' => 'completed'
+        ]);
+
+        session()->flash('success', 'Event "' . $event->nama_event . '" telah berhasil ditandai selesai.');
+    }
+
     public function with(): array
     {
         $organisasi = Auth::user()->load('organisasi')->organisasi;
@@ -61,7 +86,7 @@ new #[Layout('layouts.organisasi')] class extends Component
     }
 }; ?>
 
-<div x-data="{ showAjukanModal: false, selectedEventId: null }">
+<div x-data="{ showAjukanModal: false, showSelesaikanModal: false, selectedEventId: null }">
     
     <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
         <div>
@@ -173,6 +198,7 @@ new #[Layout('layouts.organisasi')] class extends Component
                                         </button>
                                     @endif
 
+                                    
                                     @if(in_array($event->status->value, ['draft', 'revision']))
                                         <a href="{{ route('organisasi.events.edit', $event->id) }}" wire:navigate title="Edit Detail Event" class="p-1.5 hover:bg-blue-50 hover:text-blue-800 rounded-md transition">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.89 1.147l-3.141 1.047 1.047-3.141a4.5 4.5 0 011.147-1.89L16.862 4.487zM16.862 4.487L19.5 7.125"/></svg>
@@ -180,6 +206,16 @@ new #[Layout('layouts.organisasi')] class extends Component
                                     @else
                                         <button disabled title="Event tidak bisa diedit" class="p-1.5 text-gray-300 cursor-not-allowed rounded-md">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.89 1.147l-3.141 1.047 1.047-3.141a4.5 4.5 0 011.147-1.89L16.862 4.487zM16.862 4.487L19.5 7.125"/></svg>
+                                        </button>
+                                    @endif
+
+                                    @if($event->status->value === 'published')
+                                        <button 
+                                            type="button"
+                                            @click="selectedEventId = {{ $event->id }}; showSelesaikanModal = true"
+                                            title="Tandai Event Selesai"
+                                            class="p-1.5 text-gray-500 hover:bg-indigo-50  hover:text-emerald-700 rounded-md transition focus:outline-none focus:ring-2 focus:ring-emerald-200">
+                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
                                         </button>
                                     @endif
 
@@ -192,7 +228,10 @@ new #[Layout('layouts.organisasi')] class extends Component
                                     </a>
 
                                     <a href="{{ route('organisasi.events.sertifikat-builder', $event->id) }}" wire:navigate title="Desain Template Sertifikat" class="p-1.5 text-gray-500 hover:bg-yellow-50 hover:text-yellow-600 rounded-md transition">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                                            <circle cx="12" cy="8" r="5" stroke-linecap="round" stroke-linejoin="round"></circle>
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"></path>
+                                     </svg>
                                     </a>
 
                                 </div>
@@ -262,4 +301,7 @@ new #[Layout('layouts.organisasi')] class extends Component
         </div>
     </template>
 
-</div> 
+    <x-ajukan-modal/>
+
+    <x-modal-selesaikan />
+</div>

@@ -87,6 +87,9 @@ new #[Layout('layouts.organisasi')] class extends Component
         $reg = EventRegistration::find($id);
         if ($reg && $reg->status_pendaftaran === RegistrationStatus::APPROVED) {
             $reg->update(['status_pendaftaran' => RegistrationStatus::COMPLETED]);
+            if ($reg->event && $reg->event->kuota > 0) {
+            $reg->event->decrement('kuota');
+            }
             $this->loadPendaftar();
             session()->flash('success', 'Status pendaftar diubah menjadi Selesai (Completed).');
         }
