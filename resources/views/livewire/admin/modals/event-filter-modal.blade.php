@@ -59,7 +59,11 @@
                 </div>
 
                 <!-- Filter Wilayah Fakultas -->
-                @if(!$isFakultasScope)
+                @php
+                    $currentAdminFakultas = \App\Models\AdminDpm::where('user_id', auth()->id())->value('fakultas_id');
+                @endphp
+
+                @if($currentAdminFakultas !== null && !$isFakultasScope)
                     <div class="flex flex-col gap-xs">
                         <label class="text-xs font-bold text-secondary/60 uppercase tracking-wide">Lingkup Wilayah / Fakultas</label>
                         <select wire:model.live="fakultasId" class="w-full text-body-md px-sm py-2 bg-surface-container/40 border border-outline-variant/30 rounded-xl focus:outline-none focus:border-primary/30 text-primary font-semibold cursor-pointer">

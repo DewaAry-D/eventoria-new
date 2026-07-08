@@ -27,16 +27,17 @@ class NewOrganizations extends Component
 
     public function render()
     {
-        $adminDpm = Cache::remember('admin_dpm_' . Auth::id(), 300, fn() =>
-            AdminDpm::query()->where('user_id', Auth::id())->first()
-        );
+        $adminFakultasId = Cache::remember('admin_fakultas_id_' . Auth::id(), 300, function() {
+            return AdminDpm::query()->where('user_id', Auth::id())->value('fakultas_id');
+        });
 
         $query = OrganisasiMahasiswa::query()->where('status', OrganisasiStatus::APPROVED->value); 
 
         if ($this->fakultasId) {
             $query->where('fakultas_id', $this->fakultasId);
-        } elseif ($adminDpm && $adminDpm->fakultas_id !== null) {
-            $query->where('fakultas_id', $adminDpm->fakultas_id);
+        } elseif ($adminFakultasId !== null) {
+            // Karena yang disimpan hanya nilai ID-nya, tidak akan ada error incomplete object
+            $query->where('fakultas_id', $adminFakultasId);
         } else {
             $query->where('tingkat_organisasi', 'universitas');
         }

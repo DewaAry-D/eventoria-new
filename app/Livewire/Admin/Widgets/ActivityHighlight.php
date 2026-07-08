@@ -29,15 +29,18 @@ class ActivityHighlight extends Component
 
     public function render()
     {
-        $adminDpm = Cache::remember('admin_dpm_' . Auth::id(), 300, fn() =>
-            AdminDpm::query()->where('user_id', Auth::id())->first()
-        );
+        $adminFakultasId = Cache::remember('admin_fakultas_id_' . Auth::id(), 300, function() {
+            return AdminDpm::query()->where('user_id', Auth::id())->value('fakultas_id');
+        });
 
-        $baseEventQuery = Event::whereHas('organisasi', function ($q) use ($adminDpm) {
+        // Ikat properti scope wilaya
+        $targetFakultasId = $this->fakultasId;
+
+        $baseEventQuery = Event::whereHas('organisasi', function ($q) use ($adminFakultasId, $targetFakultasId) {
             if ($this->fakultasId) {
-                $q->where('fakultas_id', $this->fakultasId);
-            } elseif ($adminDpm && $adminDpm->fakultas_id !== null) {
-                $q->where('fakultas_id', $adminDpm->fakultas_id);
+                $q->where('fakultas_id', $targetFakultasId);
+            } elseif ($adminFakultasId !== null) {
+                $q->where('fakultas_id', $adminFakultasId);
             } else {
                 $q->where('tingkat_organisasi', 'universitas');
             }

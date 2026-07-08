@@ -15,7 +15,11 @@
                 <div class="flex items-center justify-between p-sm bg-surface-container/[0.15] rounded-2xl border border-outline-variant/30 select-none">
                     <div class="flex items-center gap-md min-w-0 w-full">
                         <div class="w-10 h-10 rounded-full bg-primary/[0.06] border border-primary/20 text-primary flex items-center justify-center font-bold text-body-md shrink-0">
-                            {{ strtoupper(substr($org->nama_organisasi, 0, 2)) }}
+                            @if($org->logo_url)
+                                <img src="{{ asset('storage/' . $org->logo_url) }}" class="w-full h-full object-cover">
+                            @else
+                                {{ strtoupper(substr($org->nama_organisasi, 0, 2)) }}
+                            @endif
                         </div>
                         
                         <div class="flex flex-col min-w-0 pr-xs">

@@ -74,11 +74,14 @@ class EventMaster extends Component
         $query = Event::whereHas('organisasi', function ($q) use ($adminDpm) {
             $q->where('status', 'approved'); // Mencegah ormawa pending/rejected memunculkan event
 
-            if ($this->fakultasId) {
-                $q->where('fakultas_id', $this->fakultasId);
-            } elseif ($adminDpm && $adminDpm->fakultas_id !== null) {
-                $q->where('fakultas_id', $adminDpm->fakultas_id);
+            if ($adminDpm && $adminDpm->fakultas_id !== null) {
+                if ($this->fakultasId) {
+                    $q->where('fakultas_id', $this->fakultasId);
+                } else {
+                    $q->where('fakultas_id', $adminDpm->fakultas_id);
+                }
             } else {
+                // Admin Universitas hanya boleh melihat event tingkat universitas
                 $q->where('tingkat_organisasi', 'universitas');
             }
         });
