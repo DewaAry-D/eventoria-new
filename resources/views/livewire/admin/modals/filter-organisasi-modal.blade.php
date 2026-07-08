@@ -22,16 +22,16 @@
             </div>
 
             <div class="space-y-md">
-                <div class="flex flex-col gap-xs">
-                    <label class="text-xs font-bold text-secondary/60 uppercase tracking-wide">Tingkat Struktur</label>
-                    <select wire:model="filterTingkat" class="w-full text-body-md px-sm py-2 bg-surface-container/40 border border-outline-variant/30 rounded-xl focus:outline-none focus:border-primary/30 text-primary font-semibold cursor-pointer">
-                        <option value="">Semua Tingkat</option>
-                        @if($isFakultasAdmin)
-                            <option value="prodi">Tingkat Program Studi (Prodi)</option>
-                            <option value="fakultas">Tingkat Fakultas</option>
-                        @endif
-                    </select>
-                </div>
+                @if($isFakultasAdmin)
+                    <div class="flex flex-col gap-xs">
+                        <label class="text-xs font-bold text-secondary/60 uppercase tracking-wide">Tingkat Struktur</label>
+                        <select wire:model="filterTingkat" class="w-full text-body-md px-sm py-2 bg-surface-container/40 border border-outline-variant/30 rounded-xl focus:outline-none focus:border-primary/30 text-primary font-semibold cursor-pointer">
+                            <option value="">Semua Tingkat</option>
+                                <option value="prodi">Tingkat Program Studi (Prodi)</option>
+                                <option value="fakultas">Tingkat Fakultas</option>
+                        </select>
+                    </div>
+                @endif
 
                 <div class="flex flex-col gap-xs">
                     <label class="text-xs font-bold text-secondary/60 uppercase tracking-wide">Status Validasi Akun</label>
