@@ -14,7 +14,7 @@
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans antialiased text-on-surface bg-surface-container-lowest">
+    <body class="font-sans antialiased text-on-surface bg-background">
         
         {{ $slot }}
         

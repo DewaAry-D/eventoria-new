@@ -6,7 +6,7 @@
     <title>Eventoria - Organisasi</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="font-sans antialiased bg-gray-50 text-gray-900" x-data="{ sidebarOpen: false, showLogoutModal: false }">
+<body class="font-sans antialiased bg-background text-gray-900" x-data="{ sidebarOpen: false, showLogoutModal: false }">
     <div class="flex h-screen overflow-hidden">
         
         <div x-show="sidebarOpen" class="fixed inset-0 z-20 transition-opacity bg-black opacity-50 lg:hidden" @click="sidebarOpen = false"></div>
