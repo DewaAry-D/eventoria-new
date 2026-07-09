@@ -32,6 +32,7 @@ class EventMaster extends Component
     public ?int $filterKategoriId = null;
     public ?string $filterStatus = '';
     public ?int $filterOrganisasiId = null;
+    public ?int $filterProdiId = null;
 
     // Daftarkan listener event
     #[ \Livewire\Attributes\On('filterEvents') ]
@@ -43,6 +44,7 @@ class EventMaster extends Component
         $this->filterStatus = $filters['status'];
         $this->filterKategoriId = $filters['kategoriId'];
         $this->filterOrganisasiId = $filters['organisasiId'];
+        $this->filterProdiId = $filters['prodiId'] ?? null;
         
         // Hanya admin Universitas (fakultas_id == null) yang boleh mengganti filter fakultas
         if ($adminDpm && $adminDpm->fakultas_id === null) {
@@ -69,16 +71,17 @@ class EventMaster extends Component
     protected function baseEventQuery()
     {
         $adminDpm = AdminDpm::query()->where('user_id', Auth::id())->first();
+        $targetProdiId = $this->filterProdiId;
 
         // Query awal berdasarkan birokrasi DPM
-        $query = Event::whereHas('organisasi', function ($q) use ($adminDpm) {
+        $query = Event::whereHas('organisasi', function ($q) use ($adminDpm, $targetProdiId) {
             $q->where('status', 'approved'); // Mencegah ormawa pending/rejected memunculkan event
 
             if ($adminDpm && $adminDpm->fakultas_id !== null) {
-                if ($this->fakultasId) {
-                    $q->where('fakultas_id', $this->fakultasId);
-                } else {
-                    $q->where('fakultas_id', $adminDpm->fakultas_id);
+                $q->where('fakultas_id', $adminDpm->fakultas_id);
+            
+                if ($targetProdiId) {
+                    $q->where('prodi_id', $targetProdiId);
                 }
             } else {
                 // Admin Universitas hanya boleh melihat event tingkat universitas
@@ -217,6 +220,7 @@ class EventMaster extends Component
         $this->filterStatus = '';
         $this->filterKategoriId = null;
         $this->filterOrganisasiId = null;
+        $this->filterProdiId = null;
 
         $this->resetErrorBag(); 
         $this->alasanPenolakan = '';

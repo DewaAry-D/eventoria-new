@@ -2,7 +2,6 @@
 
 namespace App\Livewire\Pages\Admin;
 
-use App\Enums\EventStatus;
 use App\Enums\OrganisasiStatus;
 use App\Models\AdminDpm;
 use App\Models\OrganisasiMahasiswa;
@@ -18,9 +17,15 @@ class ModerasiOrganisasi extends Component
     use WithPagination;
 
     public string $search = '';
+    
+    // Filter Utama
     public string $filterStatus = '';
     public string $filterTingkat = '';
     public string $filterPeriode = '';
+
+    public string $tempStatus = '';
+    public string $tempTingkat = '';
+    public string $tempPeriode = '';
 
     // State Modal
     public bool $showApproveModal = false;
@@ -33,16 +38,26 @@ class ModerasiOrganisasi extends Component
 
     public function applyFilter(): void
     {
+        $this->filterStatus = $this->tempStatus;
+        $this->filterTingkat = $this->tempTingkat;
+        $this->filterPeriode = $this->tempPeriode;
         $this->resetPage();
     }
 
+    // Reset Seluruh Parameter Filter
     public function resetFilter()
     {
-        $this->search = '';
         $this->filterStatus = '';
         $this->filterTingkat = '';
         $this->filterPeriode = '';
+        
+        $this->tempStatus = '';
+        $this->tempTingkat = '';
+        $this->tempPeriode = '';
+
         $this->resetPage();
+        
+        $this->dispatch('reset-filter-labels');
     }
 
     protected function getAdminDpm(): ?AdminDpm
@@ -96,7 +111,7 @@ class ModerasiOrganisasi extends Component
     {
         $org = $this->baseQuery()
             ->where('id', $id)
-            ->where('status', EventStatus::PENDING_APPROVAL->value)
+            ->where('status', 'pending')
             ->first();
 
         if (!$org) {
@@ -138,7 +153,7 @@ class ModerasiOrganisasi extends Component
 
         $org = $this->baseQuery()
             ->where('id', $id)
-            ->where('status', EventStatus::PENDING_APPROVAL->value)
+            ->where('status', 'pending')
             ->first();
 
         if (!$org) {
@@ -167,6 +182,7 @@ class ModerasiOrganisasi extends Component
         $this->dispatch('modal-closed');
     }
 
+    // Fungsi Penangkap Tombol Refresh Global
     #[ \Livewire\Attributes\On('trigger-global-refresh') ]
     public function refreshComponent(): void
     {
@@ -175,8 +191,14 @@ class ModerasiOrganisasi extends Component
         $this->filterTingkat = '';
         $this->filterPeriode = '';
 
+        $this->tempStatus = '';
+        $this->tempTingkat = '';
+        $this->tempPeriode = '';
+
         $this->resetErrorBag();
         $this->resetPage();
+        
+        $this->dispatch('reset-filter-labels');
     }
 
     #[Layout('layouts.admin', ['active' => 'moderasi-organisasi'])]
@@ -185,7 +207,7 @@ class ModerasiOrganisasi extends Component
         $adminDpm = $this->getAdminDpm();
 
         $query = $this->baseQuery()
-            ->with(['user', 'fakultas']) // Eager loading aman
+            ->with(['user', 'fakultas'])
             ->when($this->search, function ($q) {
                 $q->where(function ($sub) {
                     $sub->where('nama_organisasi', 'like', '%' . $this->search . '%')
@@ -206,7 +228,6 @@ class ModerasiOrganisasi extends Component
             }
         }
 
-        // Pending muncul paling atas
         $query->orderByRaw("FIELD(status, 'pending', 'rejected', 'approved') ASC")->latest();
 
         $paginator = $query->paginate(6)->onEachSide(1);

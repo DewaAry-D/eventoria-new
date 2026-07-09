@@ -3,11 +3,13 @@
 namespace App\Livewire\Admin\Modals;
 
 use App\Enums\OrganisasiStatus;
+use App\Models\AdminDpm;
+use App\Models\Kategori;
 use Livewire\Component;
 use Livewire\Attributes\On;
-use App\Models\Fakultas;
-use App\Models\Kategori;
 use App\Models\OrganisasiMahasiswa;
+use App\Models\Prodi;
+use Illuminate\Support\Facades\Auth;
 
 class EventFilterModal extends Component
 {
@@ -16,6 +18,7 @@ class EventFilterModal extends Component
     public ?int $fakultasId = null;
     public ?int $kategoriId = null;
     public ?int $organisasiId = null;
+    public ?int $prodiId = null;
 
     public bool $isFakultasScope = false;
 
@@ -36,6 +39,7 @@ class EventFilterModal extends Component
             'fakultasId'   => $this->fakultasId,
             'kategoriId'   => $this->kategoriId,
             'organisasiId' => $this->organisasiId,
+            'prodiId'      => $this->prodiId,
         ]);
 
         $this->dispatch('close-modal', id: 'filter-event-modal');
@@ -51,6 +55,7 @@ class EventFilterModal extends Component
         }
         $this->kategoriId = null;
         $this->organisasiId = null;
+        $this->prodiId = null;
 
         $this->applyFilter();
     }
@@ -67,24 +72,34 @@ class EventFilterModal extends Component
         
         $this->kategoriId = null;
         $this->organisasiId = null;
+        $this->prodiId = null;
         
         $this->resetErrorBag();
     }
 
     public function render()
     {
-        $organisasiQuery = OrganisasiMahasiswa::query();
+        // Ambil fakultas_id milik admin yang sedang login
+        $adminFakultasId = AdminDpm::where('user_id', Auth::id())->value('fakultas_id');
 
-        if ($this->fakultasId) {
-            // Jika dalam lingkup fakultas, hanya tampilkan ormawa milik fakultas tersebut
-            $organisasiQuery->where('fakultas_id', $this->fakultasId)->where('status', OrganisasiStatus::APPROVED->value);
+        // Query list prodi yang berada di bawah fakultas admin tersebut
+        $listProdi = $adminFakultasId 
+            ? Prodi::where('fakultas_id', $adminFakultasId)->orderBy('nama_prodi', 'asc')->get()
+            : collect(); // Kosongkan jika admin universitas
+
+        $organisasiQuery = OrganisasiMahasiswa::query()->where('status', OrganisasiStatus::APPROVED->value);
+
+        if ($adminFakultasId) {
+            $organisasiQuery->where('fakultas_id', $adminFakultasId);
+            if ($this->prodiId) {
+                $organisasiQuery->where('prodi_id', $this->prodiId);
+            }
         } else {
-            // Jika dalam lingkup universitas, batasi hanya menampilkan ormawa tingkat universitas saja
-            $organisasiQuery->where('tingkat_organisasi', 'universitas')->where('status', OrganisasiStatus::APPROVED->value);
+            $organisasiQuery->where('tingkat_organisasi', 'universitas');
         }
 
         return view('livewire.admin.modals.event-filter-modal', [
-            'listFakultas'   => Fakultas::orderBy('nama_fakultas', 'asc')->get(),
+            'listProdi'      => $listProdi,
             'listKategori'   => Kategori::orderBy('nama_kategori', 'asc')->get(),
             'listOrganisasi' => $organisasiQuery->orderBy('nama_organisasi', 'asc')->get()
         ]);
