@@ -105,7 +105,7 @@ class Dashboard extends Component
         $headers = [
             'ID Event', 'Nama Event', 'Kategori', 'Penyelenggara', 
             'Tingkat', 'Status', 'Kuota Total', 'Sisa Kuota', 
-            'Narasumber', 'Nama Lokasi', 'URL Lokasi', 'Link Pendaftaran', 
+            'Narasumber', 'Nama Lokasi', 'URL Lokasi', 
             'Tanggal Diajukan'
         ];
         
@@ -127,7 +127,6 @@ class Dashboard extends Component
                 '"' . str_replace('"', '""', $event->narasumber ?? '-') . '"',
                 '"' . str_replace('"', '""', $event->nama_lokasi ?? '-') . '"',
                 '"' . ($event->lokasi_url ?? '-') . '"',
-                '"' . ($event->link_event ?? '-') . '"',
                 $event->created_at->format('Y-m-d H:i')
             ];
 
