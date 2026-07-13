@@ -7,14 +7,45 @@
     
         <!-- Unduh Laporan -->
         <x-slot name="action">
-            <button type="button" wire:click="exportReport" wire:loading.attr="disabled"
-                class="inline-flex items-center justify-center gap-sm px-md sm:px-lg py-2.5 sm:py-md bg-primary text-white font-bold sm:font-bold rounded-lg shadow-sm hover:bg-primary/90 disabled:opacity-50 transition-colors text-xs sm:text-body-md group">
-                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/>
-                </svg>
-                <span wire:loading.remove wire:target="exportReport">Unduh Laporan</span>
-                <span wire:loading wire:target="exportReport">Mengekspor...</span>
-            </button>
+            <div class="relative inline-block text-left" x-data="{ dropdownOpen: false }" @click.away="dropdownOpen = false">
+                
+                <button type="button" @click="dropdownOpen = !dropdownOpen"
+                    class="inline-flex items-center justify-center gap-sm px-md sm:px-lg py-2.5 sm:py-md bg-primary text-white font-bold rounded-lg shadow-sm hover:bg-primary/90 transition-all text-xs sm:text-body-md group cursor-pointer">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"/>
+                    </svg>
+                    <span>Unduh Laporan</span>
+                    <svg class="w-3.5 h-3.5 text-white/70 transition-transform duration-200" :class="dropdownOpen ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+        
+                <!-- Menu Pilihan Opsi Melayang (Overlay Menu Options) -->
+                <div class="absolute right-0 mt-xs z-50 w-48 rounded-2xl bg-surface-container-lowest border border-outline-variant/40 shadow-lg p-xs space-y-[2px]"
+                        x-show="dropdownOpen"
+                        x-transition:enter="transition ease-out duration-100"
+                        x-transition:enter-start="opacity-0 transform scale-95 -translate-y-2"
+                        x-transition:enter-end="opacity-100 transform scale-100 translate-y-0"
+                        x-transition:leave="transition ease-in duration-75"
+                        x-transition:leave-start="opacity-100 transform scale-100 translate-y-0"
+                        x-transition:leave-end="opacity-0 transform scale-95 -translate-y-2"
+                        x-cloak>
+                    
+                    <!-- Pilihan: CSV -->
+                    <button type="button" wire:click="exportReport" @click="dropdownOpen = false" 
+                            class="w-full text-left text-body-md px-md py-2 rounded-xl text-secondary hover:bg-emerald-500/[0.04] hover:text-emerald-700 font-bold transition-colors cursor-pointer inline-flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                        Format Excel (.CSV)
+                    </button>
+        
+                    <!-- Pilihan: PDF -->
+                    <button type="button" wire:click="exportReportPdf" @click="dropdownOpen = false" 
+                            class="w-full text-left text-body-md px-md py-2 rounded-xl text-secondary hover:bg-blue-500/[0.04] hover:text-blue-700 font-bold transition-colors cursor-pointer inline-flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                        Format Resmi (.PDF)
+                    </button>
+                </div>
+            </div>
         </x-slot>
     </x-admin.header-info>
     

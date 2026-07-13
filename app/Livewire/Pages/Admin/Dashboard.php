@@ -13,6 +13,7 @@ use App\Enums\OrganisasiStatus;
 use App\Enums\TingkatOrganisasi;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class Dashboard extends Component
 {
@@ -139,6 +140,29 @@ class Dashboard extends Component
         return response()->streamDownload(fn() => print($csv), $fileName, [
             'Content-Type' => 'text/csv',
         ]);
+    }
+
+    public function exportReportPdf()
+    {
+        $events = $this->baseEventQuery()
+            ->with(['organisasi', 'kategori'])
+            ->latest()
+            ->get();
+
+        $suffix = $this->fakultasId ? "Fakultas_{$this->fakultasId}" : 'Universitas';
+        $fileName = "Laporan_Aktivitas_Event_{$suffix}_" . date('Y_m_d_His') . '.pdf';
+
+        // Load visual layout khusus untuk PDF cetakan
+        $pdf = Pdf::loadView('pdf.laporan-overview-admin', [
+            'scopeName'    => $this->scopeName,
+            'cardsData'    => $this->cardsData,
+            'statPengajuan'=> $this->statPengajuan,
+            'events'       => $events,
+        ])->setPaper('a4', 'landscape');
+
+        return response()->streamDownload(function () use ($pdf) {
+            echo $pdf->output();
+        }, $fileName);
     }
 
     // Memuat Layout Utama
