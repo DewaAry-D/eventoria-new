@@ -42,7 +42,7 @@
         
         <div class="flex items-center justify-between gap-md mb-lg select-none w-full">
             <div>
-                <h4 class="text-title-sm sm:text-title-md font-bold text-primary tracking-tight">
+                <h4 class="text-title-sm sm:text-title-md font-bold sm:font-bold text-primary tracking-tight">
                     Daftar Pendaftaran Organisasi
                 </h4>
             </div>

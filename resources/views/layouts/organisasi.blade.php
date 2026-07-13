@@ -12,7 +12,7 @@
         <div x-show="sidebarOpen" class="fixed inset-0 z-20 transition-opacity bg-black opacity-50 lg:hidden" @click="sidebarOpen = false"></div>
 
         <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'" class="fixed inset-y-0 left-0 z-30 w-64 overflow-y-auto transition duration-300 transform bg-white border-r border-outline-variant lg:translate-x-0 lg:static lg:inset-auto">
-            <div class="flex items-center justify-center h-16 border-b border-outline-variant px-6">
+            <div class="flex items-center justify-center h-[73px] border-b border-outline-variant px-6">
                 <div class="flex items-center gap-2 font-bold text-xl text-primary">
                     <svg class="w-8 h-8 text-primary" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72l5 2.73 5-2.73v3.72z"/></svg>
                     Eventoria
@@ -54,9 +54,7 @@
                 <div class="flex-1 lg:flex-none"></div>
                 
                 <div class="flex items-center gap-4">
-                    <button class="text-gray-400 hover:text-gray-600">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
-                    </button>
+                    
                     <a href="{{ route('organisasi.profil') }}" wire:navigate class="flex items-center gap-3 text-left group">
                         @if(Auth::user()->organisasi && Auth::user()->organisasi->logo)
                             <img class="w-10 h-10 rounded-full object-cover border border-indigo-200 group-hover:ring-2 group-hover:ring-indigo-300 transition" src="{{ asset('storage/' . Auth::user()->organisasi->logo) }}" alt="Logo Organisasi">

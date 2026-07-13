@@ -9,7 +9,17 @@ use Livewire\Volt\Component;
 new #[Layout('layouts.guest')] class extends Component
 {
     public LoginForm $form;
-
+    public function mount(): void
+    {
+        // Cek apakah user sudah terautentikasi melalui cookie 'remember' laravel
+        if (Auth::check()) {
+            $user = Auth::user();
+            
+            // Auto-fill field email dari data user yang tersimpan di sistem
+            $this->form->email = $user->email;
+            $this->form->remember = true;
+        }
+    }
     /**
      * Handle an incoming authentication request.
      */
@@ -140,14 +150,7 @@ new #[Layout('layouts.guest')] class extends Component
                 </p>
             </div>
 
-            <div class="mt-10 flex items-center justify-center gap-6 text-[12px] text-outline font-medium">
-                <a href="#" class="flex items-center gap-1.5 transition-colors hover:text-primary">
-                    <i class="fa-regular fa-circle-question"></i> Pusat Bantuan
-                </a>
-                <a href="#" class="flex items-center gap-1.5 transition-colors hover:text-primary">
-                    <i class="fa-solid fa-globe"></i> Bahasa Indonesia
-                </a>
-            </div>
+            
 
         </div>
     </div>

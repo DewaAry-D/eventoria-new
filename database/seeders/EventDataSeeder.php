@@ -58,7 +58,7 @@ class EventDataSeeder extends Seeder
             $namaLokasi = $isOnline ? 'Online via Zoom Meeting' : 'Gedung Rektorat Universitas Udayana Kampus Bukit Jimbaran';
             
             $lokasiUrl = null;
-            $lokasiUrl = $isOnline ? 'https://zoom.us/j/999888777666' : 'https://www.google.com/maps/place/Bakmi+Akiu+Barito/@-8.681323,115.2342554,15z/data=!4m6!3m5!1s0x2dd24146079224eb:0xe475df55825e59b5!8m2!3d-8.6840893!4d115.2346304!16s%2Fg%2F11vbttzn03?entry=ttu&g_ep=EgoyMDI2MDYyMy4wIKXMDSoASAFQAw%3D%3D';
+            $lokasiUrl = $isOnline ? 'https://zoom.us/j/999888777666' : 'https://maps.app.goo.gl/ZpeJPvE1eWQwqV2z8';
             
 
             $e = Event::create([
@@ -111,7 +111,7 @@ class EventDataSeeder extends Seeder
                 'status' => 'revision',
                 'deskripsi' => 'Peninjauan berkas simulasi penetrasi keamanan jaringan lokal.',
                 'nama_lokasi' => 'Gedung Lab Komputer AB FMIPA Kampus Bukit',
-                'lokasi_url' => 'https://www.google.com/maps/place/Bakmi+Akiu+Barito/@-8.681323,115.2342554,15z/data=!4m6!3m5!1s0x2dd24146079224eb:0xe475df55825e59b5!8m2!3d-8.6840893!4d115.2346304!16s%2Fg%2F11vbttzn03?entry=ttu&g_ep=EgoyMDI2MDYyMy4wIKXMDSoASAFQAw%3D%3D',
+                'lokasi_url' => 'https://maps.app.goo.gl/ZpeJPvE1eWQwqV2z8',
                 'kuota' => 30,
                 'sisa_kuota' => 30,
                 'narasumber' => $daftarNarasumber[($j + 2) % count($daftarNarasumber)],
@@ -141,7 +141,7 @@ class EventDataSeeder extends Seeder
                 'status' => 'pending_approval',
                 'deskripsi' => 'Analisis data spasial dengan performa komputasi tinggi terpadu.',
                 'nama_lokasi' => 'Gedung Aula BG FMIPA Kampus Bukit',
-                'lokasi_url' => 'https://www.google.com/maps/place/Bakmi+Akiu+Barito/@-8.681323,115.2342554,15z/data=!4m6!3m5!1s0x2dd24146079224eb:0xe475df55825e59b5!8m2!3d-8.6840893!4d115.2346304!16s%2Fg%2F11vbttzn03?entry=ttu&g_ep=EgoyMDI2MDYyMy4wIKXMDSoASAFQAw%3D%3D',
+                'lokasi_url' => 'https://maps.app.goo.gl/ZpeJPvE1eWQwqV2z8',
                 'kuota' => 50,
                 'sisa_kuota' => 50,
                 'narasumber' => $daftarNarasumber[($k + 4) % count($daftarNarasumber)],
@@ -177,7 +177,7 @@ class EventDataSeeder extends Seeder
                 'status' => 'completed',
                 'deskripsi' => 'Event pelatihan yang telah selesai dilaksanakan secara sukses dan kredibel bagi seluruh mahasiswa.',
                 'nama_lokasi' => 'Gedung Aula AB FMIPA Kampus Bukit Jimbaran',
-                'lokasi_url' => 'https://www.google.com/maps/place/Bakmi+Akiu+Barito/@-8.681323,115.2342554,15z/data=!4m6!3m5!1s0x2dd24146079224eb:0xe475df55825e59b5!8m2!3d-8.6840893!4d115.2346304!16s%2Fg%2F11vbttzn03?entry=ttu&g_ep=EgoyMDI2MDYyMy4wIKXMDSoASAFQAw%3D%3D',
+                'lokasi_url' => 'https://maps.app.goo.gl/ZpeJPvE1eWQwqV2z8',
                 'kuota' => 50,
                 'sisa_kuota' => 0,
                 'narasumber' => $daftarNarasumber[($idx + 1) % count($daftarNarasumber)],

@@ -86,7 +86,7 @@ new #[Layout('layouts.organisasi')] class extends Component
     }
 }; ?>
 
-<div x-data="{ showAjukanModal: false, showSelesaikanModal: false, selectedEventId: null }">
+<div x-data="{showAjukanModal: false, showSelesaikanModal: false, selectedEventId: null }">
     
     <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
         <div>
@@ -165,9 +165,13 @@ new #[Layout('layouts.organisasi')] class extends Component
                                 @elseif($event->status->value === 'pending_approval')
                                     <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-1 rounded-full border border-yellow-300">Review DPM</span>
                                 @elseif($event->status->value === 'revision')
-                                    <div class="flex flex-col items-start gap-1">
+                                    <div class="flex flex-col  gap-1">
                                         <span class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-1 rounded-full border border-red-300">Revisi</span>
-                                        <a class="text-xs text-red-600 cursor-pointer hover:underline" title="{{ $event->catatan_revisi }}" href="#">Lihat Catatan</a>
+                                        <button type="button" 
+                                                @click="$dispatch('pesan-penolakan', { pesan: `{{ addslashes($event->catatan_revisi) }}` })"
+                                                class="text-xs inline-flex items-center gap-1.5 rounded-md bg-red-50 px-3 py-1.5 text-sm font-semibold text-red-600 transition-colors hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1">
+                                            <i class="fa-regular fa-clipboard"></i> Lihat Catatan
+                                        </button>
                                     </div>
                                 @elseif($event->status->value === 'published')
                                     <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-1 rounded-full border border-green-300">Dipublikasi</span>
@@ -302,6 +306,6 @@ new #[Layout('layouts.organisasi')] class extends Component
     </template>
 
     <x-ajukan-modal/>
-
+    <x-pesan-penolakan/>
     <x-modal-selesaikan />
 </div>
