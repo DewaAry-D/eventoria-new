@@ -29,10 +29,9 @@
     <!-- Ringkasan Statistik -->
     <table class="grid-stats" cellspacing="5">
         <tr>
-            <td width="25%"><div class="card-stat"><h4>Organisasi Aktif</h4><p>{{ $cardsData['orgAktif'] }}</p></div></td>
-            <td width="25%"><div class="card-stat"><h4>Event Berhasil</h4><p>{{ $cardsData['eventBerlangsung'] }}</p></div></td>
-            <td width="25%"><div class="card-stat"><h4>Review Event Baru</h4><p>{{ $statPengajuan['menunggu'] }}</p></div></td>
-            <td width="25%"><div class="card-stat"><h4>Selesai / Publikasi</h4><p>{{ $statPengajuan['disetujui'] }}</p></div></td>
+            <td><div class="card-stat"><h4>Organisasi Aktif</h4><p>{{ $cardsData['orgAktif'] }}</p></div></td>
+            <td><div class="card-stat"><h4>Event Berhasil</h4><p>{{ $cardsData['eventBerlangsung'] }}</p></div></td>
+            <td><div class="card-stat"><h4>Review Event Baru</h4><p>{{ $statPengajuan['menunggu'] }}</p></div></td>
         </tr>
     </table>
 
