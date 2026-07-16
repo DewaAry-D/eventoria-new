@@ -4,7 +4,6 @@
     <meta charset="utf-8">
     <title>Laporan Event - {{ $organisasi->nama_organisasi }}</title>
     <style>
-        /* dompdf hanya mendukung CSS 2.1 + sebagian CSS3, jadi styling di sini sengaja dibuat sederhana (tanpa Tailwind/flexbox/grid) */
         @page {
             margin: 25px 30px;
         }
